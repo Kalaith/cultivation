@@ -26,3 +26,10 @@ pub struct MapNode {
     pub x: f32,
     pub y: f32,
 }
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct OngoingMission {
+    pub mission: Mission,
+    pub disciple_indices: Vec<usize>,
+    pub ticks_remaining: u32,
+}

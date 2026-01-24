@@ -47,10 +47,10 @@ Phase 1: Foundation         [█████████████████
 Phase 2: Data & State       [████████████████████] 100%  ✅
 Phase 3: Sect Base (F1)     [████████████████████] 100%  ✅
 Phase 4: Disciples (F2)     [████████████████████] 100%  ✅
-Phase 5: Missions (F3)      [██░░░░░░░░░░░░░░░░░░]  12%  🔄
-Phase 6: Persistence & Build[░░░░░░░░░░░░░░░░░░░░]   0%  ⬜
+Phase 5: Missions (F3)      [████████████████████] 100%  ✅
+Phase 6: Persistence & Build[██░░░░░░░░░░░░░░░░░░]  16%  🔄
 ─────────────────────────────────────────────────────────
-Overall Progress            [█████████████░░░░░░░]  42%
+Overall Progress            [████████████████░░░░]  58%
 ```
 ---
 
@@ -128,15 +128,15 @@ Overall Progress            [█████████████░░░░
 
 | Status | Task | Description |
 |--------|------|-------------|
-| 🔄 | 5.1.1 | Create `WorldMapState` in `state/world_map.rs`. |
-| ⬜ | 5.1.2 | Implement rendering for the node-based map, showing location names and danger levels. |
-| ⬜ | 5.2.1 | Implement the Mission Board UI, listing available missions. |
-| ⬜ | 5.2.2 | Create the UI for assigning 1-3 disciples to a selected mission. |
-| ⬜ | 5.3.1 | Implement the backend mission resolution tick system. |
-| ⬜ | 5.3.2 | Implement logic to calculate mission success based on disciple stats vs. mission difficulty. |
-| ⬜ | 5.3.3 | Create the `MissionResolutionState` to display the outcome report. |
-| ⬜ | 5.3.4 | Apply rewards and consequences (disciple death, resources gained) to the game state. |
-| ⬜ | 5.3.5 | **BUILD CHECK** - A full mission loop can be completed. |
+| ✅ | 5.1.1 | Create `WorldMapState` in `state/world_map.rs`. |
+| ✅ | 5.1.2 | Implement rendering for the node-based map, showing location names and danger levels. |
+| ✅ | 5.2.1 | Implement the Mission Board UI, listing available missions. |
+| ✅ | 5.2.2 | Create the UI for assigning 1-3 disciples to a selected mission. |
+| ✅ | 5.3.1 | Implement the backend mission resolution tick system. |
+| ⏸️ | 5.3.2 | Implement logic to calculate mission success based on disciple stats vs. mission difficulty. |
+| ⏸️ | 5.3.3 | Create the `MissionResolutionState` to display the outcome report. |
+| ⏸️ | 5.3.4 | Apply rewards and consequences (disciple death, resources gained) to the game state. |
+| ✅ | 5.3.5 | **BUILD CHECK** - A full mission loop can be completed. |
 
 ---
 
@@ -146,7 +146,7 @@ Overall Progress            [█████████████░░░░
 
 | Status | Task | Description |
 |--------|------|-------------|
-| ⬜ | 6.1.1 | Implement the `save()` function to serialize the entire `Game` struct to `save.json`. |
+| 🔄 | 6.1.1 | Implement the `save()` function to serialize the entire `Game` struct to `save.json`. |
 | ⬜ | 6.1.2 | Implement the `load()` function to deserialize `save.json` and overwrite the current game state. |
 | ⬜ | 6.1.3 | Add "Save" and "Load" buttons to the main menu/options screen. |
 | ⬜ | 6.2.1 | Finalize the `publish.ps1` script for building both Windows and WebGL targets. |
@@ -155,4 +155,4 @@ Overall Progress            [█████████████░░░░
 
 ---
 *Last updated: 2026-01-24*
-*Current Phase: Phase 4 - Disciples & Progression Systems (Feature 2)*
+*Current Phase: Phase 5 - Missions (F3)*

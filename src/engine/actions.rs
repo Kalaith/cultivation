@@ -4,4 +4,6 @@ use crate::data::buildings::BuildingType;
 pub enum Action {
     UpgradeBuilding(BuildingType),
     RecruitDisciple,
+    StartMission(String, Vec<usize>),
+    SaveGame,
 }

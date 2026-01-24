@@ -13,6 +13,7 @@ pub struct SectBaseState {
     selected_building: Option<BuildingType>,
     upgrade_button_rect: Rect,
     recruit_button_rect: Rect,
+    save_button_rect: Rect,
 }
 
 impl SectBaseState {
@@ -25,23 +26,25 @@ impl SectBaseState {
             BuildingType::MissionBoard,
             BuildingType::SpiritGarden,
         ];
-
         let mut y = 100.0;
         for building_type in building_types {
-            let x = 50.0; // Align to the left
-            slots.insert(building_type, Rect::new(x, y, SLOT_SIZE.x, SLOT_SIZE.y));
+            let x = 50.0;
+            slots.insert(
+                building_type.clone(),
+                Rect::new(x, y, SLOT_SIZE.x, SLOT_SIZE.y),
+            );
             y += SLOT_SIZE.y + SLOT_PADDING;
         }
-
         Self {
             slots,
             selected_building: None,
             upgrade_button_rect: Rect::new(320.0, 400.0, 150.0, 40.0),
             recruit_button_rect: Rect::new(320.0, 350.0, 150.0, 40.0),
+            save_button_rect: Rect::new(screen_width() - 170.0, screen_height() - 60.0, 150.0, 40.0),
         }
     }
 
-    pub fn update(&mut self) -> UpdateResult {
+    pub fn update(&mut self, data: &GameData) -> UpdateResult {
         if is_key_pressed(KeyCode::Escape) {
             return UpdateResult::new().with_transition(StateTransition::ToMainMenu);
         }
@@ -59,25 +62,48 @@ impl SectBaseState {
                 return UpdateResult::new();
             }
         }
-
-        if let Some(selected) = &self.selected_building {
-            if self.upgrade_button_rect.contains(mouse_pos) && is_mouse_button_pressed(MouseButton::Left) {
-                return UpdateResult::new().with_action(Action::UpgradeBuilding(selected.clone()));
-            }
-
-            if *selected == BuildingType::SectHall
-                && self.recruit_button_rect.contains(mouse_pos)
-                && is_mouse_button_pressed(MouseButton::Left)
-            {
-                return UpdateResult::new().with_action(Action::RecruitDisciple);
-            }
+        
+        if self.save_button_rect.contains(mouse_pos) && is_mouse_button_pressed(MouseButton::Left) {
+            return UpdateResult::new().with_action(Action::SaveGame);
         }
 
+        if let Some(selected) = &self.selected_building {
+            if *selected == BuildingType::MissionBoard {
+                let panel_rect = Rect::new(300.0, 100.0, 400.0, 500.0);
+                let mut y_offset = 80.0;
+                for mission in &data.missions {
+                    let mission_rect = Rect::new(
+                        panel_rect.x + 10.0,
+                        panel_rect.y + y_offset - 10.0,
+                        panel_rect.w - 20.0,
+                        55.0,
+                    );
+                    if mission_rect.contains(mouse_pos) && is_mouse_button_pressed(MouseButton::Left) {
+                        return UpdateResult::new().with_transition(
+                            StateTransition::ToMissionAssignment(mission.description.clone()),
+                        );
+                    }
+                    y_offset += 60.0;
+                }
+            } else {
+                if self.upgrade_button_rect.contains(mouse_pos)
+                    && is_mouse_button_pressed(MouseButton::Left)
+                {
+                    return UpdateResult::new()
+                        .with_action(Action::UpgradeBuilding(selected.clone()));
+                }
+                if *selected == BuildingType::SectHall
+                    && self.recruit_button_rect.contains(mouse_pos)
+                    && is_mouse_button_pressed(MouseButton::Left)
+                {
+                    return UpdateResult::new().with_action(Action::RecruitDisciple);
+                }
+            }
+        }
         UpdateResult::new()
     }
 
     pub fn draw(&self, data: &GameData, spirit_stones: u32) {
-        // Draw Header
         draw_text("SECT BASE", 20.0, 40.0, 40.0, WHITE);
         draw_text(
             "Press ESC for Main Menu | Press D for Disciples | Press M for Map",
@@ -86,13 +112,16 @@ impl SectBaseState {
             20.0,
             GRAY,
         );
-
-        // Draw Resources
         let stone_text = format!("Spirit Stones: {}", spirit_stones);
         draw_text(&stone_text, screen_width() - 250.0, 40.0, 24.0, GOLD);
-
         self.draw_building_slots(data);
         self.draw_details_panel(data);
+
+        // Draw Save Button
+        let mouse_pos = mouse_position().into();
+        let btn_color = if self.save_button_rect.contains(mouse_pos) { BLUE } else { DARKBLUE };
+        draw_rectangle(self.save_button_rect.x, self.save_button_rect.y, self.save_button_rect.w, self.save_button_rect.h, btn_color);
+        draw_text("Save Game", self.save_button_rect.x + 20.0, self.save_button_rect.y + 28.0, 24.0, WHITE);
     }
 }
 
@@ -106,7 +135,6 @@ impl SectBaseState {
                 DARKGRAY
             };
             draw_rectangle(rect.x, rect.y, rect.w, rect.h, color);
-
             if let Some(building) = data.buildings.get(building_type) {
                 let name = format!("{:?}", building.building_type);
                 let level = format!("Lvl: {}", building.level);
@@ -115,36 +143,77 @@ impl SectBaseState {
             } else {
                 draw_text("[Empty Slot]", rect.x + 10.0, rect.y + 40.0, 20.0, GRAY);
             }
-
             draw_rectangle_lines(rect.x, rect.y, rect.w, rect.h, 2.0, GRAY);
         }
     }
 
-//...
     fn draw_details_panel(&self, data: &GameData) {
         let panel_rect = Rect::new(300.0, 100.0, 400.0, 500.0);
-//...
+        draw_rectangle(
+            panel_rect.x,
+            panel_rect.y,
+            panel_rect.w,
+            panel_rect.h,
+            Color::from_rgba(20, 20, 30, 200),
+        );
+        draw_rectangle_lines(
+            panel_rect.x,
+            panel_rect.y,
+            panel_rect.w,
+            panel_rect.h,
+            3.0,
+            DARKGRAY,
+        );
+
         if let Some(selected_type) = &self.selected_building {
-            // --- Mission Board View ---
             if *selected_type == BuildingType::MissionBoard {
-                draw_text("Available Missions", panel_rect.x + 20.0, panel_rect.y + 40.0, 30.0, WHITE);
+                draw_text(
+                    "Available Missions",
+                    panel_rect.x + 20.0,
+                    panel_rect.y + 40.0,
+                    30.0,
+                    WHITE,
+                );
                 let mut y_offset = 80.0;
                 for mission in &data.missions {
-                    draw_text(&mission.description, panel_rect.x + 20.0, panel_rect.y + y_offset, 20.0, WHITE);
+                    let mission_rect = Rect::new(
+                        panel_rect.x + 10.0,
+                        panel_rect.y + y_offset - 10.0,
+                        panel_rect.w - 20.0,
+                        55.0,
+                    );
+                    let mouse_pos = mouse_position().into();
+                    if mission_rect.contains(mouse_pos) {
+                        draw_rectangle(
+                            mission_rect.x,
+                            mission_rect.y,
+                            mission_rect.w,
+                            mission_rect.h,
+                            Color::from_rgba(255, 255, 255, 30),
+                        );
+                    }
+                    draw_text(
+                        &mission.description,
+                        panel_rect.x + 20.0,
+                        panel_rect.y + y_offset,
+                        20.0,
+                        WHITE,
+                    );
                     let danger_text = format!("Danger: {}", mission.danger_level);
-                    draw_text(&danger_text, panel_rect.x + 20.0, panel_rect.y + y_offset + 25.0, 18.0, GRAY);
+                    draw_text(
+                        &danger_text,
+                        panel_rect.x + 20.0,
+                        panel_rect.y + y_offset + 25.0,
+                        18.0,
+                        GRAY,
+                    );
                     y_offset += 60.0;
                 }
-                return; // End early for this specific view
+                return;
             }
-
-            // --- Default Building View ---
             if let Some(building) = data.buildings.get(selected_type) {
-//...
                 let name = format!("{:?}", building.building_type);
                 let level = format!("Level {}", building.level);
-                let description = "A description of the building and its purpose would go here. It provides bonuses to the sect.";
-
                 draw_text(
                     &name,
                     panel_rect.x + 20.0,
@@ -159,8 +228,6 @@ impl SectBaseState {
                     24.0,
                     LIGHTGRAY,
                 );
-
-                // --- Upgrade Button ---
                 let btn_rect = self.upgrade_button_rect;
                 let mouse_pos = mouse_position().into();
                 let btn_color = if btn_rect.contains(mouse_pos) { LIME } else { GREEN };
@@ -172,8 +239,6 @@ impl SectBaseState {
                     24.0,
                     BLACK,
                 );
-
-                // --- Recruit Button (SectHall only) ---
                 if building.building_type == BuildingType::SectHall {
                     let recruit_btn_rect = self.recruit_button_rect;
                     let recruit_btn_color = if recruit_btn_rect.contains(mouse_pos) {
