@@ -1,0 +1,14 @@
+[
+    {
+        "mission_type": "Exploration",
+        "duration": 10,
+        "description": "Scout the Serene Forest for valuable herbs.",
+        "danger_level": 1
+    },
+    {
+        "mission_type": "MonsterSuppression",
+        "duration": 20,
+        "description": "Clear out the restless spirits in the Haunted Ruins.",
+        "danger_level": 5
+    }
+]

@@ -1,0 +1,16 @@
+[
+    {
+        "id": "serene_forest",
+        "name": "Serene Forest",
+        "danger_level": 1,
+        "x": 100.0,
+        "y": 200.0
+    },
+    {
+        "id": "haunted_ruins",
+        "name": "Haunted Ruins",
+        "danger_level": 5,
+        "x": 300.0,
+        "y": 400.0
+    }
+]
