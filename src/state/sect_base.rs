@@ -2,23 +2,73 @@ use crate::data::buildings::BuildingType;
 use crate::data::loader::GameData;
 use crate::engine::actions::Action;
 use crate::state::{StateTransition, UpdateResult};
+use crate::ui::components::*;
+use crate::ui::theme::*;
 use macroquad::prelude::*;
-use std::collections::HashMap;
-
-const SLOT_SIZE: Vec2 = vec2(200.0, 80.0);
-const SLOT_PADDING: f32 = 20.0;
 
 pub struct SectBaseState {
-    slots: HashMap<BuildingType, Rect>,
     selected_building: Option<BuildingType>,
-    upgrade_button_rect: Rect,
-    recruit_button_rect: Rect,
-    save_button_rect: Rect,
+    settings_open: bool,
 }
 
 impl SectBaseState {
     pub fn new() -> Self {
-        let mut slots = HashMap::new();
+        Self {
+            selected_building: None,
+            settings_open: false,
+        }
+    }
+
+    /// Update handling immediate mode UI
+    pub fn update(&mut self, data: &GameData, spirit_stones: u32, herbs: u32, event_log: &[String]) -> UpdateResult {
+        // --- Navigation Keys (Keep for accessibility) ---
+        if is_key_pressed(KeyCode::Escape) {
+            if self.settings_open {
+                self.settings_open = false;
+            } else {
+                return UpdateResult::new().with_transition(StateTransition::ToMainMenu);
+            }
+        }
+
+        // --- Layout Constants ---
+        let screen_w = screen_width();
+        let screen_h = screen_height();
+        
+        let header_h = 60.0;
+        let footer_h = 0.0; // No footer needed now
+        let left_panel_w = 250.0;
+        let right_panel_w = 250.0;
+        // Calculate center width dynamically
+        let center_w = screen_w - left_panel_w - right_panel_w - 20.0; 
+
+        // --- Header (Resources) ---
+        draw_panel(Rect::new(0.0, 0.0, screen_w, header_h), None);
+        draw_text("SECT MANAGEMENT", 20.0, 40.0, FONT_TITLE_SIZE, PRIMARY);
+        
+        let res_text = format!("Spirit Stones: {}   Herbs: {}", spirit_stones, herbs);
+        let res_dims = measure_text(&res_text, None, FONT_HEADER_SIZE as u16, 1.0);
+        // Position resources to the left of the Cog button area
+        draw_text(&res_text, screen_w - res_dims.width - 60.0, 40.0, FONT_HEADER_SIZE, TEXT_HIGHLIGHT);
+
+        // Cog Button (Settings)
+        if draw_button(Rect::new(screen_w - 50.0, 10.0, 40.0, 40.0), "O", false) {
+            self.settings_open = !self.settings_open;
+        }
+
+        // --- Left Panel (Buildings) ---
+        let left_rect = Rect::new(0.0, header_h, left_panel_w, screen_h - header_h);
+        draw_panel(left_rect, Some("Buildings"));
+        
+        // Navigation Buttons inside Left Panel (Bottom)
+        let nav_y_start = left_rect.y + left_rect.h - 120.0;
+        if draw_button(Rect::new(left_rect.x + 10.0, nav_y_start, left_panel_w - 20.0, 40.0), "Disciples", false) {
+             return UpdateResult::new().with_transition(StateTransition::ToDiscipleRoster);
+        }
+        if draw_button(Rect::new(left_rect.x + 10.0, nav_y_start + 50.0, left_panel_w - 20.0, 40.0), "World Map", false) {
+             return UpdateResult::new().with_transition(StateTransition::ToWorldMap);
+        }
+
+        // Building List
         let building_types = [
             BuildingType::SectHall,
             BuildingType::TrainingYard,
@@ -26,258 +76,109 @@ impl SectBaseState {
             BuildingType::MissionBoard,
             BuildingType::SpiritGarden,
         ];
-        let mut y = 100.0;
-        for building_type in building_types {
-            let x = 50.0;
-            slots.insert(
-                building_type.clone(),
-                Rect::new(x, y, SLOT_SIZE.x, SLOT_SIZE.y),
-            );
-            y += SLOT_SIZE.y + SLOT_PADDING;
-        }
-        Self {
-            slots,
-            selected_building: None,
-            upgrade_button_rect: Rect::new(320.0, 400.0, 150.0, 40.0),
-            recruit_button_rect: Rect::new(320.0, 350.0, 150.0, 40.0),
-            save_button_rect: Rect::new(screen_width() - 170.0, screen_height() - 60.0, 150.0, 40.0),
-        }
-    }
 
-    pub fn update(&mut self, data: &GameData) -> UpdateResult {
-        if is_key_pressed(KeyCode::Escape) {
-            return UpdateResult::new().with_transition(StateTransition::ToMainMenu);
-        }
-        if is_key_pressed(KeyCode::D) {
-            return UpdateResult::new().with_transition(StateTransition::ToDiscipleRoster);
-        }
-        if is_key_pressed(KeyCode::M) {
-            return UpdateResult::new().with_transition(StateTransition::ToWorldMap);
-        }
-
-        let mouse_pos = mouse_position().into();
-        for (building_type, rect) in &self.slots {
-            if rect.contains(mouse_pos) && is_mouse_button_pressed(MouseButton::Left) {
-                self.selected_building = Some(building_type.clone());
-                return UpdateResult::new();
+        let mut btn_y = header_h + 50.0;
+        for b_type in building_types {
+            let name = format!("{}", b_type);
+            let active = Some(b_type.clone()) == self.selected_building;
+            
+            if draw_button(Rect::new(left_rect.x + 10.0, btn_y, left_panel_w - 20.0, 40.0), &name, active) {
+                self.selected_building = Some(b_type.clone());
             }
+            btn_y += 50.0;
         }
-        
-        if self.save_button_rect.contains(mouse_pos) && is_mouse_button_pressed(MouseButton::Left) {
-            return UpdateResult::new().with_action(Action::SaveGame);
-        }
+
+        // --- Center Panel (Content) ---
+        let center_rect = Rect::new(left_panel_w, header_h, center_w, screen_h - header_h);
+        draw_panel(center_rect, Some(if let Some(_b) = &self.selected_building { "Details" } else { "Welcome" }));
 
         if let Some(selected) = &self.selected_building {
-            if *selected == BuildingType::MissionBoard {
-                let panel_rect = Rect::new(300.0, 100.0, 400.0, 500.0);
-                let mut y_offset = 80.0;
-                for mission in &data.missions {
-                    let mission_rect = Rect::new(
-                        panel_rect.x + 10.0,
-                        panel_rect.y + y_offset - 10.0,
-                        panel_rect.w - 20.0,
-                        55.0,
-                    );
-                    if mission_rect.contains(mouse_pos) && is_mouse_button_pressed(MouseButton::Left) {
-                        return UpdateResult::new().with_transition(
-                            StateTransition::ToMissionAssignment(mission.description.clone()),
-                        );
-                    }
-                    y_offset += 60.0;
-                }
-            } else {
-                if self.upgrade_button_rect.contains(mouse_pos)
-                    && is_mouse_button_pressed(MouseButton::Left)
-                {
-                    return UpdateResult::new()
-                        .with_action(Action::UpgradeBuilding(selected.clone()));
-                }
-                if *selected == BuildingType::SectHall
-                    && self.recruit_button_rect.contains(mouse_pos)
-                    && is_mouse_button_pressed(MouseButton::Left)
-                {
-                    return UpdateResult::new().with_action(Action::RecruitDisciple);
-                }
+             if let Some(building) = data.buildings.get(selected) {
+                 draw_text(&format!("{}", selected), center_rect.x + 20.0, center_rect.y + 60.0, FONT_HEADER_SIZE, PRIMARY);
+                 draw_text(&format!("Level: {}", building.level), center_rect.x + 20.0, center_rect.y + 90.0, FONT_BODY_SIZE, TEXT_PRIMARY);
+                 
+                 let info = match selected {
+                     BuildingType::SectHall => format!("Max Disciples: {}", building.get_max_disciples()),
+                     BuildingType::TrainingYard => format!("Cultivation Mult: x{:.2}", building.get_cultivation_multiplier()),
+                     BuildingType::SpiritGarden => format!("Passive Income: {}/tick", building.get_passive_income()),
+                     _ => String::new(),
+                 };
+                 draw_text(&info, center_rect.x + 20.0, center_rect.y + 120.0, FONT_BODY_SIZE, TEXT_SECONDARY);
+
+                 // Actions
+                 if *selected == BuildingType::MissionBoard {
+                     // Mission list
+                     let mut m_y = center_rect.y + 150.0;
+                     for mission in &data.missions {
+                         if draw_button(Rect::new(center_rect.x + 20.0, m_y, center_w - 40.0, 35.0), &format!("Mission: {}", mission.description), false) {
+                              return UpdateResult::new().with_transition(StateTransition::ToMissionAssignment(mission.description.clone()));
+                         }
+                         m_y += 40.0;
+                     }
+                 } else {
+                     // Upgrade Button
+                     if draw_button(Rect::new(center_rect.x + 20.0, center_rect.y + 200.0, 150.0, 40.0), "Upgrade (50 SS)", false) {
+                         return UpdateResult::new().with_action(Action::UpgradeBuilding(selected.clone()));
+                     }
+                     if *selected == BuildingType::SectHall {
+                         if draw_button(Rect::new(center_rect.x + 180.0, center_rect.y + 200.0, 150.0, 40.0), "Recruit", false) {
+                             return UpdateResult::new().with_action(Action::RecruitDisciple);
+                         }
+                     }
+                 }
+             }
+        } else {
+             draw_text("Select a building to manage.", center_rect.x + 20.0, center_rect.y + 60.0, FONT_BODY_SIZE, TEXT_SECONDARY);
+        }
+
+        // --- Right Panel (Event Log) ---
+        let right_rect = Rect::new(left_panel_w + center_w, header_h, right_panel_w, screen_h - header_h);
+        draw_panel(right_rect, Some("Event Log"));
+        
+        let mut log_y = right_rect.y + 50.0;
+        // Show last 20 events reversed
+        for event in event_log.iter().rev().take(20) {
+            // Simple word wrap or just truncate for now? Let's truncate to fit width
+            // In a real app we'd wrap, but truncation prevents overlap
+            let mut display_text = event.clone();
+            if display_text.len() > 30 {
+                 display_text.truncate(27);
+                 display_text.push_str("...");
+            }
+            draw_text(&display_text, right_rect.x + 10.0, log_y, FONT_SMALL_SIZE, TEXT_SECONDARY);
+            log_y += 20.0;
+        }
+
+        // --- Settings Overlay ---
+        if self.settings_open {
+            // Dim background
+            draw_rectangle(0.0, 0.0, screen_w, screen_h, Color::new(0.0, 0.0, 0.0, 0.8));
+            
+            let modal_w = 300.0;
+            let modal_h = 250.0;
+            let modal_x = (screen_w - modal_w) / 2.0;
+            let modal_y = (screen_h - modal_h) / 2.0;
+            let modal_rect = Rect::new(modal_x, modal_y, modal_w, modal_h);
+            
+            draw_panel(modal_rect, Some("Settings"));
+            
+            if draw_button(Rect::new(modal_x + 50.0, modal_y + 60.0, 200.0, 40.0), "Save Game", false) {
+                return UpdateResult::new().with_action(Action::SaveGame);
+            }
+
+            if draw_button(Rect::new(modal_x + 50.0, modal_y + 120.0, 200.0, 40.0), "Exit to Menu", false) {
+                 return UpdateResult::new().with_transition(StateTransition::ToMainMenu);
+            }
+            
+            if draw_button(Rect::new(modal_x + 50.0, modal_y + 180.0, 200.0, 40.0), "Close", false) {
+                self.settings_open = false;
             }
         }
+
         UpdateResult::new()
     }
 
-    pub fn draw(&self, data: &GameData, spirit_stones: u32) {
-        draw_text("SECT BASE", 20.0, 40.0, 40.0, WHITE);
-        draw_text(
-            "Press ESC for Main Menu | Press D for Disciples | Press M for Map",
-            20.0,
-            70.0,
-            20.0,
-            GRAY,
-        );
-        let stone_text = format!("Spirit Stones: {}", spirit_stones);
-        draw_text(&stone_text, screen_width() - 250.0, 40.0, 24.0, GOLD);
-        self.draw_building_slots(data);
-        self.draw_details_panel(data);
-
-        // Draw Save Button
-        let mouse_pos = mouse_position().into();
-        let btn_color = if self.save_button_rect.contains(mouse_pos) { BLUE } else { DARKBLUE };
-        draw_rectangle(self.save_button_rect.x, self.save_button_rect.y, self.save_button_rect.w, self.save_button_rect.h, btn_color);
-        draw_text("Save Game", self.save_button_rect.x + 20.0, self.save_button_rect.y + 28.0, 24.0, WHITE);
-    }
-}
-
-impl SectBaseState {
-    fn draw_building_slots(&self, data: &GameData) {
-        let mouse_pos = mouse_position().into();
-        for (building_type, rect) in &self.slots {
-            let color = if rect.contains(mouse_pos) {
-                LIGHTGRAY
-            } else {
-                DARKGRAY
-            };
-            draw_rectangle(rect.x, rect.y, rect.w, rect.h, color);
-            if let Some(building) = data.buildings.get(building_type) {
-                let name = format!("{:?}", building.building_type);
-                let level = format!("Lvl: {}", building.level);
-                draw_text(&name, rect.x + 10.0, rect.y + 30.0, 24.0, WHITE);
-                draw_text(&level, rect.x + 10.0, rect.y + 60.0, 20.0, LIGHTGRAY);
-            } else {
-                draw_text("[Empty Slot]", rect.x + 10.0, rect.y + 40.0, 20.0, GRAY);
-            }
-            draw_rectangle_lines(rect.x, rect.y, rect.w, rect.h, 2.0, GRAY);
-        }
-    }
-
-    fn draw_details_panel(&self, data: &GameData) {
-        let panel_rect = Rect::new(300.0, 100.0, 400.0, 500.0);
-        draw_rectangle(
-            panel_rect.x,
-            panel_rect.y,
-            panel_rect.w,
-            panel_rect.h,
-            Color::from_rgba(20, 20, 30, 200),
-        );
-        draw_rectangle_lines(
-            panel_rect.x,
-            panel_rect.y,
-            panel_rect.w,
-            panel_rect.h,
-            3.0,
-            DARKGRAY,
-        );
-
-        if let Some(selected_type) = &self.selected_building {
-            if *selected_type == BuildingType::MissionBoard {
-                draw_text(
-                    "Available Missions",
-                    panel_rect.x + 20.0,
-                    panel_rect.y + 40.0,
-                    30.0,
-                    WHITE,
-                );
-                let mut y_offset = 80.0;
-                for mission in &data.missions {
-                    let mission_rect = Rect::new(
-                        panel_rect.x + 10.0,
-                        panel_rect.y + y_offset - 10.0,
-                        panel_rect.w - 20.0,
-                        55.0,
-                    );
-                    let mouse_pos = mouse_position().into();
-                    if mission_rect.contains(mouse_pos) {
-                        draw_rectangle(
-                            mission_rect.x,
-                            mission_rect.y,
-                            mission_rect.w,
-                            mission_rect.h,
-                            Color::from_rgba(255, 255, 255, 30),
-                        );
-                    }
-                    draw_text(
-                        &mission.description,
-                        panel_rect.x + 20.0,
-                        panel_rect.y + y_offset,
-                        20.0,
-                        WHITE,
-                    );
-                    let danger_text = format!("Danger: {}", mission.danger_level);
-                    draw_text(
-                        &danger_text,
-                        panel_rect.x + 20.0,
-                        panel_rect.y + y_offset + 25.0,
-                        18.0,
-                        GRAY,
-                    );
-                    y_offset += 60.0;
-                }
-                return;
-            }
-            if let Some(building) = data.buildings.get(selected_type) {
-                let name = format!("{:?}", building.building_type);
-                let level = format!("Level {}", building.level);
-                draw_text(
-                    &name,
-                    panel_rect.x + 20.0,
-                    panel_rect.y + 40.0,
-                    30.0,
-                    WHITE,
-                );
-                draw_text(
-                    &level,
-                    panel_rect.x + 20.0,
-                    panel_rect.y + 70.0,
-                    24.0,
-                    LIGHTGRAY,
-                );
-                let btn_rect = self.upgrade_button_rect;
-                let mouse_pos = mouse_position().into();
-                let btn_color = if btn_rect.contains(mouse_pos) { LIME } else { GREEN };
-                draw_rectangle(btn_rect.x, btn_rect.y, btn_rect.w, btn_rect.h, btn_color);
-                draw_text(
-                    "Upgrade (50)",
-                    btn_rect.x + 10.0,
-                    btn_rect.y + 28.0,
-                    24.0,
-                    BLACK,
-                );
-                if building.building_type == BuildingType::SectHall {
-                    let recruit_btn_rect = self.recruit_button_rect;
-                    let recruit_btn_color = if recruit_btn_rect.contains(mouse_pos) {
-                        LIGHTGRAY
-                    } else {
-                        GRAY
-                    };
-                    draw_rectangle(
-                        recruit_btn_rect.x,
-                        recruit_btn_rect.y,
-                        recruit_btn_rect.w,
-                        recruit_btn_rect.h,
-                        recruit_btn_color,
-                    );
-                    draw_text(
-                        "Recruit (Free)",
-                        recruit_btn_rect.x + 10.0,
-                        recruit_btn_rect.y + 28.0,
-                        24.0,
-                        BLACK,
-                    );
-                }
-            } else {
-                draw_text(
-                    "Empty Slot",
-                    panel_rect.x + 20.0,
-                    panel_rect.y + 40.0,
-                    30.0,
-                    GRAY,
-                );
-            }
-        } else {
-            draw_text(
-                "Select a building to see details",
-                panel_rect.x + 20.0,
-                panel_rect.y + 40.0,
-                24.0,
-                GRAY,
-            );
-        }
+    pub fn draw(&self, _data: &GameData, _spirit_stones: u32) {
+        // Drawing handled in update for immediate mode
     }
 }

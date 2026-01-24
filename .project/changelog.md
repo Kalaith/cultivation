@@ -10,16 +10,14 @@
 ## [Unreleased]
 
 ### Added
-- TBD
+- Phase 7 (Deep Systems) and Phase 8 (Polish) to `build-plan.md` to cover missing GDD features.
+- Compilation fix in `game.rs` for `Game::new` and imports.
 
 ### Changed
-- TBD
+- Updated `build-plan.md` progress summary.
 
 ### Fixed
-- TBD
-
-### Removed
-- TBD
+- Unclosed delimiter error in `src/game.rs`.
 
 ---
 

@@ -48,9 +48,11 @@ Phase 2: Data & State       [█████████████████
 Phase 3: Sect Base (F1)     [████████████████████] 100%  ✅
 Phase 4: Disciples (F2)     [████████████████████] 100%  ✅
 Phase 5: Missions (F3)      [████████████████████] 100%  ✅
-Phase 6: Persistence & Build[██░░░░░░░░░░░░░░░░░░]  16%  🔄
+Phase 6: Persistence & Build[████████████████████] 100%  ✅
+Phase 7: Deep Systems (GDD) [░░░░░░░░░░░░░░░░░░░░]   0%  ⬜
+Phase 8: Polish & UI        [░░░░░░░░░░░░░░░░░░░░]   0%  ⬜
 ─────────────────────────────────────────────────────────
-Overall Progress            [████████████████░░░░]  58%
+Overall Progress            [██████████████░░░░░░]  75%
 ```
 ---
 
@@ -133,9 +135,9 @@ Overall Progress            [████████████████░
 | ✅ | 5.2.1 | Implement the Mission Board UI, listing available missions. |
 | ✅ | 5.2.2 | Create the UI for assigning 1-3 disciples to a selected mission. |
 | ✅ | 5.3.1 | Implement the backend mission resolution tick system. |
-| ⏸️ | 5.3.2 | Implement logic to calculate mission success based on disciple stats vs. mission difficulty. |
-| ⏸️ | 5.3.3 | Create the `MissionResolutionState` to display the outcome report. |
-| ⏸️ | 5.3.4 | Apply rewards and consequences (disciple death, resources gained) to the game state. |
+| ✅ | 5.3.2 | Implement logic to calculate mission success based on disciple stats vs. mission difficulty. |
+| ✅ | 5.3.3 | Create the `MissionResolutionState` to display the outcome report. |
+| ✅ | 5.3.4 | Apply rewards and consequences (disciple death, resources gained) to the game state. |
 | ✅ | 5.3.5 | **BUILD CHECK** - A full mission loop can be completed. |
 
 ---
@@ -146,13 +148,45 @@ Overall Progress            [████████████████░
 
 | Status | Task | Description |
 |--------|------|-------------|
-| 🔄 | 6.1.1 | Implement the `save()` function to serialize the entire `Game` struct to `save.json`. |
-| ⬜ | 6.1.2 | Implement the `load()` function to deserialize `save.json` and overwrite the current game state. |
-| ⬜ | 6.1.3 | Add "Save" and "Load" buttons to the main menu/options screen. |
-| ⬜ | 6.2.1 | Finalize the `publish.ps1` script for building both Windows and WebGL targets. |
-| ⬜ | 6.2.2 | Create the final `index.html` file for hosting the WASM binary. |
-| ⬜ | 6.2.3 | **BUILD CHECK** - Game can be saved, closed, reopened, and loaded successfully. |
+| ✅ | 6.1.1 | Implement the `save()` function to serialize the entire `Game` struct to `save.json`. |
+| ✅ | 6.1.2 | Implement the `load()` function to deserialize `save.json` and overwrite the current game state. |
+| ✅ | 6.1.3 | Add "Save" and "Load" buttons to the main menu/options screen. |
+| ✅ | 6.2.1 | Finalize the `publish.ps1` script for building both Windows and WebGL targets. |
+| ✅ | 6.2.2 | Create the final `index.html` file for hosting the WASM binary. |
+| ✅ | 6.2.3 | **BUILD CHECK** - Game can be saved, closed, reopened, and loaded successfully. |
 
 ---
-*Last updated: 2026-01-24*
-*Current Phase: Phase 5 - Missions (F3)*
+
+## Phase 7: Deep Systems Implementation (Missing Features)
+
+**Goal:** Implement the distinct mechanics for buildings, traits, mission types, and map evolution as defined in the GDD.
+
+| Status | Task | Description |
+|--------|------|-------------|
+| ✅ | 7.1.1 | **Building Effects**: Implement specific passive bonuses for `SectHall` (unlocks), `TrainingYard` (multiplier to cultivation speed), `SpiritGarden` (passive spirit stones). |
+| ✅ | 7.1.2 | **Building Effects**: Implement `LibraryPavilion` logic to unlock/store specific Techniques/Doctrines. |
+| ✅ | 7.2.1 | **Trait System**: Refactor `FateTrait` to include functional effect hooks (e.g., `modify_breakthrough_chance`, `modify_mission_success`). |
+| ✅ | 7.2.2 | **Trait Logic**: Implement 3-5 traits (e.g., "Unlucky", "Genius", "Bloodthirsty") and apply them in `game.rs`. |
+| ✅ | 7.3.1 | **Mission Logic**: Differentiate logic for `Exploration`, `Resource`, `Monster`, `Diplomacy`. (e.g., Diplomacy uses Mind stat, Monster uses Power). |
+| ✅ | 7.3.2 | **Advanced Resources**: Add `Herbs`, `Relics`, `Influence` to `GameData` and `Game` structs. |
+| ✅ | 7.4.1 | **Map Evolution**: Implement a system for Nodes to gain "Corruption" or "Danger" over time (World Tick). |
+| ✅ | 7.4.2 | **Sect History**: Create a `Hall of Records` to log dead disciples with their achievements. |
+
+---
+
+## Phase 8: Polish & User Experience
+
+**Goal:** UI improvements, better feedback, and balancing.
+
+| Status | Task | Description |
+|--------|------|-------------|
+| ✅ | 8.1.1 | **Library UI**: Implement the interactive screen for the Library to view/unlock techniques. |
+| ✅ | 8.1.2 | **Event Log**: Add a scrolling message log to the Sect Base screen for feedback (instead of `println!`). |
+| ✅ | 8.1.3 | **UI Overhaul**: Rebuild Main Menu, Sect Base, Mission screens with new Theme and Components. |
+| ✅ | 8.2.1 | **Visual Polish**: Add tooltips for stats (Mouse over "Body" explains what it does). |
+| ✅ | 8.2.2 | **Balancing**: Tune the breakthrough chances and mission difficulty based on playtesting. |
+| ✅ | 8.3.1 | **Final Build**: Verify WebGL build with all new features. |
+
+---
+*Last updated: 2026-01-25*
+*Current Phase: Complete*

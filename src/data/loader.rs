@@ -5,6 +5,7 @@ use crate::data::{
 };
 use std::collections::HashMap;
 
+#[derive(Clone)]
 pub struct GameData {
     pub buildings: HashMap<BuildingType, Building>,
     pub fate_traits: Vec<FateTrait>,

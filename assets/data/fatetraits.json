@@ -1,10 +1,39 @@
 [
   {
     "name": "Unlucky",
-    "description": "Higher injury chance."
+    "description": "Fate seems to conspire against them. Higher injury chance.",
+    "injury_modifier": 0.15
   },
   {
     "name": "Dao Insight",
-    "description": "Faster breakthroughs."
+    "description": "Possesses an innate understanding of the Dao. Faster breakthroughs.",
+    "breakthrough_modifier": 0.2
+  },
+  {
+    "name": "Bloodthirsty",
+    "description": "Revels in combat. Strong in battle, weak in diplomacy.",
+    "combat_modifier": 0.25,
+    "diplomacy_modifier": -0.3
+  },
+  {
+    "name": "Iron Body",
+    "description": "A constitution forged in hardship. Resists injury.",
+    "injury_modifier": -0.1
+  },
+  {
+    "name": "Silver Tongue",
+    "description": "Skilled in negotiation and persuasion.",
+    "diplomacy_modifier": 0.3
+  },
+  {
+    "name": "Wanderer's Heart",
+    "description": "Drawn to the unknown. Excels on expeditions.",
+    "exploration_modifier": 0.2
+  },
+  {
+    "name": "Cursed Fate",
+    "description": "Born under a dark star. Breakthroughs are perilous.",
+    "breakthrough_modifier": -0.2,
+    "injury_modifier": 0.1
   }
 ]

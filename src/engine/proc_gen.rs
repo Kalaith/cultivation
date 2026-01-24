@@ -1,4 +1,4 @@
-use crate::data::disciples::{Attributes, CultivationRealm, Disciple, FateTrait, Talent};
+use crate::data::disciples::{Attributes, CultivationRealm, Disciple, Talent};
 use crate::data::loader::GameData;
 use rand::prelude::*;
 

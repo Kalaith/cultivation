@@ -24,11 +24,25 @@ pub struct Attributes {
     pub spirit: u32,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, Default)]
 pub struct FateTrait {
     pub name: String,
     pub description: String,
-    // We can add effect modifiers here later
+    /// Modifier to breakthrough success chance (e.g., 0.2 = +20%)
+    #[serde(default)]
+    pub breakthrough_modifier: f32,
+    /// Modifier to injury/death chance (e.g., 0.15 = +15% injury chance)
+    #[serde(default)]
+    pub injury_modifier: f32,
+    /// Modifier to combat mission success (MonsterSuppression, RuinDelve)
+    #[serde(default)]
+    pub combat_modifier: f32,
+    /// Modifier to diplomacy mission success
+    #[serde(default)]
+    pub diplomacy_modifier: f32,
+    /// Modifier to exploration/resource mission success
+    #[serde(default)]
+    pub exploration_modifier: f32,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
