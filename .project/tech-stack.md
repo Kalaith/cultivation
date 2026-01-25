@@ -18,6 +18,7 @@
 ├─────────────────────────────────────────────────┤
 │                   Data Layer                     │
 │  JSON Files + serde_json                          │
+│  (Deeply nested data for Laws/Manuals)          │
 ├─────────────────────────────────────────────────┤
 │                Infrastructure                    │
 │  GitHub Actions (CI/CD) + Itch.io/Steam (Hosting)       │
@@ -62,7 +63,7 @@
 
 **Rationale:**
 - JSON is human-readable and easy to edit, making it ideal for defining game data (missions, buildings, traits) during development.
-- Using `serde` for serializing the entire game state to a single JSON file provides a robust, ironman-friendly save system as required by the PRD.
+- **Expanded Scope:** `serde` is critical for handling the new, highly complex `CultivationLaw` and `Manual` data structures which will have nested stages and conditional nodes.
 
 ---
 
@@ -131,13 +132,13 @@ cargo clippy -- -D warnings
 cultivation/
 ├── .project/           # Project documentation
 ├── assets/
-│   ├── data/           # Game data (JSON files)
+│   ├── data/           # Game data (JSON files - Laws, Buildings, Items)
 │   └── images/         # Sprites and icons
 ├── src/
 │   ├── main.rs         # Entry point, window config, main loop
 │   ├── game.rs         # Top-level game struct and state transition logic
 │   ├── state/          # Game states (SectBase, WorldMap, etc.)
-│   ├── engine/         # Core, stateless game logic
+│   ├── engine/         # Core, stateless game logic (Feng Shui, Combat)
 │   ├── data/           # Data structures (structs) and loaders
 │   ├── ui/             # Reusable immediate-mode UI functions
 │   └── save/           # Save/load system
@@ -153,6 +154,7 @@ cultivation/
 | State Machine | `game.rs`, `state/` | To manage the active game screen (e.g., Base, Map) and enforce explicit transitions. |
 | Immediate-Mode UI | `ui/`, all draw calls | To ensure UI is a simple function of state, returning user intent without modifying state itself. |
 | Data-Oriented | `assets/data/`, `data/` | To define game entities (missions, traits) in JSON, separating data from code for easier tuning. |
+| System/Component | `engine/` | Implementing logic like the Five Elements cycle as purely functional stat transformations. |
 
 ---
 
@@ -181,10 +183,10 @@ cultivation/
 - None. This is a single-player, offline game.
 
 ### Data Protection
-- Save data is stored locally on the user's machine. While not encrypted, the serialized format will discourage trivial manual editing, supporting the ironman design goal.
+- Save data is stored locally on the user's machine.
 
 ### Dependencies
-- We will use `cargo audit` periodically to scan for vulnerabilities in third-party crates. Dependencies will be kept up-to-date.
+- We will use `cargo audit` periodically to scan for vulnerabilities in third-party crates.
 
 ---
 
@@ -202,9 +204,10 @@ cultivation/
 
 | Date | Decision | Rationale | Alternatives Considered |
 |------|----------|-----------|------------------------|
-| 2026-01-24 | Use Rust + Macroquad | Aligns with the PRD's requirement for a cross-platform (Windows/WebGL), 2D, systems-driven game. Macroquad is lightweight and avoids engine overhead, fitting the "simplicity is a feature" philosophy. | Bevy (more complex, ECS-first), Fyrox (full-featured 3D engine, overkill for this project). |
-| 2026-01-24 | Use JSON for data | Human-readable and easy to modify, which is critical for a data-driven game where balancing and content iteration are frequent. `serde` provides robust, low-effort integration with Rust structs. | SQLite (better for complex queries but overkill for MVP), custom binary format (less portable and harder to debug). |
+| 2026-01-24 | Use Rust + Macroquad | Aligns with the PRD's requirement for a cross-platform (Windows/WebGL), 2D, systems-driven game. Macroquad is lightweight and avoids engine overhead. | Bevy (more complex), Fyrox (overkill). |
+| 2026-01-24 | Use JSON for data | Human-readable and easy to modify. | SQLite (overkill). |
+| 2026-01-25 | Reconfirm Architecture | The expanded "Deep Simulation" scope (Wuxing, Laws) fits well with the Data-Oriented design. We will stick to JSON + Structs for defining complex cultivation laws. | Switching to ECS (Bevy) - rejected to maintain momentum and simplicity of save state serialization in `game.rs`. |
 
 ---
 
-*Last updated: 2026-01-24*
+*Last updated: 2026-01-25*

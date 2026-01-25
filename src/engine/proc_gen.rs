@@ -1,4 +1,4 @@
-use crate::data::disciples::{Attributes, CultivationRealm, Disciple, Talent};
+use crate::data::disciples::{Attributes, CultivationRealm, Disciple, DiscipleRank, Talent};
 use crate::data::loader::GameData;
 use rand::prelude::*;
 
@@ -31,6 +31,7 @@ pub fn generate_disciple(game_data: &GameData) -> Disciple {
 
     Disciple {
         name,
+        rank: DiscipleRank::Outer,
         realm: CultivationRealm::Mortal,
         talent,
         attributes,
@@ -38,5 +39,7 @@ pub fn generate_disciple(game_data: &GameData) -> Disciple {
         fate_traits,
         exp: 0,
         exp_to_next_level: 100,
+        qi: 0,
+        max_qi: 0,
     }
 }

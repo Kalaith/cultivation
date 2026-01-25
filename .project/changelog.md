@@ -10,25 +10,26 @@
 ## [Unreleased]
 
 ### Added
-- Phase 7 (Deep Systems) and Phase 8 (Polish) to `build-plan.md` to cover missing GDD features.
-- Compilation fix in `game.rs` for `Game::new` and imports.
+- **Expanded Scope:** Added Phases 9-12 to `build-plan.md` covering Taiyi Backstory, Feng Shui, Laws, and Advanced Crafting.
+- Updated `prd.md` with new stratified society (Outer/Inner disciples) and element systems.
+- Initial GDD update to "Expanded Cultivation Simulator" scope.
 
 ### Changed
-- Updated `build-plan.md` progress summary.
-
-### Fixed
-- Unclosed delimiter error in `src/game.rs`.
+- Shifted project focus from simple MVP to "Deep Simulation" roadmap.
 
 ---
 
 ## [0.1.0] - 2026-01-24
 
 ### Added
+- Phase 7 (Deep Systems) and Phase 8 (Polish) to `build-plan.md`.
 - Initialized the project's documentation framework in the `.project/` directory.
-- Created `prd.md` to define the product requirements for the MVP.
-- Created `tech-stack.md` to document all technology and architecture decisions.
-- Created `build-plan.md` to establish a phased task list for MVP development.
-- Created this `changelog.md` to track project history.
+- Created `prd.md` (Original MVP).
+- Created `tech-stack.md`.
+- Created `build-plan.md` (Phases 1-6).
+
+### Fixed
+- Compilation fixes for `game.rs` and imports.
 
 ---
 
@@ -52,4 +53,4 @@
 | **Security** | Security-related changes. |
 
 ---
-*Last updated: 2026-01-24*
+*Last updated: 2026-01-25*

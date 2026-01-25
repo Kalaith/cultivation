@@ -1,4 +1,4 @@
-use crate::data::disciples::{CultivationRealm, Disciple, Talent};
+use crate::data::disciples::{CultivationRealm, Disciple, DiscipleRank, Talent};
 use crate::data::buildings::BuildingType;
 use crate::data::history::DeceasedDisciple;
 use crate::data::loader::GameData;
@@ -8,7 +8,7 @@ use crate::engine::proc_gen::generate_disciple;
 use crate::state::{
     library::LibraryState, main_menu::MainMenuState,
     mission_assignment::MissionAssignmentState, mission_resolution::MissionResolutionState,
-    roster::DiscipleRosterState, sect_base::SectBaseState, world_map::WorldMapState, GameState,
+    roster::DiscipleRosterState, sect_base::SectBaseState, sect_creation::SectCreationState, world_map::WorldMapState, GameState,
     StateTransition,
 };
 use rand::Rng;
@@ -21,6 +21,7 @@ use quad_storage::LocalStorage;
 pub struct Game {
     pub state: GameState,
     pub data: GameData,
+    pub sect_name: String,
     pub spirit_stones: u32,
     pub herbs: u32,
     pub disciples: Vec<Disciple>,
@@ -34,17 +35,39 @@ pub struct Game {
 impl Game {
     pub async fn new() -> Self {
         let data = GameData::load().expect("Failed to load game data");
-        let disciples = vec![generate_disciple(&data), generate_disciple(&data)];
+        // Scenario: Survivors of the Fallen Sect
+        // 1. The Patriarch (Sect Leader)
+        let mut leader = generate_disciple(&data);
+        leader.name = "Patriarch".to_string(); // User will name sect/player later? Or just rank title?
+        leader.rank = DiscipleRank::SectLeader;
+        leader.realm = CultivationRealm::FoundationEstablishment;
+        leader.attributes.spirit += 10;
+        leader.attributes.mind += 5;
+        leader.max_qi = 500;
+        leader.qi = 500;
+
+        // 2. Loyal Workers (Outer Disciples)
+        let mut d1 = generate_disciple(&data);
+        d1.rank = DiscipleRank::Outer;
+        d1.talent = Talent::Low; // Hard workers, not geniuses
+        
+        let mut d2 = generate_disciple(&data);
+        d2.rank = DiscipleRank::Outer;
+        d2.talent = Talent::Low;
+
+        let disciples = vec![leader, d1, d2];
+        
         Self {
             state: GameState::MainMenu(MainMenuState::new()),
             data,
-            spirit_stones: 100,
-            herbs: 0,
+            sect_name: "Unnamed Sect".to_string(), // Initial placeholder
+            spirit_stones: 50, // Reduced from 100 - hard times
+            herbs: 10,         // Some supplies
             disciples,
             deceased_disciples: Vec::new(),
             ongoing_missions: Vec::new(),
             completed_missions: Vec::new(),
-            event_log: vec!["Welcome to your sect, Grandmaster.".to_string()],
+            event_log: vec!["The sect has fallen... We must rebuild.".to_string()],
             tick: 0,
         }
     }
@@ -96,9 +119,19 @@ impl Game {
             }
 
             // Apply Spirit Garden passive income
+            // Apply Spirit Garden passive income (Feature 9.1.3: Requires Outer Disciples)
             if let Some(garden) = self.data.buildings.get(&BuildingType::SpiritGarden) {
-                let income = garden.get_passive_income();
-                self.spirit_stones += income;
+                let outer_count = self.disciples.iter().filter(|d| d.rank == DiscipleRank::Outer).count();
+                if outer_count > 0 {
+                    let income = garden.get_passive_income();
+                    // Optional: Bonus for more workers? For MVP just require > 0.
+                    self.spirit_stones += income;
+                    
+                    // Small chance to find herbs if workers are present
+                    if rand::thread_rng().gen_bool(0.1) {
+                        self.herbs += 1;
+                    }
+                }
             }
 
             // Mission Tick
@@ -139,6 +172,7 @@ impl Game {
             GameState::MissionResolution(s) => s.update(&mut self.completed_missions),
             GameState::Library(s) => s.update(&self.data, self.spirit_stones, &self.deceased_disciples),
             GameState::MissionAssignment(s) => s.update(&self.disciples),
+            GameState::SectCreation(s) => s.update(),
         };
 
         if let Some(action) = update_result.action {
@@ -158,6 +192,7 @@ impl Game {
             GameState::MissionResolution(s) => s.draw(&self.data, self.spirit_stones),
             GameState::Library(s) => s.draw(&self.data, self.spirit_stones, &self.deceased_disciples),
             GameState::MissionAssignment(s) => s.draw(&self.data, &self.disciples, self.spirit_stones),
+            GameState::SectCreation(s) => s.draw(&self.data),
         }
     }
 
@@ -174,6 +209,7 @@ impl Game {
                 GameState::MissionResolution(MissionResolutionState::new())
             }
             StateTransition::ToLibrary => GameState::Library(LibraryState::new()),
+            StateTransition::ToSectCreation => GameState::SectCreation(SectCreationState::new()),
         };
     }
 
@@ -305,12 +341,20 @@ impl Game {
     fn execute_action(&mut self, action: Action) {
         match action {
             Action::UpgradeBuilding(building_type) => {
-                let cost = 50;
-                if self.spirit_stones >= cost {
-                    if let Some(building) = self.data.buildings.get_mut(&building_type) {
-                        self.spirit_stones -= cost;
-                        building.level += 1;
-                        self.event_log.push(format!("Upgraded {:?} to Lv {}", building.building_type, building.level));
+                // Feature 9.1.3: Restrict Building to Outer Disciples
+                let has_outer_workers = self.disciples.iter().any(|d| d.rank == DiscipleRank::Outer);
+                if !has_outer_workers {
+                    self.event_log.push("Cannot Build: No Outer Disciples available to work!".to_string());
+                } else {
+                    let cost = 50;
+                    if self.spirit_stones >= cost {
+                        if let Some(building) = self.data.buildings.get_mut(&building_type) {
+                            self.spirit_stones -= cost;
+                            building.level += 1;
+                            self.event_log.push(format!("Upgraded {:?} to Lv {}", building.building_type, building.level));
+                        }
+                    } else {
+                        self.event_log.push("Not enough Spirit Stones.".to_string());
                     }
                 }
             }
@@ -355,6 +399,54 @@ impl Game {
                      self.event_log.push("Game loaded successfully.".to_string());
                 }
             }
+            Action::StartNewGame(name) => {
+                // We're essentially resetting, but keeping the name.
+                // However, self.new() is async and creates everything fresh.
+                // We should probably just trigger a state change here OR manually reset fields.
+                // For MVP, knowing that new() creates the 'Survivor' preset, we can just apply the name.
+                // BUT, new() is static. 
+                
+                // Let's manually reset to "New Game" state with our preset logic:
+                let data = self.data.clone();
+                
+                // 1. Leader
+                let mut leader = generate_disciple(&data);
+                leader.name = "Patriarch".to_string(); 
+                leader.rank = DiscipleRank::SectLeader;
+                leader.realm = CultivationRealm::FoundationEstablishment;
+                leader.attributes.spirit += 10;
+                leader.attributes.mind += 5;
+                leader.max_qi = 500;
+                leader.qi = 500;
+
+                // 2. Workers
+                let mut d1 = generate_disciple(&data);
+                d1.rank = DiscipleRank::Outer;
+                d1.talent = Talent::Low;
+                
+                let mut d2 = generate_disciple(&data);
+                d2.rank = DiscipleRank::Outer;
+                d2.talent = Talent::Low;
+
+                self.disciples = vec![leader, d1, d2];
+                self.sect_name = name;
+                self.spirit_stones = 50;
+                self.herbs = 10;
+                self.ongoing_missions.clear();
+                self.completed_missions.clear();
+                self.deceased_disciples.clear();
+                self.event_log = vec!["The sect has fallen... We must rebuild.".to_string()];
+                self.tick = 0;
+                
+                // Reset Buildings (manually for now as they are part of GameData which is shared... wait. 
+                // GameData is loaded once. Building STATE (levels) is inside GameData.buildings.
+                // We need to reset the levels.
+                for building in self.data.buildings.values_mut() {
+                    building.level = 1;
+                }
+
+                self.transition(StateTransition::ToSectBase);
+            }
         }
     }
 
@@ -362,6 +454,7 @@ impl Game {
         let buildings_to_save: Vec<_> = self.data.buildings.values().cloned().collect();
 
         let save_data = SaveData {
+            sect_name: self.sect_name.clone(),
             spirit_stones: self.spirit_stones,
             herbs: self.herbs,
             disciples: self.disciples.clone(),
@@ -428,6 +521,7 @@ impl Game {
                        Some(Self {
                           state: GameState::MainMenu(MainMenuState::new()), // Reset to main menu or keep current? Let's reset.
                           data: game_data,
+                          sect_name: save_data.sect_name,
                           spirit_stones: save_data.spirit_stones,
                           herbs: save_data.herbs,
                           disciples: save_data.disciples,

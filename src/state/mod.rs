@@ -2,18 +2,18 @@ use crate::engine::actions::Action;
 
 pub mod library;
 pub mod main_menu;
+pub mod mission_assignment;
 pub mod mission_resolution;
 pub mod roster;
 pub mod sect_base;
+pub mod sect_creation;
 pub mod world_map;
 
-pub mod mission_assignment;
-// ...
 use self::{
     library::LibraryState, main_menu::MainMenuState,
     mission_assignment::MissionAssignmentState,
     mission_resolution::MissionResolutionState, roster::DiscipleRosterState,
-    sect_base::SectBaseState, world_map::WorldMapState,
+    sect_base::SectBaseState, sect_creation::SectCreationState, world_map::WorldMapState,
 };
 
 pub enum GameState {
@@ -24,6 +24,7 @@ pub enum GameState {
     MissionResolution(MissionResolutionState),
     Library(LibraryState),
     MissionAssignment(MissionAssignmentState),
+    SectCreation(SectCreationState),
 }
 
 pub enum StateTransition {
@@ -32,8 +33,9 @@ pub enum StateTransition {
     ToDiscipleRoster,
     ToWorldMap,
     ToMissionAssignment(String),
-    ToMissionResolution, // This will likely carry data
+    ToMissionResolution,
     ToLibrary,
+    ToSectCreation,
 }
 //...
 

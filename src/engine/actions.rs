@@ -9,4 +9,5 @@ pub enum Action {
     ClaimRewards(MissionOutcome),
     SaveGame,
     LoadGame,
+    StartNewGame(String), // Sect Name
 }

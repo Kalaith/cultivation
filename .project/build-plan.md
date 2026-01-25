@@ -49,144 +49,83 @@ Phase 3: Sect Base (F1)     [█████████████████
 Phase 4: Disciples (F2)     [████████████████████] 100%  ✅
 Phase 5: Missions (F3)      [████████████████████] 100%  ✅
 Phase 6: Persistence & Build[████████████████████] 100%  ✅
-Phase 7: Deep Systems (GDD) [░░░░░░░░░░░░░░░░░░░░]   0%  ⬜
-Phase 8: Polish & UI        [░░░░░░░░░░░░░░░░░░░░]   0%  ⬜
+Phase 7: Deep Systems (Old) [████████████████████] 100%  ✅
+Phase 8: Polish & UI        [████████████████████] 100%  ✅
+Phase 9: Taiyi & Stratif.   [░░░░░░░░░░░░░░░░░░░░]   0%  ⬜
+Phase 10: Feng Shui/Elements[░░░░░░░░░░░░░░░░░░░░]   0%  ⬜
+Phase 11: Laws & Training   [░░░░░░░░░░░░░░░░░░░░]   0%  ⬜
+Phase 12: Crafting          [░░░░░░░░░░░░░░░░░░░░]   0%  ⬜
 ─────────────────────────────────────────────────────────
-Overall Progress            [██████████████░░░░░░]  75%
+Overall Progress            [█████████████░░░░░░░]  66%
 ```
 ---
 
-## Phase 1: Foundation & Setup
-
-**Goal:** Establish the project structure, dependencies, and a runnable empty application.
-
-| Status | Task | Description |
-|--------|------|-------------|
-| ✅ | 1.1.1 | Initialize Git repository with `.gitignore`. |
-| ✅ | 1.1.2 | Create `.project/` directory and documentation (prd, tech-stack). |
-| ✅ | 1.1.3 | Create `build-plan.md` (this file). |
-| ✅ | 1.1.4 | Create `changelog.md`. |
-| ✅ | 1.2.1 | Initialize Cargo project (`cargo new`). |
-| ✅ | 1.2.2 | Add all dependencies to `Cargo.toml` (`macroquad`, `serde`, `rand`). |
-| ✅ | 1.2.3 | Create project folder structure (`src/state`, `src/data`, etc.). |
-| ✅ | 1.2.4 | Implement `main.rs` entry point with window config and empty game loop. |
-| ✅ | 1.2.5 | **BUILD CHECK** - Ensure project compiles and runs, showing a blank screen. |
+## Phase 1-8: (Completed)
+*Refer to previous versions or git history for detailed breakdown of completed phases.*
+*(Phases 1-8 are complete as of the previous MVP delivery.)*
 
 ---
 
-## Phase 2: Core Data Structures & State Management
+## Phase 9: Survivor Scenario & Stratification (Expanded Feature 1)
 
-**Goal:** Define all core data types and the main game state machine.
-
-| Status | Task | Description |
-|--------|------|-------------|
-| ✅ | 2.1.1 | Implement `GameState` and `StateTransition` enums in `state/mod.rs`. |
-| ✅ | 2.1.2 | Implement the main `Game` struct in `game.rs` with state and transition logic. |
-| ✅ | 2.2.1 | Define `Building` structs and enums in `data/` with `serde` support. |
-| ✅ | 2.2.2 | Define `Disciple` and `FateTrait` structs in `data/` with `serde` support. |
-| ✅ | 2.2.3 | Define `Mission` structs in `data/` with `serde` support. |
-| ✅ | 2.2.4 | Create `loader.rs` to load game data (buildings, traits) from placeholder JSON files. |
-| ✅ | 2.2.5 | **BUILD CHECK** - All data structures compile and can be instantiated. |
-
----
-
-## Phase 3: Sect Base Implementation (Feature 1)
-
-**Goal:** Create a functional, viewable sect base screen.
+**Goal:** Implement the specific startup scenario, player-chosen Sect Name, and the separation of Outer/Inner disciples.
 
 | Status | Task | Description |
 |--------|------|-------------|
-| ✅ | 3.1.1 | Create `SectBaseState` in `state/sect_base.rs` with `update` and `draw` methods. |
-| ✅ | 3.1.2 | Add `SectBase` to the main `GameState` enum. |
-| ✅ | 3.2.1 | Implement drawing logic for static building slots on the base screen. |
-| ✅ | 3.2.2 | Draw the current buildings and their levels based on game state. |
-| ✅ | 3.3.1 | Implement UI for selecting a building to view its details and upgrade options. |
-| ✅ | 3.3.2 | Implement the upgrade logic (spend resources, increment level). |
-| ⏸️ | 3.3.3 | Apply passive bonuses from building levels to the relevant game systems. |
-| ✅ | 3.3.4 | **BUILD CHECK** - Can view, select, and upgrade a building. |
+| ✅ | 9.1.1 | **Data:** Update `Disciple` struct to include a `Rank` enum (`Outer`, `Inner`, `Elder`). |
+| ✅ | 9.1.2 | **Logic:** Implement `promote_disciple` function that changes rank and unlocks Inner stats (Qi). |
+| ✅ | 9.1.3 | **Logic:** Restrict `Mining`, `Building`, `Hauling` jobs to `Outer` rank in the job system. |
+| ✅ | 9.2.1 | **Scenario:** Create a `New Game` flow that initializes the "Survivors" preset (1 Leader, 2 Outer). |
+| 🔄 | 9.2.2 | **UI:** Create "Sect Creation" modal/screen to input Sect Name. |
+| ⬜ | 9.2.3 | **UI:** Update `Character Sheet` to visually distinguish Outer vs Inner disciples. |
+| ⬜ | 9.3.1 | **BUILD CHECK** - Can start a new game, name the sect, and promote a worker. |
 
 ---
 
-## Phase 4: Disciples & Progression Systems (Feature 2)
+## Phase 10: Feng Shui & Five Elements (Expanded Feature 2)
 
-**Goal:** Implement disciple generation, the roster screen, and the background cultivation process.
+**Goal:** Implement the environmental interactions and room manufacturing logic.
 
 | Status | Task | Description |
 |--------|------|-------------|
-| ✅ | 4.1.1 | Create `DiscipleRosterState` in `state/roster.rs`. |
-| ✅ | 4.1.2 | Implement UI to display a list of all current disciples and their core stats. |
-| ✅ | 4.2.1 | Implement procedural generation logic for disciples (name, stats, traits). |
-| ✅ | 4.2.2 | Add a button/event in the Sect Hall to recruit a new disciple. |
-| ✅ | 4.3.1 | Implement the background cultivation tick system that increases disciple EXP over time. |
-| ✅ | 4.3.2 | Implement the roll-based breakthrough logic when a disciple's EXP is full. |
-| ✅ | 4.3.3 | Implement consequences for breakthrough failure (injury, death). |
-| ✅ | 4.3.4 | **BUILD CHECK** - Can recruit disciples and they will progress (or die) over time. |
+| ⬜ | 10.1.1 | **Data:** Add `Element` enum (`Metal`, `Wood`, `Water`, `Fire`, `Earth`) to all `Item` and `Building` structs. |
+| ⬜ | 10.1.2 | **Logic:** Implement `get_elemental_interaction(a, b)` helper to return Create/Destroy/Neutral relationships. |
+| ⬜ | 10.2.1 | **Grid:** Add `FengShuiRating` and `ElementStrength` maps to the `Grid` state. |
+| ⬜ | 10.2.2 | **Logic:** Implement `calculate_room_stats()` which scans a room's contents and orientation to output a Feng Shui score. |
+| ⬜ | 10.3.1 | **UI:** Create a "Feng Shui Overlay" mode for the base view, coloring tiles by their dominant element. |
+| ⬜ | 10.3.2 | **Mechanic:** Apply buffs/debuffs to characters inside rooms based on the Feng Shui score. |
+| ⬜ | 10.4.1 | **BUILD CHECK** - Placing wood furniture increases Wood element; Water suppresses Fire. |
 
 ---
 
-## Phase 5: World Map & Mission System (Feature 3)
+## Phase 11: Cultivation Laws (Expanded Feature 3)
 
-**Goal:** Implement the world map, mission assignment, and outcome resolution.
+**Goal:** Data-driven cultivation paths for Inner Disciples.
 
 | Status | Task | Description |
 |--------|------|-------------|
-| ✅ | 5.1.1 | Create `WorldMapState` in `state/world_map.rs`. |
-| ✅ | 5.1.2 | Implement rendering for the node-based map, showing location names and danger levels. |
-| ✅ | 5.2.1 | Implement the Mission Board UI, listing available missions. |
-| ✅ | 5.2.2 | Create the UI for assigning 1-3 disciples to a selected mission. |
-| ✅ | 5.3.1 | Implement the backend mission resolution tick system. |
-| ✅ | 5.3.2 | Implement logic to calculate mission success based on disciple stats vs. mission difficulty. |
-| ✅ | 5.3.3 | Create the `MissionResolutionState` to display the outcome report. |
-| ✅ | 5.3.4 | Apply rewards and consequences (disciple death, resources gained) to the game state. |
-| ✅ | 5.3.5 | **BUILD CHECK** - A full mission loop can be completed. |
+| ⬜ | 11.1.1 | **Data:** Define `CultivationLaw` struct with `Stages`, `RequiredElement`, and `StatModifiers`. |
+| ⬜ | 11.1.2 | **Loaders:** Create JSON loader for `assets/data/laws/*.json`. |
+| ⬜ | 11.2.1 | **Logic:** Implement xp/qi gain formula modification based on the disciple's Law vs Environment Element. |
+| ⬜ | 11.2.2 | **Breakthrough:** Implement the breakthrough minigame/check that differs per Law phase. |
+| ⬜ | 11.3.1 | **UI:** Create "Cultivation" tab in Character Sheet showing current Law progress and next bottleneck. |
+| ⬜ | 11.4.1 | **BUILD CHECK** - Disciple with Fire Law gains more Qi in a Fire room. |
 
 ---
 
-## Phase 6: Persistence & Finalization
+## Phase 12: Advanced Crafting (PCrafting)
 
-**Goal:** Implement the save/load system and prepare final build artifacts.
+**Goal:** Multi-step production for Pills and Artifacts.
 
 | Status | Task | Description |
 |--------|------|-------------|
-| ✅ | 6.1.1 | Implement the `save()` function to serialize the entire `Game` struct to `save.json`. |
-| ✅ | 6.1.2 | Implement the `load()` function to deserialize `save.json` and overwrite the current game state. |
-| ✅ | 6.1.3 | Add "Save" and "Load" buttons to the main menu/options screen. |
-| ✅ | 6.2.1 | Finalize the `publish.ps1` script for building both Windows and WebGL targets. |
-| ✅ | 6.2.2 | Create the final `index.html` file for hosting the WASM binary. |
-| ✅ | 6.2.3 | **BUILD CHECK** - Game can be saved, closed, reopened, and loaded successfully. |
+| ⬜ | 12.1.1 | **Data:** Define `Recipe` struct for Alchemy and Smithing. |
+| ⬜ | 12.1.2 | **Logic:** Implement `CraftingTask` that consumes specific ingredients and outputs items based on user skill. |
+| ⬜ | 12.2.1 | **Alchemy:** Implement "Pill" item type with consumption effects (Heal, Boost Qi). |
+| ⬜ | 12.2.2 | **Artifacts:** Implement "Artifact" item type that can be equipped by Inner Disciples for combat stats. |
+| ⬜ | 12.3.1 | **BUILD CHECK** - Can craft a basic Spirit Stone Sword and equip it. |
 
 ---
 
-## Phase 7: Deep Systems Implementation (Missing Features)
-
-**Goal:** Implement the distinct mechanics for buildings, traits, mission types, and map evolution as defined in the GDD.
-
-| Status | Task | Description |
-|--------|------|-------------|
-| ✅ | 7.1.1 | **Building Effects**: Implement specific passive bonuses for `SectHall` (unlocks), `TrainingYard` (multiplier to cultivation speed), `SpiritGarden` (passive spirit stones). |
-| ✅ | 7.1.2 | **Building Effects**: Implement `LibraryPavilion` logic to unlock/store specific Techniques/Doctrines. |
-| ✅ | 7.2.1 | **Trait System**: Refactor `FateTrait` to include functional effect hooks (e.g., `modify_breakthrough_chance`, `modify_mission_success`). |
-| ✅ | 7.2.2 | **Trait Logic**: Implement 3-5 traits (e.g., "Unlucky", "Genius", "Bloodthirsty") and apply them in `game.rs`. |
-| ✅ | 7.3.1 | **Mission Logic**: Differentiate logic for `Exploration`, `Resource`, `Monster`, `Diplomacy`. (e.g., Diplomacy uses Mind stat, Monster uses Power). |
-| ✅ | 7.3.2 | **Advanced Resources**: Add `Herbs`, `Relics`, `Influence` to `GameData` and `Game` structs. |
-| ✅ | 7.4.1 | **Map Evolution**: Implement a system for Nodes to gain "Corruption" or "Danger" over time (World Tick). |
-| ✅ | 7.4.2 | **Sect History**: Create a `Hall of Records` to log dead disciples with their achievements. |
-
----
-
-## Phase 8: Polish & User Experience
-
-**Goal:** UI improvements, better feedback, and balancing.
-
-| Status | Task | Description |
-|--------|------|-------------|
-| ✅ | 8.1.1 | **Library UI**: Implement the interactive screen for the Library to view/unlock techniques. |
-| ✅ | 8.1.2 | **Event Log**: Add a scrolling message log to the Sect Base screen for feedback (instead of `println!`). |
-| ✅ | 8.1.3 | **UI Overhaul**: Rebuild Main Menu, Sect Base, Mission screens with new Theme and Components. |
-| ✅ | 8.2.1 | **Visual Polish**: Add tooltips for stats (Mouse over "Body" explains what it does). |
-| ✅ | 8.2.2 | **Balancing**: Tune the breakthrough chances and mission difficulty based on playtesting. |
-| ✅ | 8.3.1 | **Final Build**: Verify WebGL build with all new features. |
-
----
 *Last updated: 2026-01-25*
-*Current Phase: Complete*
+*Current Phase: Phase 9*

@@ -2,148 +2,103 @@
 
 > **Document Location:** `.project/prd.md`
 >
-> This document defines the product requirements, features, and specifications for the MVP. It is the single source of truth for what we're building.
+> This document defines the product requirements, features, and specifications for the Expanded MVP. It is the single source of truth for what we're building.
 
 ---
 
 ## Overview
 
 ### Problem Statement
-There is a lack of deep, progression-fantasy games that focus on indirect management and strategic planning rather than direct character control. Players who enjoy cultivation stories often have to play as a single hero, not as the master of a sect who guides others.
+There is a lack of deep, progression-fantasy games that focus on indirect management and strategic planning with complex underlying systems (Feng Shui, Wuxing). Players often want to simulate the "Sect Master" experience of managing resources, shaping terrain, and guiding disciples through complex cultivation laws, rather than just fighting battles.
 
 ### Solution
-A 2D, systems-driven RPG where the player acts as the Patriarch of a cultivation sect. The core gameplay involves managing the sect base, training procedurally-generated disciples, and sending them on missions. The focus is on indirect control, long-term progression, and permanent, meaningful consequences.
+A 2D, systems-driven Colony Sim / RPG where the player acts as the Patriarch of the fallen Taiyi Sect. The core gameplay involves complex base building (Feng Shui), stratified disciple management (Outer vs Inner), and an elemental simulation (Five Elements) that drives combat, crafting, and progression.
 
 ### Target Users
-- **Primary:** Fans of progression/cultivation fantasy (e.g., Cradle series, xianxia novels), and players of management sims or strategy RPGs (e.g., RimWorld, Crusader Kings).
-- **Secondary:** Players of idle/incremental games who desire more meaningful, systems-driven progression.
+- **Primary:** Fans of *Amazing Cultivation Simulator*, *RimWorld*, and heavy Xianxia novels (Cradle, Renegade Immortal).
+- **Secondary:** Players of strategy/logistics games who enjoy optimizing complex systems and production chains.
 
 ### Success Metrics
-- [ ] A player can successfully guide at least one disciple from the Mortal realm to the Core Formation realm.
-- [ ] The full MVP gameplay loop is implemented: Base Management -> Disciple Training -> World Map Missions -> Mission Resolution -> Upgrades.
-- [ ] The game is engaging enough to encourage repeat play sessions to explore different strategies and disciple outcomes.
+- [ ] A player can successfully establish a base with at least one "Auspicious" (Good Feng Shui) room.
+- [ ] The Outer/Inner disciple loop is functional: Outer disciples provide resources, Inner disciples protect the sect.
+- [ ] At least one Cultivation Law is fully playable from Mortal to Golden Core.
+- [ ] The Five Elements interactions (Creation/Destruction cycles) are correctly implemented in interacting with the environment and combat.
 
 ---
 
 ## Features
 
-### Core Features (MVP)
+### Core Features (Expanded MVP)
 
-#### Feature 1: Sect Base Management
+#### Feature 1: Survivor Scenario & Stratified Society
 **Priority:** P0 (Must Have)
-
 **Description:**
-Players manage a 2D base screen with modular, upgradable buildings. Each building provides passive bonuses and unlocks new gameplay functionality. In the MVP, buildings are placed in static, predefined slots.
-
+The game starts with a specific scenario: The fall of the player's old sect. Players name their new Sect, control a "Sect Leader", and manage a few survivors. The population is split into **Outer Disciples** (Workers) and **Inner Disciples** (Cultivators).
 **User Story:**
-> As a Patriarch, I want to build and upgrade my sect's facilities so that I can improve my disciples' training speed, unlock new techniques, generate resources, and assign missions.
-
+> As a Sect Leader, I need to name my new sect and assign mundane tasks to my Outer Disciples so my Inner Disciples have the time and resources to cultivate.
 **Acceptance Criteria:**
-- [ ] A dedicated "Sect Base" screen is implemented.
-- [ ] The five starting buildings are present: Sect Hall, Training Yard, Library Pavilion, Mission Board, Spirit Garden.
-- [ ] Buildings can be upgraded from Level 1 to 3.
-- [ ] Upgrading a building provides a clear, documented passive bonus (e.g., `+5%` cultivation speed).
+- [ ] Scenario start: "Fall of the Sect" moves the player to a random map location.
+- [ ] Player is prompted to input a Name for their Sect.
+- [ ] Disciple Stratification: Characters can be promoted from Outer to Inner.
+- [ ] Outer Disciples handle: Farming, Mining, Hauling, Building.
+- [ ] Inner Disciples handle: Cultivation, Combat, Artifact Crafting.
 
----
-
-#### Feature 2: Disciple Management & Progression
+#### Feature 2: Feng Shui & Five Elements (Wu Xing)
 **Priority:** P0 (Must Have)
-
 **Description:**
-Recruit, view, and manage a roster of procedurally generated disciples. Each disciple has unique stats, traits, and a cultivation path. Their progression is time-based and event-driven, with a core risk/reward mechanic for realm breakthroughs.
-
+The game world acts on the Five Elements cycle (Metal > Water > Wood > Fire > Earth). Rooms have "Feng Shui" ratings based on the harmony of their furniture and structure.
 **User Story:**
-> As a Patriarch, I want to recruit and develop unique disciples so that I can build a powerful sect capable of accomplishing dangerous missions.
-
+> As a builder, I want to construct a Fire-element cultivation room using Wood furniture (to feed Fire) so that my Fire Law disciples cultivate faster.
 **Acceptance Criteria:**
-- [ ] Disciples are procedurally generated with a Name, Cultivation Realm, Talent, Attributes (Body, Mind, Spirit), Loyalty, and 1-2 random Fate Traits.
-- [ ] The four MVP cultivation realms are implemented: Mortal, Qi Refinement, Foundation Establishment, Core Formation.
-- [ ] Disciples cultivate over time, influenced by base bonuses and assignments.
-- [ ] Breakthroughs are a roll-based check with modifiers. Failure can result in injury, stat loss, or death.
-- [ ] Dead disciples are recorded in a sect history log.
+- [ ] All items/materials have an Element tag and a Material tag.
+- [ ] Feng Shui calculation: Rooms are rated (Very Bad to Very Auspicious) based on element interactions and door orientation.
+- [ ] Element interactions: Water suppresses Fire, Wood feeds Fire, etc.
+- [ ] Auspicious rooms provide buffs; Ominous rooms cause debuffs or disasters.
 
----
-
-#### Feature 3: World Map & Missions
+#### Feature 3: Cultivation Laws
 **Priority:** P0 (Must Have)
-
 **Description:**
-A node-based 2D world map where players can assign disciples to missions. Missions are not directly controlled; they resolve over time and return a text-based report detailing the outcome.
-
+Inner Disciples must practice a specific "Law" (Class) that dictates their spells, stat growth, and elemental needs.
 **User Story:**
-> As a Patriarch, I want to send my disciples on missions to dangerous locations so that they can gather resources, gain experience, and further the sect's influence.
-
+> As a player, I want to find the "True Sun Refining Law" so I can train a powerful fire-attribute sword master.
 **Acceptance Criteria:**
-- [ ] A node-based 2D map screen is implemented with 10-15 nodes for the MVP.
-- [ ] Nodes represent locations (dungeons, ruins, cities) and have a visible Danger Level.
-- [ ] Players can assign 1-3 disciples to a mission from the Mission Board.
-- [ ] The five MVP mission types are available: Exploration, Resource Gathering, Monster Suppression, Diplomacy, Ruin Delve.
-- [ ] Mission resolution is automatic and provides a summary of events, consequences, and rewards. Consequences can include disciple injury or death.
+- [ ] Laws framework implemented using data files.
+- [ ] Disciples can "Learn" a Law upon becoming Inner Disciples.
+- [ ] Laws unlock specific Spells and Stat modifiers.
+- [ ] "Breakthrough" minigame/check implemented based on the Law's requirements.
+
+#### Feature 4: Expanded Crafting & Industry
+**Priority:** P1 (High)
+**Description:**
+A deep crafting system where output quality depends on material tier and crafter skill.
+**Acceptance Criteria:**
+- [ ] Alchemy: Creating Pills for healing and cultivation XP.
+- [ ] Blacksmithing: Forging weapons and farming tools.
+- [ ] Artifact Refining: Transforming items into flying artifacts for Inner Disciples.
 
 ---
 
 ## User Interface
 
 ### Screens/Views
-- Sect Base: View and upgrade buildings.
-- Disciple Roster: List of all disciples and their status.
-- World Map: View nodes and assign missions.
-- Mission Resolution: Report screen detailing mission outcomes.
-- Library / Doctrines: View unlocked techniques and sect-wide buffs.
+- **Sect Base (Grid):** Main view. Top-down, tile-based. Needs overlays for Feng Shui and Element strength.
+- **Character Gear/Psyche:** Detailed view showing relationships, mood, body parts, and equipped Law.
+- **Manuals Library:** A tree or list view of known Laws and unlocked nodes.
 
 ### Design Guidelines
-- **Art Style:** Flat 2D, minimal animation, symbol-driven with a cultivation glyph aesthetic. UI-first.
-- **Color Palette:**
-| Name | Hex | Usage |
-|------|-----|-------|
-| Primary | #E0E0E0 | Main text, icons |
-| Secondary | #B0B0B0 | Supporting text, borders |
-| Accent | #60DFFF | Highlights, actions, calls to action |
-| Background | #0A0A0A | Main app background |
-| Surface | #111111 | Cards, panels, building slots |
-- **Typography:**
-  - **Headings:** A serif font with a traditional feel (e.g., Noto Serif).
-  - **Body:** A clean, readable sans-serif font (e.g., Noto Sans).
-  - **Code/Stats:** A clear monospace font.
+- **Art Style:** "Cultivation Glyph" aesthetic. Clean, readable icons over complex 3D models.
+- **Visual Feedback:** Elements should be color-coded (Red=Fire, Green=Wood, etc.).
 
 ---
 
 ## Technical Requirements
 
-### Platform
-- **Primary:** WebGL (WASM) for browser play.
-- **Secondary:** Native Windows executable.
+### Data
+- **Complex Definitions:** JSON schema must support nested Law definitions (stages, nodes, requirements).
+- **Save System:** Must serialize the state of the Grid (elements, heat, qi) and all Entities efficiently.
 
 ### Performance
-- Must run smoothly on mid-range hardware and within a web browser without causing significant CPU or memory strain during idle periods.
-- The main simulation tick should be efficient and not cause stuttering.
-
-### Security
-- The save file should be serialized in a way that discourages trivial manual editing to preserve the integrity of the ironman experience.
-
-### Data
-- **Game Data:** All core game data (missions, buildings, traits, etc.) will be defined in external JSON files for easy iteration.
-- **Save Data:** The entire game state will be serialized to a single save file. No cloud saves for MVP.
-
----
-
-## Constraints & Assumptions
-
-### Constraints
-- The art style must be minimal and achievable with simple shapes, icons, and UI elements.
-- The game is strictly indirect control. The player never directly controls a disciple in combat or exploration.
-- The game is ironman-by-design. Decisions have permanent consequences, and save-scumming is not an intended feature.
-
-### Assumptions
-- Players are broadly familiar with concepts from cultivation/progression fantasy genres.
-- Players will find satisfaction in strategic planning and management over direct, tactical control.
-
-### Out of Scope (For MVP)
-- Direct combat control or visualization.
-- Multiplayer features.
-- Free-roaming on the world map.
-- Complex rival sect AI and diplomacy.
-- Narrative story cutscenes or a fixed plot.
+- **Simulation:** The "World Tick" must handle element propagation (fire spreading, Qi flowing) without stalling the game.
 
 ---
 
@@ -151,11 +106,12 @@ A node-based 2D world map where players can assign disciples to missions. Missio
 
 | Term | Definition |
 |------|------------|
-| **Cultivation** | The practice of absorbing spiritual energy to grow in power, extend one's lifespan, and ascend to higher states of being. |
-| **Realm** | A distinct stage or level of power in the cultivation journey (e.g., Mortal, Qi Refinement). |
-| **Breakthrough** | The high-risk, high-reward process of attempting to advance from one realm to the next. |
-| **Sect** | An organization or school dedicated to a particular path of cultivation, led by the player (the Patriarch). |
-| **Fate Trait**| A procedurally assigned trait that permanently affects a disciple's stats or behavior. |
+| **Wu Xing** | The Five Elements (Metal, Wood, Water, Fire, Earth). |
+| **Feng Shui** | The art of arranging rooms to harmonize with the environment/elements. |
+| **Law** | A specific cultivation method (class) that determines a character's path. |
+| **Qi** | Spiritual energy. Gathered for cultivation. Flows through the map. |
+| **Outer Disciple** | A worker who handles logistics and menial labor. |
+| **Inner Disciple** | A cultivator who focuses on fighting and ascension. |
 
 ---
 
@@ -163,8 +119,9 @@ A node-based 2D world map where players can assign disciples to missions. Missio
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 1.1 | 2026-01-25 | Antigravity | Updated for "Expanded GDD" features (Taiyi, Wuxing, Laws). |
 | 1.0 | 2026-01-24 | Gemini | Initial draft based on GDD v1. |
 
 ---
 
-*Last updated: 2026-01-24*
+*Last updated: 2026-01-25*

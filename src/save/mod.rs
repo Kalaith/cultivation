@@ -8,6 +8,8 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct SaveData {
+    #[serde(default)]
+    pub sect_name: String,
     pub spirit_stones: u32,
     #[serde(default)]
     pub herbs: u32,

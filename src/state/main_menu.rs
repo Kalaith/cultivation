@@ -23,7 +23,7 @@ impl MainMenuState {
         self.load_btn.x = screen_width() / 2.0 - 100.0;
 
         if draw_button(self.start_btn, "Start Journey", true) {
-            return UpdateResult::new().with_transition(StateTransition::ToSectBase);
+            return UpdateResult::new().with_transition(StateTransition::ToSectCreation);
         }
 
         if draw_button(self.load_btn, "Load Game", true) {
@@ -31,7 +31,7 @@ impl MainMenuState {
         }
 
         if is_key_pressed(KeyCode::Space) {
-            return UpdateResult::new().with_transition(StateTransition::ToSectBase);
+            return UpdateResult::new().with_transition(StateTransition::ToSectCreation);
         }
 
         UpdateResult::new()
