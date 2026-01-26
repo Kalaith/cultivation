@@ -83,13 +83,10 @@ impl DiscipleRosterState {
                 draw_text(&format!("Rank: {}", rank_str), x, y, FONT_HEADER_SIZE, SECONDARY);
                 y += 40.0;
                 
-                let realm_name = data.stages.iter()
-                    .find(|s| s.id == disciple.realm)
-                    .map(|s| s.name.as_str())
-                    .unwrap_or(&disciple.realm);
+                let stage = data.stages.get(&disciple.realm);
+                let realm_name = stage.map(|s| s.name.as_str()).unwrap_or(&disciple.realm);
 
-                let sub_stage_name = data.stages.iter()
-                    .find(|s| s.id == disciple.realm)
+                let sub_stage_name = stage
                     .and_then(|s| s.sub_stages.get(disciple.sub_stage))
                     .map(|ss| format!(" - {}", ss.name))
                     .unwrap_or_default();

@@ -71,8 +71,8 @@ impl SectBaseState {
         // --- 3. Draw Header ---
         self.draw_header(screen_w, header_h, spirit_stones, herbs, influence, relics);
 
-        // --- 4. Draw Left Panel (Global Navigation) ---
-        if let Some(res) = self.draw_left_panel(header_h, screen_h, left_panel_w) {
+        // --- 4. Draw Left Panel (Buildings & Navigation) ---
+        if let Some(res) = self.draw_left_panel(header_h, screen_h, left_panel_w, data) {
             return res;
         }
 
@@ -147,10 +147,33 @@ impl SectBaseState {
         }
     }
 
-    fn draw_left_panel(&mut self, header_h: f32, screen_h: f32, width: f32) -> Option<UpdateResult> {
+    fn draw_left_panel(&mut self, header_h: f32, screen_h: f32, width: f32, data: &GameData) -> Option<UpdateResult> {
         let rect = Rect::new(0.0, header_h, width, screen_h - header_h);
         draw_panel(rect, Some("Buildings"));
-        
+
+        // List constructed buildings
+        let mut btn_y = rect.y + 40.0;
+        for building in &data.buildings {
+            let status_str = match building.status {
+                BuildingStatus::Active => "",
+                BuildingStatus::Ruined => " (Ruined)",
+                BuildingStatus::Constructing => " (Building...)",
+            };
+            let label = format!("{}{}", building.building_type, status_str);
+
+            if draw_button(Rect::new(rect.x + 10.0, btn_y, width - 20.0, 35.0), &label, false) {
+                self.view = SectView::BuildingDetails(building.id);
+            }
+            btn_y += 40.0;
+
+            // Prevent overflow
+            if btn_y > rect.y + rect.h - 200.0 {
+                draw_text("...", rect.x + 10.0, btn_y, FONT_SMALL_SIZE, TEXT_SECONDARY);
+                break;
+            }
+        }
+
+        // Navigation buttons at bottom
         let nav_y_start = rect.y + rect.h - 170.0;
         if draw_button(Rect::new(rect.x + 10.0, nav_y_start, width - 20.0, 40.0), "Disciples", false) {
              return Some(UpdateResult::new().with_transition(StateTransition::ToDiscipleRoster));
@@ -159,9 +182,8 @@ impl SectBaseState {
              return Some(UpdateResult::new().with_transition(StateTransition::ToWorldMap));
         }
         if draw_button(Rect::new(rect.x + 10.0, nav_y_start + 100.0, width - 20.0, 40.0), "Construction", false) {
-             // Open Construction Modal (Blueprints) logic handled in map view via crafting_modal flag
              self.view = SectView::Map;
-             self.crafting_modal_open = true; 
+             self.crafting_modal_open = true;
         }
         None
     }

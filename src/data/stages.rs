@@ -1,14 +1,23 @@
 use serde::{Deserialize, Serialize};
-use crate::data::disciples::Attributes;
+
+#[derive(Clone, Debug, Serialize, Deserialize, Default)]
+pub struct StatMultipliers {
+    #[serde(default = "default_one")]
+    pub body: f32,
+    #[serde(default = "default_one")]
+    pub mind: f32,
+    #[serde(default = "default_one")]
+    pub spirit: f32,
+}
+
+fn default_one() -> f32 { 1.0 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct SubStage {
     pub name: String,
-    #[serde(default = "default_modifier")]
+    #[serde(default = "default_one")]
     pub stats_modifier: f32,
 }
-
-fn default_modifier() -> f32 { 1.0 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct StageDefinition {
@@ -17,7 +26,8 @@ pub struct StageDefinition {
     pub description: String,
     pub base_hp: u32,
     pub base_qi: u32,
-    pub stat_multipliers: Attributes,
+    #[serde(default)]
+    pub stat_multipliers: StatMultipliers,
     #[serde(default)]
     pub sub_stages: Vec<SubStage>,
 }

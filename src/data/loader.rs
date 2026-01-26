@@ -20,6 +20,8 @@ pub struct GameData {
     pub recipes: Vec<crate::data::items::Recipe>,
     pub techs: std::collections::HashMap<String, crate::data::tech::Technology>,
     pub stages: std::collections::HashMap<String, StageDefinition>,
+    /// Ordered list of stage IDs for progression
+    pub stages_order: Vec<String>,
 }
 
 #[derive(Clone, serde::Deserialize)]
@@ -82,6 +84,7 @@ impl GameData {
 
         let stages_json = std::fs::read_to_string("assets/data/stages.json").unwrap_or_else(|_| "[]".to_string());
         let stages_list: Vec<StageDefinition> = serde_json::from_str(&stages_json)?;
+        let stages_order: Vec<String> = stages_list.iter().map(|s| s.id.clone()).collect();
         let stages = stages_list.into_iter().map(|s| (s.id.clone(), s)).collect();
 
         let bloodlines_json = std::fs::read_to_string("assets/data/bloodlines.json").unwrap_or_else(|_| "[]".to_string());
@@ -100,6 +103,7 @@ impl GameData {
             recipes,
             techs,
             stages,
+            stages_order,
         })
     }
 }

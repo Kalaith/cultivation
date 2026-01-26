@@ -6,14 +6,24 @@ use crate::data::loader::GameData;
 use crate::data::missions::{MissionOutcome, MissionRewards, OngoingMission, RelevantStat};
 use crate::engine::actions::Action;
 use crate::engine::proc_gen::generate_disciple;
+use crate::engine::tribulation::{TribulationState, TribulationType};
 use crate::state::{
     library::LibraryState, main_menu::MainMenuState,
     mission_assignment::MissionAssignmentState, mission_resolution::MissionResolutionState,
-    roster::DiscipleRosterState, sect_base::SectBaseState, sect_creation::SectCreationState, world_map::WorldMapState, GameState,
+    roster::DiscipleRosterState, sect_base::SectBaseState, sect_creation::SectCreationState,
+    world_map::WorldMapState, tribulation::TribulationEncounterState, GameState,
     StateTransition,
 };
 use rand::Rng;
 use crate::save::SaveData;
+
+/// Result of a breakthrough attempt
+pub enum BreakthroughResult {
+    Success,
+    Failure,           // Died
+    Injured,           // Survived but didn't advance
+    Tribulation(TribulationType), // Needs tribulation
+}
 #[cfg(not(target_arch = "wasm32"))]
 use std::fs;
 #[cfg(target_arch = "wasm32")]
@@ -87,35 +97,62 @@ impl Game {
         self.tick += 1;
 
         if self.tick % 60 == 0 {
-            // Cultivation Tick
+            // Collect indices of disciples currently on missions (they don't cultivate)
+            let disciples_on_mission: std::collections::HashSet<usize> = self.ongoing_missions
+                .iter()
+                .flat_map(|m| m.disciple_indices.iter().copied())
+                .collect();
+
+            // Cultivation Tick - check for breakthroughs (only for disciples not on missions)
             let mut disciples_to_breakthrough = Vec::new();
             for (i, disciple) in self.disciples.iter().enumerate() {
-                if disciple.exp >= disciple.exp_to_next_level {
+                if !disciples_on_mission.contains(&i) && disciple.exp >= disciple.exp_to_next_level {
                     disciples_to_breakthrough.push(i);
                 }
             }
             
-            // Process breakthroughs and handle deaths
+            // Process breakthroughs and handle results
             let mut indices_to_remove = Vec::new();
+            let mut pending_tribulation: Option<(TribulationType, usize)> = None;
+
             for i in disciples_to_breakthrough {
                 let mut disciple = self.disciples[i].clone();
-                let died = self.attempt_breakthrough(&mut disciple);
-                if died {
-                    // Record in hall of fallen
-                    self.deceased_disciples.push(DeceasedDisciple::new(
-                        disciple.name.clone(),
-                        disciple.realm.clone(),
-                        "Failed Breakthrough".to_string(),
-                        self.tick,
-                    ));
-                    indices_to_remove.push(i);
-                } else {
-                    self.disciples[i] = disciple;
+                let result = self.attempt_breakthrough(&mut disciple);
+
+                match result {
+                    BreakthroughResult::Failure => {
+                        // Record in hall of fallen
+                        self.deceased_disciples.push(DeceasedDisciple::new(
+                            disciple.name.clone(),
+                            disciple.realm.clone(),
+                            "Failed Breakthrough".to_string(),
+                            self.tick,
+                        ));
+                        indices_to_remove.push(i);
+                    }
+                    BreakthroughResult::Tribulation(t_type) => {
+                        // Queue tribulation (only one per tick)
+                        if pending_tribulation.is_none() {
+                            pending_tribulation = Some((t_type, i));
+                        }
+                        self.disciples[i] = disciple;
+                    }
+                    _ => {
+                        // Success or Injured - update disciple
+                        self.disciples[i] = disciple;
+                    }
                 }
             }
+
             // Remove dead disciples (in reverse to preserve indices)
             for i in indices_to_remove.into_iter().rev() {
                 self.disciples.remove(i);
+            }
+
+            // Trigger tribulation if pending
+            if let Some((t_type, idx)) = pending_tribulation {
+                let trib_state = TribulationState::new(t_type, &self.disciples[idx]);
+                self.transition(StateTransition::ToTribulation(trib_state, idx));
             }
             // Apply Training Yard bonus
             // Apply Training Yard bonus
@@ -128,7 +165,12 @@ impl Game {
             let feng_shui_mod = yard_score / 100.0;
             let final_yard_multiplier = (yard_multiplier + feng_shui_mod).max(0.1);
             
-            for disciple in &mut self.disciples {
+            for (i, disciple) in self.disciples.iter_mut().enumerate() {
+                // Skip disciples on missions - they don't cultivate while away
+                if disciples_on_mission.contains(&i) {
+                    continue;
+                }
+
                 let mut base_exp = 1 + (disciple.attributes.spirit / 5);
                 
                 // --- Law Logic ---
@@ -263,8 +305,9 @@ impl Game {
             GameState::WorldMap(s) => s.update(&self.data),
             GameState::MissionResolution(s) => s.update(&mut self.completed_missions),
             GameState::Library(s) => s.update(&self.data, self.spirit_stones, &self.deceased_disciples),
-            GameState::MissionAssignment(s) => s.update(&self.disciples),
+            GameState::MissionAssignment(s) => s.update(&self.data, &self.disciples),
             GameState::SectCreation(s) => s.update(),
+            GameState::Tribulation(s) => s.update(&self.disciples),
         };
 
         if let Some(action) = update_result.action {
@@ -275,8 +318,8 @@ impl Game {
         }
     }
 
-    pub fn draw(&self) {
-        match &self.state {
+    pub fn draw(&mut self) {
+        match &mut self.state {
             GameState::MainMenu(s) => s.draw(&self.data, self.spirit_stones),
             GameState::SectBase(s) => s.draw(&self.data, &self.grid, self.spirit_stones),
             GameState::DiscipleRoster(s) => s.draw(&self.data, &self.disciples, self.spirit_stones),
@@ -285,6 +328,7 @@ impl Game {
             GameState::Library(s) => s.draw(&self.data, self.spirit_stones, &self.deceased_disciples),
             GameState::MissionAssignment(s) => s.draw(&self.data, &self.disciples, self.spirit_stones),
             GameState::SectCreation(s) => s.draw(&self.data),
+            GameState::Tribulation(s) => s.draw(&self.data, &self.disciples),
         }
     }
 
@@ -302,6 +346,9 @@ impl Game {
             }
             StateTransition::ToLibrary => GameState::Library(LibraryState::new()),
             StateTransition::ToSectCreation => GameState::SectCreation(SectCreationState::new()),
+            StateTransition::ToTribulation(trib_state, disciple_idx) => {
+                GameState::Tribulation(TribulationEncounterState::new(trib_state, disciple_idx))
+            }
         };
     }
 
@@ -349,92 +396,65 @@ impl Game {
         let success_chance = (base_chance + trait_modifier + law_modifier + bloodline_breakthrough_mod).clamp(0.05, 0.99);
 
         if rng.gen::<f32>() < success_chance {
-            // Find current stage definition
-             if let Some((stage_idx, stage)) = self.data.stages.iter().enumerate().find(|(_, s)| s.id == disciple.realm) {
+            // Find current stage index using stages_order
+            let stage_idx = self.data.stages_order.iter().position(|id| id == &disciple.realm);
+            let stage = self.data.stages.get(&disciple.realm);
+
+            if let (Some(stage_idx), Some(stage)) = (stage_idx, stage) {
                 // Check if can advance sub-stage
                 if disciple.sub_stage < stage.sub_stages.len().saturating_sub(1) {
-                     // Minor breakthrough
-                     disciple.sub_stage += 1;
-                     self.event_log.push(format!("{} advanced to {} - {}!", disciple.name, stage.name, stage.sub_stages[disciple.sub_stage].name));
-                     // Reset XP for next sub-stage (scaling?)
-                     disciple.exp = 0;
-                     // Increase requirement slightly for sub-stages
-                     disciple.exp_to_next_level = (disciple.exp_to_next_level as f32 * 1.2) as u32;
+                    // Minor breakthrough (sub-stage advance)
+                    disciple.sub_stage += 1;
+                    let sub_stage_name = stage.sub_stages.get(disciple.sub_stage)
+                        .map(|s| s.name.as_str())
+                        .unwrap_or("Unknown");
+                    self.event_log.push(format!("{} advanced to {} - {}!", disciple.name, stage.name, sub_stage_name));
+                    disciple.exp = 0;
+                    disciple.exp_to_next_level = (disciple.exp_to_next_level as f32 * 1.2) as u32;
                 } else {
-                     // Check for Major breakthrough (Next Stage)
-                     if let Some(next_stage) = self.data.stages.get(stage_idx + 1) {
-                         // Determine if this is a Major Realm breakthrough (Tribulation Trigger)
-                         // For MVP, assume explicit IDs or look for specific transitions
-                         // Currently: Mortal -> Qi Refinement (Safe), QiRef -> Foundation (Safe), 
-                         // Foundation -> Core Formation (TRIBULATION NEEDED)
-                         
-                         let needs_tribulation = match disciple.realm.as_str() {
-                             "foundation_establishment" => true, // To Golden Core
-                             "golden_core" => true, // To Nascent Soul
-                             _ => false,
-                         };
-                         
-                         if needs_tribulation {
-                             // Trigger Tribulation!
-                             self.event_log.push(format!("Tribulation clouds gather above {}...", disciple.name));
-                             
-                             let t_type = match disciple.realm.as_str() {
-                                 "foundation_establishment" => crate::engine::tribulation::TribulationType::GoldenCore,
-                                 "golden_core" => crate::engine::tribulation::TribulationType::NascentSoul,
-                                 _ => crate::engine::tribulation::TribulationType::GoldenCore,
-                             };
-                             
-                             let trib_state = crate::engine::tribulation::TribulationState::new(t_type, disciple);
-                             
-                             // Find disciple index for state
-                             // This is tricky because attempt_breakthrough is called inside a loop over indices.
-                             // We need to pass the index or handle state transition queueing.
-                             // Wait, attempt_breakthrough returns bool (died).
-                             // We can't immediately transition state here because we are in the middle of an update loop.
-                             // Refactor: Queue the transition?
-                             // Correction: Game update handles transition at end. We can return a transition?
-                             // But attempt_breakthrough is a helper.
-                             // Compromise: We will handle this by returning a specialized enum or mutating a "pending_transition" field?
-                             // Simpler: Just allow it to happen instantly? No, we need UI.
-                             // Hack for MVP: We can't easily break the loop.
-                             // We will just mark it as "Pending Tribulation" on the disciple and handle it in the next tick?
-                             // Or just trigger it for the FIRST one found and ignore others this tick?
-                             
-                             // Let's assume only 1 major event per tick for now.
-                             // We need the index. `attempt_breakthrough` doesn't have it.
-                             // Let's modify call signature or logic.
-                             // Actually, let's just do the mutation here.
-                             // But we need to transition the GAME STATE.
-                             // We can't do `self.transition` because we are borrowing `self` mutably for `disciples`.
-                             // Actually `disciples` is being iterated.
-                             // We are in `self.update()`, specifically:
-                             // `for (i, disciple) in self.disciples.iter().enumerate()`
-                             
-                             // Since we are refactoring, let's change `attempt_breakthrough` to return a `BreakthroughResult` enum.
-                             
-                             // For this step, I'll return `Breaking(TribulationState)` and handle it in the loop.
-                             // Resuming standard logic...
-                             
-                             return BreakthroughResult::Tribulation(t_type);
-                         } else {
-                             // Instant Success
-                             disciple.realm = next_stage.id.clone();
-                             disciple.sub_stage = 0;
-                             self.event_log.push(format!("{} broke through to {} realm!", disciple.name, next_stage.name));
-                             
-                             disciple.exp = 0;
-                             disciple.exp_to_next_level = (disciple.exp_to_next_level as f32 * 2.5) as u32;
-                         }
-                     } else {
-                         // Pinnacle
-                         self.event_log.push(format!("{} has reached the apex of this world.", disciple.name));
-                         disciple.exp = disciple.exp_to_next_level; // Cap it
-                     }
+                    // Major breakthrough (next realm)
+                    let next_stage_id = self.data.stages_order.get(stage_idx + 1);
+
+                    if let Some(next_id) = next_stage_id {
+                        if let Some(next_stage) = self.data.stages.get(next_id) {
+                            // Determine if tribulation is needed (Core Formation and above)
+                            let needs_tribulation = matches!(
+                                disciple.realm.as_str(),
+                                "FoundationEstablishment" | "CoreFormation" | "NascentSoul" |
+                                "SoulTransformation" | "Ascension" | "TrueImmortal"
+                            );
+
+                            if needs_tribulation {
+                                self.event_log.push(format!("Tribulation clouds gather above {}...", disciple.name));
+
+                                let t_type = match disciple.realm.as_str() {
+                                    "FoundationEstablishment" => TribulationType::GoldenCore,
+                                    "CoreFormation" => TribulationType::NascentSoul,
+                                    "NascentSoul" => TribulationType::SpiritSevering,
+                                    "SoulTransformation" => TribulationType::Ascension,
+                                    _ => TribulationType::GoldenCore,
+                                };
+
+                                return BreakthroughResult::Tribulation(t_type);
+                            } else {
+                                // Instant success for early realms
+                                disciple.realm = next_stage.id.clone();
+                                disciple.sub_stage = 0;
+                                self.event_log.push(format!("{} broke through to {} realm!", disciple.name, next_stage.name));
+                                disciple.exp = 0;
+                                disciple.exp_to_next_level = (disciple.exp_to_next_level as f32 * 2.5) as u32;
+                            }
+                        }
+                    } else {
+                        // Pinnacle
+                        self.event_log.push(format!("{} has reached the apex of this world.", disciple.name));
+                        disciple.exp = disciple.exp_to_next_level;
+                    }
                 }
-             } else {
-                 self.event_log.push(format!("Error: Unknown realm {} for {}", disciple.realm, disciple.name));
-             }
-             
+            } else {
+                self.event_log.push(format!("Error: Unknown realm {} for {}", disciple.realm, disciple.name));
+            }
+
             BreakthroughResult::Success
         } else {
             // Failed breakthrough - check for death
@@ -453,7 +473,7 @@ impl Game {
                     self.event_log.push(format!("{} failed breakthrough and suffered internal injuries.", disciple.name));
                     disciple.exp = (disciple.exp as f32 * 0.5) as u32; // Lose 50% EXP
                 }
-                BreakthroughResult::None // Did not die
+                BreakthroughResult::Injured
             }
         }
     }
@@ -470,8 +490,7 @@ impl Game {
         for &idx in &ongoing.disciple_indices {
             if let Some(disciple) = self.disciples.get(idx) {
                 // Realm power from Data
-                let realm_power = self.data.stages.iter()
-                    .find(|s| s.id == disciple.realm)
+                let realm_power = self.data.stages.get(&disciple.realm)
                     .map(|s| (s.base_hp + s.base_qi) / 100) // Rough estimate
                     .unwrap_or(1) as i32;
                 

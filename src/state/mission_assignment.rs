@@ -45,20 +45,16 @@ impl MissionAssignmentState {
         for (i, disciple) in disciples.iter().enumerate() {
             let is_selected = self.selected_disciples.contains(&i);
             
-            let stage_name = data.stages.iter()
-                .find(|s| s.id == disciple.realm)
-                .map(|s| s.name.as_str())
-                .unwrap_or("Unknown");
-                
-            let sub_stage_name = data.stages.iter()
-                .find(|s| s.id == disciple.realm)
+            let stage = data.stages.get(&disciple.realm);
+            let stage_name = stage.map(|s| s.name.as_str()).unwrap_or("Unknown");
+
+            let sub_stage_name = stage
                 .and_then(|s| s.sub_stages.get(disciple.sub_stage))
                 .map(|ss| format!(" - {}", ss.name))
                 .unwrap_or_default();
 
-            // Estimated power calculation based on stage base stats (simple sum for now)
-            let stage_power = data.stages.iter()
-                .find(|s| s.id == disciple.realm)
+            // Estimated power calculation based on stage base stats
+            let stage_power = stage
                 .map(|s| (s.base_hp + s.base_qi) / 100)
                 .unwrap_or(1);
 
