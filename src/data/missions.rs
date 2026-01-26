@@ -45,6 +45,8 @@ pub struct Mission {
     pub duration: u32, // in game ticks
     pub description: String,
     pub danger_level: u32,
+    #[serde(default)]
+    pub repeatable: bool,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -81,4 +83,10 @@ pub struct MissionRewards {
     pub disciple_exp: u32,
     #[serde(default)]
     pub herbs: u32,
+    #[serde(default)]
+    pub influence: u32,
+    #[serde(default)]
+    pub relics: u32,
+    #[serde(default)]
+    pub items: Vec<(String, u32)>, // Item ID, Amount
 }

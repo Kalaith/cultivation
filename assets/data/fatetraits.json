@@ -35,5 +35,39 @@
     "description": "Born under a dark star. Breakthroughs are perilous.",
     "breakthrough_modifier": -0.2,
     "injury_modifier": 0.1
+  },
+  {
+    "name": "Lazy",
+    "description": "Prefers leisure over labor. Slower work speed.",
+    "work_speed_modifier": -0.2
+  },
+  {
+    "name": "Workaholic",
+    "description": "Lives to work. Fast worker but neglects cultivation.",
+    "work_speed_modifier": 0.3,
+    "cultivation_speed_modifier": -0.1
+  },
+  {
+    "name": "Charismatic",
+    "description": "A natural leader. Excels in diplomacy.",
+    "diplomacy_modifier": 0.2
+  },
+  {
+    "name": "Clumsy",
+    "description": "Prone to accidents.",
+    "injury_modifier": 0.15,
+    "work_speed_modifier": -0.1
+  },
+  {
+    "name": "Genius",
+    "description": "A cultivation prodigy.",
+    "cultivation_speed_modifier": 0.25,
+    "breakthrough_modifier": 0.1
+  },
+  {
+    "name": "Survivor",
+    "description": "Blessed by fate to endure. Cannot die from breakthroughs or missions, only suffer setbacks.",
+    "survivor": true,
+    "injury_modifier": -0.05
   }
 ]

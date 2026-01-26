@@ -1,0 +1,56 @@
+[
+    {
+        "id": "sect_restoration",
+        "name": "Sect Restoration",
+        "description": "Basic knowledge required to repair the Sect Hall and begin rebuilding.",
+        "cost_spirit_stones": 0,
+        "unlocks_buildings": [
+            "SectHall"
+        ],
+        "unlocks_missions": []
+    },
+    {
+        "id": "geomancy",
+        "name": "Geomancy",
+        "description": "Learn to see the flow of Qi in the land. Unlocks Feng Shui view (Press F).",
+        "cost_spirit_stones": 50,
+        "unlocks_buildings": [],
+        "unlocks_missions": [],
+        "prerequisites": [
+            "sect_restoration"
+        ]
+    },
+    {
+        "id": "basic_infrastructure",
+        "name": "Basic Infrastructure",
+        "description": "Unlock construction of Training Yards and Spirit Gardens.",
+        "cost_spirit_stones": 100,
+        "unlocks_buildings": [
+            "TrainingYard",
+            "SpiritGarden"
+        ],
+        "unlocks_missions": [
+            "ResourceGathering"
+        ],
+        "prerequisites": [
+            "sect_restoration"
+        ]
+    },
+    {
+        "id": "advanced_facilities",
+        "name": "Advanced Facilities",
+        "description": "Unlock specialized buildings like the Alchemy Furnace and Library.",
+        "cost_spirit_stones": 300,
+        "unlocks_buildings": [
+            "LibraryPavilion",
+            "AlchemyFurnace",
+            "ArtifactForge"
+        ],
+        "unlocks_missions": [
+            "Exploration"
+        ],
+        "prerequisites": [
+            "basic_infrastructure"
+        ]
+    }
+]

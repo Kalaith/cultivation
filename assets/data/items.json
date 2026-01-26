@@ -1,0 +1,41 @@
+[
+    {
+        "id": "spirit_healing_pill",
+        "name": "Spirit Healing Pill",
+        "description": "A basic pill that soothes internal injuries.",
+        "item_type": "Pill",
+        "effects": [
+            {
+                "Heal": 20
+            }
+        ]
+    },
+    {
+        "id": "gathering_qi_pill",
+        "name": "Qi Gathering Pill",
+        "description": "Concentrates spiritual energy to aid cultivation.",
+        "item_type": "Pill",
+        "effects": [
+            {
+                "BoostQi": 100
+            }
+        ]
+    },
+    {
+        "id": "iron_sword",
+        "name": "Iron Sword",
+        "description": "A common sword forged from mortal iron.",
+        "item_type": "Artifact",
+        "effects": [
+            {
+                "BoostBody": 5
+            }
+        ]
+    },
+    {
+        "id": "spirit_ore",
+        "name": "Spirit Ore",
+        "description": "Ore infused with spiritual energy. Used for forging.",
+        "item_type": "Resource"
+    }
+]

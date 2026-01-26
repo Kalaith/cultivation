@@ -19,7 +19,7 @@ impl MissionAssignmentState {
         }
     }
 
-    pub fn update(&mut self, disciples: &[Disciple]) -> UpdateResult {
+    pub fn update(&mut self, data: &GameData, disciples: &[Disciple]) -> UpdateResult {
         if is_key_pressed(KeyCode::Escape) {
             return UpdateResult::new().with_transition(StateTransition::ToSectBase);
         }
@@ -44,15 +44,26 @@ impl MissionAssignmentState {
         let mut btn_y = list_rect.y + 50.0;
         for (i, disciple) in disciples.iter().enumerate() {
             let is_selected = self.selected_disciples.contains(&i);
-            let label = format!("{} ({:?}) - Power estimate: {}", 
-                disciple.name, disciple.realm, 
-                // Simple power estimate for display
-                match disciple.realm {
-                    crate::data::disciples::CultivationRealm::Mortal => 1,
-                    crate::data::disciples::CultivationRealm::QiRefinement => 2,
-                    crate::data::disciples::CultivationRealm::FoundationEstablishment => 4,
-                    crate::data::disciples::CultivationRealm::CoreFormation => 7,
-                }
+            
+            let stage_name = data.stages.iter()
+                .find(|s| s.id == disciple.realm)
+                .map(|s| s.name.as_str())
+                .unwrap_or("Unknown");
+                
+            let sub_stage_name = data.stages.iter()
+                .find(|s| s.id == disciple.realm)
+                .and_then(|s| s.sub_stages.get(disciple.sub_stage))
+                .map(|ss| format!(" - {}", ss.name))
+                .unwrap_or_default();
+
+            // Estimated power calculation based on stage base stats (simple sum for now)
+            let stage_power = data.stages.iter()
+                .find(|s| s.id == disciple.realm)
+                .map(|s| (s.base_hp + s.base_qi) / 100)
+                .unwrap_or(1);
+
+            let label = format!("{} ({}{}) - Power estimate: {}", 
+                disciple.name, stage_name, sub_stage_name, stage_power
             );
 
             if draw_button(Rect::new(list_rect.x + 10.0, btn_y, left_w - 20.0, 40.0), &label, is_selected) {

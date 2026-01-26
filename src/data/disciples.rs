@@ -1,12 +1,5 @@
 use serde::{Deserialize, Serialize};
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub enum CultivationRealm {
-    Mortal,
-    QiRefinement,
-    FoundationEstablishment,
-    CoreFormation,
-}
+use crate::data::bloodlines::DiscipleBloodline;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum Talent {
@@ -43,6 +36,15 @@ pub struct FateTrait {
     /// Modifier to exploration/resource mission success
     #[serde(default)]
     pub exploration_modifier: f32,
+    /// Modifier to cultivation speed (e.g. 0.1 = +10% exp gain)
+    #[serde(default)]
+    pub cultivation_speed_modifier: f32,
+    /// Modifier to work speed (for base tasks)
+    #[serde(default)]
+    pub work_speed_modifier: f32,
+    /// If true, this character cannot die from breakthroughs or missions - only injured
+    #[serde(default)]
+    pub survivor: bool,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
@@ -57,7 +59,11 @@ pub enum DiscipleRank {
 pub struct Disciple {
     pub name: String,
     pub rank: DiscipleRank,
-    pub realm: CultivationRealm,
+    /// ID of the cultivation stage (references stages.json)
+    pub realm: String,
+    /// Current sub-stage index (0-indexed)
+    #[serde(default)]
+    pub sub_stage: usize,
     pub talent: Talent,
     pub attributes: Attributes,
     pub loyalty: u32,
@@ -70,6 +76,11 @@ pub struct Disciple {
     /// Maximum spiritual energy capacity
     #[serde(default)]
     pub max_qi: u32,
+    #[serde(default)]
+    pub law_id: Option<String>,
+    /// Bloodline inheritance and awakening state
+    #[serde(default)]
+    pub bloodline: DiscipleBloodline,
 }
 
 impl Disciple {

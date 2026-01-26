@@ -8,12 +8,14 @@ pub mod roster;
 pub mod sect_base;
 pub mod sect_creation;
 pub mod world_map;
+pub mod tribulation;
 
 use self::{
     library::LibraryState, main_menu::MainMenuState,
     mission_assignment::MissionAssignmentState,
     mission_resolution::MissionResolutionState, roster::DiscipleRosterState,
     sect_base::SectBaseState, sect_creation::SectCreationState, world_map::WorldMapState,
+    tribulation::TribulationEncounterState,
 };
 
 pub enum GameState {
@@ -25,6 +27,7 @@ pub enum GameState {
     Library(LibraryState),
     MissionAssignment(MissionAssignmentState),
     SectCreation(SectCreationState),
+    Tribulation(TribulationEncounterState),
 }
 
 pub enum StateTransition {
@@ -36,6 +39,7 @@ pub enum StateTransition {
     ToMissionResolution,
     ToLibrary,
     ToSectCreation,
+    ToTribulation(crate::engine::tribulation::TribulationState, usize),
 }
 //...
 

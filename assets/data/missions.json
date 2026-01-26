@@ -3,12 +3,35 @@
         "mission_type": "Exploration",
         "duration": 10,
         "description": "Scout the Serene Forest for valuable herbs.",
-        "danger_level": 1
+        "danger_level": 1,
+        "repeatable": true
+    },
+    {
+        "mission_type": "ResourceGathering",
+        "duration": 20,
+        "description": "Mine Spirit Ore in the Iron Hills.",
+        "danger_level": 2,
+        "repeatable": true
     },
     {
         "mission_type": "MonsterSuppression",
-        "duration": 20,
-        "description": "Clear out the restless spirits in the Haunted Ruins.",
-        "danger_level": 5
+        "duration": 40,
+        "description": "Hunt the Rock Bear threatening the village.",
+        "danger_level": 5,
+        "repeatable": true
+    },
+    {
+        "mission_type": "Diplomacy",
+        "duration": 60,
+        "description": "Establish trade with the Azure Cloud Sect.",
+        "danger_level": 3,
+        "repeatable": true
+    },
+    {
+        "mission_type": "RuinDelve",
+        "duration": 100,
+        "description": "Explore the Tablet of Earth's Legacy.",
+        "danger_level": 8,
+        "repeatable": false
     }
 ]

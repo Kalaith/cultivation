@@ -1,0 +1,38 @@
+[
+    {
+        "id": "iron_skin_classic",
+        "name": "Iron Skin Classic",
+        "description": "A Metal-based technique that tempers the body like steel.",
+        "element": "Metal",
+        "stat_growth_modifiers": {
+            "body": 2,
+            "mind": 1,
+            "spirit": 1
+        },
+        "breakthrough_modifier": 0.05
+    },
+    {
+        "id": "verdant_heart_mantra",
+        "name": "Verdant Heart Mantra",
+        "description": "Draws life from nature. Effective in Wood environments.",
+        "element": "Wood",
+        "stat_growth_modifiers": {
+            "body": 1,
+            "mind": 1,
+            "spirit": 2
+        },
+        "breakthrough_modifier": 0.02
+    },
+    {
+        "id": "crimson_flame_scripture",
+        "name": "Crimson Flame Scripture",
+        "description": "Burns impurities with Fire Qi. Aggressive and dangerous.",
+        "element": "Fire",
+        "stat_growth_modifiers": {
+            "body": 3,
+            "mind": 1,
+            "spirit": 0
+        },
+        "breakthrough_modifier": 0.10
+    }
+]

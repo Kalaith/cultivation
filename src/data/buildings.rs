@@ -1,5 +1,12 @@
 use serde::{Deserialize, Serialize};
 
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+pub enum BuildingStatus {
+    Ruined,
+    Constructing,
+    Active,
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum BuildingType {
     SectHall,
@@ -7,6 +14,9 @@ pub enum BuildingType {
     LibraryPavilion,
     MissionBoard,
     SpiritGarden,
+    Decoration,
+    AlchemyFurnace,
+    ArtifactForge,
 }
 
 impl std::fmt::Display for BuildingType {
@@ -17,21 +27,55 @@ impl std::fmt::Display for BuildingType {
             BuildingType::LibraryPavilion => write!(f, "Library Pavilion"),
             BuildingType::MissionBoard => write!(f, "Mission Board"),
             BuildingType::SpiritGarden => write!(f, "Spirit Garden"),
+            BuildingType::Decoration => write!(f, "Decoration"),
+            BuildingType::AlchemyFurnace => write!(f, "Alchemy Furnace"),
+            BuildingType::ArtifactForge => write!(f, "Artifact Forge"),
         }
     }
 }
 
+use crate::data::elements::Element;
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Building {
+    #[serde(default)]
+    pub id: u64,
     pub building_type: BuildingType,
     pub level: u32,
+    #[serde(default = "default_element")]
+    pub element: Element,
+    #[serde(default = "default_element")]
+    pub material_element: Element,
+    #[serde(default)]
+    pub x: i32,
+    #[serde(default)]
+    pub y: i32,
+    #[serde(default = "default_status")]
+    pub status: BuildingStatus,
+    #[serde(default)]
+    pub feng_shui_score: f32,
+}
+
+fn default_status() -> BuildingStatus {
+    BuildingStatus::Active
+}
+
+fn default_element() -> Element {
+    Element::None
 }
 
 impl Building {
     pub fn new(building_type: BuildingType) -> Self {
         Self {
+            id: 0, // Should be assigned by game logic
             building_type,
             level: 1,
+            element: Element::None,
+            material_element: Element::None,
+            x: 0,
+            y: 0,
+            status: BuildingStatus::Active,
+            feng_shui_score: 0.0,
         }
     }
 

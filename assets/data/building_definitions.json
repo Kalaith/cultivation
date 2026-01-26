@@ -1,0 +1,65 @@
+[
+    {
+        "type": "SectHall",
+        "cost": 0,
+        "name": "Sect Hall",
+        "description": "The heart of the sect.",
+        "tech_required": null,
+        "element": "Earth",
+        "unique": true
+    },
+    {
+        "type": "TrainingYard",
+        "cost": 100,
+        "name": "Training Yard",
+        "description": "Where disciples cultivate.",
+        "tech_required": "basic_infrastructure",
+        "element": "Metal",
+        "unique": false
+    },
+    {
+        "type": "SpiritGarden",
+        "cost": 150,
+        "name": "Spirit Garden",
+        "description": "Grows spiritual herbs and gathers ambient Qi.",
+        "tech_required": "basic_infrastructure",
+        "element": "Wood",
+        "unique": false
+    },
+    {
+        "type": "LibraryPavilion",
+        "cost": 300,
+        "name": "Library Pavilion",
+        "description": "Store scriptures and record history.",
+        "tech_required": "advanced_facilities",
+        "element": "Water",
+        "unique": true
+    },
+    {
+        "type": "AlchemyFurnace",
+        "cost": 200,
+        "name": "Alchemy Furnace",
+        "description": "Refine pills and elixirs.",
+        "tech_required": "advanced_facilities",
+        "element": "Fire",
+        "unique": false
+    },
+    {
+        "type": "ArtifactForge",
+        "cost": 200,
+        "name": "Artifact Forge",
+        "description": "Craft magical artifacts.",
+        "tech_required": "advanced_facilities",
+        "element": "Metal",
+        "unique": false
+    },
+    {
+        "type": "MissionBoard",
+        "cost": 50,
+        "name": "Mission Board",
+        "description": "Assign disciples to missions.",
+        "tech_required": "sect_restoration",
+        "element": "None",
+        "unique": true
+    }
+]

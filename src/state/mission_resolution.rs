@@ -49,7 +49,7 @@ impl MissionResolutionState {
             let mut draw_y = y + 60.0;
             
             for word in words {
-                let test_line = if line.is_empty() {
+                let test_line: String = if line.is_empty() {
                     word.to_string()
                 } else {
                     format!("{} {}", line, word)

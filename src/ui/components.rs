@@ -68,7 +68,7 @@ pub fn draw_tooltip(pos: Vec2, text: &str) {
      let pad = 8.0;
      let w = dimensions.width + pad * 2.0;
      let h = dimensions.height + pad * 2.0;
-     
+
      // Ensure tooltip stays on screen
      let mut x = pos.x + 15.0;
      let mut y = pos.y + 15.0;
@@ -78,4 +78,40 @@ pub fn draw_tooltip(pos: Vec2, text: &str) {
      draw_rectangle(x, y, w, h, Color::new(0.05, 0.05, 0.08, 0.95));
      draw_rectangle_lines(x, y, w, h, 1.0, PRIMARY);
      draw_text(text, x + pad, y + h - pad, font_size, TEXT_PRIMARY);
+}
+
+/// Draws a multi-line tooltip box at the given position.
+pub fn draw_tooltip_box(x: f32, y: f32, lines: &[String]) {
+    let font_size = FONT_SMALL_SIZE;
+    let pad = 8.0;
+    let line_height = font_size + 4.0;
+
+    // Calculate dimensions
+    let mut max_width: f32 = 0.0;
+    for line in lines {
+        let dims = measure_text(line, None, font_size as u16, 1.0);
+        max_width = max_width.max(dims.width);
+    }
+
+    let w = max_width + pad * 2.0;
+    let h = (lines.len() as f32) * line_height + pad * 2.0;
+
+    // Ensure tooltip stays on screen
+    let mut tx = x;
+    let mut ty = y;
+    if tx + w > screen_width() { tx = screen_width() - w - 5.0; }
+    if ty + h > screen_height() { ty = screen_height() - h - 5.0; }
+    if tx < 0.0 { tx = 5.0; }
+    if ty < 0.0 { ty = 5.0; }
+
+    // Draw background
+    draw_rectangle(tx, ty, w, h, Color::new(0.05, 0.05, 0.08, 0.95));
+    draw_rectangle_lines(tx, ty, w, h, 1.0, PRIMARY);
+
+    // Draw lines
+    let mut ly = ty + pad + font_size;
+    for line in lines {
+        draw_text(line, tx + pad, ly, font_size, TEXT_PRIMARY);
+        ly += line_height;
+    }
 }

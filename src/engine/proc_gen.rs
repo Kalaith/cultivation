@@ -1,4 +1,5 @@
-use crate::data::disciples::{Attributes, CultivationRealm, Disciple, DiscipleRank, Talent};
+use crate::data::bloodlines::{BloodlineRarity, DiscipleBloodline};
+use crate::data::disciples::{Attributes, Disciple, DiscipleRank, Talent};
 use crate::data::loader::GameData;
 use rand::prelude::*;
 
@@ -29,10 +30,14 @@ pub fn generate_disciple(game_data: &GameData) -> Disciple {
         .cloned()
         .collect();
 
+    // Generate bloodline based on rarity chances
+    let bloodline = generate_bloodline(game_data, &mut rng);
+
     Disciple {
         name,
         rank: DiscipleRank::Outer,
-        realm: CultivationRealm::Mortal,
+        realm: "Mortal".to_string(),
+        sub_stage: 0,
         talent,
         attributes,
         loyalty: 50,
@@ -41,5 +46,41 @@ pub fn generate_disciple(game_data: &GameData) -> Disciple {
         exp_to_next_level: 100,
         qi: 0,
         max_qi: 0,
+        law_id: None,
+        bloodline,
+    }
+}
+
+/// Generate a random bloodline for a disciple based on rarity chances
+fn generate_bloodline(game_data: &GameData, rng: &mut ThreadRng) -> DiscipleBloodline {
+    // Roll for whether disciple has a bloodline at all
+    let bloodline_roll = rng.gen_range(0..=99);
+
+    // 60% no bloodline, 25% Mortal, 10% Spirit, 4% Ancient, 0.9% Primordial, 0.1% Mythic
+    let target_rarity = match bloodline_roll {
+        0..=59 => return DiscipleBloodline::none(),  // No bloodline
+        60..=84 => BloodlineRarity::Mortal,          // 25%
+        85..=94 => BloodlineRarity::Spirit,          // 10%
+        95..=98 => BloodlineRarity::Ancient,         // 4%
+        99 => {
+            // 1% chance, split between Primordial (0.9%) and Mythic (0.1%)
+            if rng.gen_range(0..10) == 0 {
+                BloodlineRarity::Mythic
+            } else {
+                BloodlineRarity::Primordial
+            }
+        }
+        _ => return DiscipleBloodline::none(),
+    };
+
+    // Filter bloodlines by target rarity
+    let matching_bloodlines: Vec<_> = game_data.bloodlines.values()
+        .filter(|b| b.rarity == target_rarity)
+        .collect();
+
+    if let Some(bloodline) = matching_bloodlines.choose(rng) {
+        DiscipleBloodline::new(bloodline.id.clone())
+    } else {
+        DiscipleBloodline::none()
     }
 }

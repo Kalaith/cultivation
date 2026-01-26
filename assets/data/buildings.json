@@ -5,7 +5,33 @@
   },
   {
     "building_type": "MissionBoard",
-    "level": 1
+    "level": 1,
+    "element": "Wood",
+    "material_element": "Earth"
+  },
+  {
+    "building_type": "Decoration",
+    "level": 1,
+    "element": "Water",
+    "material_element": "Metal"
+  },
+  {
+    "building_type": "Decoration",
+    "level": 1,
+    "element": "Fire",
+    "material_element": "Wood"
+  },
+  {
+    "building_type": "AlchemyFurnace",
+    "level": 1,
+    "element": "Fire",
+    "material_element": "Earth"
+  },
+  {
+    "building_type": "ArtifactForge",
+    "level": 1,
+    "element": "Metal",
+    "material_element": "Fire"
   },
   {
     "building_type": "TrainingYard",

@@ -1,7 +1,6 @@
 use crate::data::loader::GameData;
 use crate::engine::actions::Action;
 use crate::state::UpdateResult;
-use crate::ui::components::*;
 use crate::ui::theme::*;
 use macroquad::prelude::*;
 
@@ -12,13 +11,12 @@ pub struct SectCreationState {
 impl SectCreationState {
     pub fn new() -> Self {
         Self {
-            input_buffer: String::new(),
+            input_buffer: "Test".to_string(),
         }
     }
 
     pub fn update(&mut self) -> UpdateResult {
         // Simple text input
-        let char_code = get_last_key_pressed();
         // Macroquad doesn't have a great built-in text input event for chars yet without some work, 
         // using simulated input for now or `get_char_pressed()`.
         
@@ -44,7 +42,7 @@ impl SectCreationState {
     }
 
     pub fn draw(&self, _data: &GameData) {
-        draw_rectangle(0.0, 0.0, screen_width(), screen_height(), PRIMARY);
+        draw_rectangle(0.0, 0.0, screen_width(), screen_height(), Color::new(0.1, 0.1, 0.1, 1.0));
 
         let title_text = "FOUND A NEW SECT";
         let title_dims = measure_text(title_text, None, FONT_TITLE_SIZE as u16, 1.0);

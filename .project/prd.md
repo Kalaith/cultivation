@@ -76,6 +76,24 @@ A deep crafting system where output quality depends on material tier and crafter
 - [ ] Blacksmithing: Forging weapons and farming tools.
 - [ ] Artifact Refining: Transforming items into flying artifacts for Inner Disciples.
 
+#### Feature 5: Expanded Mission System
+**Priority:** P1 (High)
+**Description:**
+A diverse mission system allowing the sect to interact with the world in multiple ways, utilizing different disciple attributes.
+**User Story:**
+> As a player, I want to send my high-Charisma disciple to negotiate trade routes while my fighters suppress monsters, ensuring my sect grows in both wealth and safety.
+**Mission Types:**
+1.  **Exploration (Spirit):** Scouting safe paths and gathering basic ingredients (Herbs).
+2.  **Resource Gathering (Spirit):** Targeted harvesting of specific nodes (Ore/Wood).
+3.  **Monster Suppression (Body):** Combat focused. Reduces "Danger Level" of a map node. Reward: Loot/Reputation.
+4.  **Diplomacy (Mind):** Negotiating with other sects or mortal cities. Reward: **Influence** (New Resource) and Trade Routes.
+5.  **Ruin Delving (Body/Luck):** High-risk dungeon crawling for **Relics** (New Resource) and Ancient Manuals.
+**Acceptance Criteria:**
+- [ ] Implement unique reward logic for each type (Influence, Relics, Danger Reduction).
+- [ ] Implement "Influence" resource usage (e.g., recruiting better disciples, buying rare maps).
+- [ ] Implement "Relic" resource usage (e.g., crafting high-tier artifacts).
+
+
 ---
 
 ## User Interface

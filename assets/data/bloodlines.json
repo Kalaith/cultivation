@@ -1,0 +1,365 @@
+[
+  {
+    "id": "mortal_strong",
+    "name": "Strong Physique",
+    "description": "Descended from a line of warriors. Enhanced physical foundation.",
+    "rarity": "Mortal",
+    "element": "None",
+    "passive_effects": {
+      "body_bonus": 5,
+      "hp_multiplier": 1.15,
+      "breakthrough_modifier": 0.0,
+      "cultivation_speed_modifier": 0.0,
+      "injury_modifier": -0.05
+    },
+    "awakening_chance": 0.0,
+    "realm_skip": false
+  },
+  {
+    "id": "mortal_keen",
+    "name": "Keen Mind",
+    "description": "Born with sharp intellect. Faster comprehension of techniques.",
+    "rarity": "Mortal",
+    "element": "None",
+    "passive_effects": {
+      "mind_bonus": 5,
+      "cultivation_speed_modifier": 0.1,
+      "breakthrough_modifier": 0.05,
+      "injury_modifier": 0.0
+    },
+    "awakening_chance": 0.0,
+    "realm_skip": false
+  },
+  {
+    "id": "spirit_fire",
+    "name": "Ember Veins",
+    "description": "Fire element flows through the bloodline. Natural affinity for flame arts.",
+    "rarity": "Spirit",
+    "element": "Fire",
+    "passive_effects": {
+      "spirit_bonus": 3,
+      "cultivation_speed_modifier": 0.15,
+      "breakthrough_modifier": 0.05,
+      "combat_modifier": 0.1,
+      "injury_modifier": 0.0
+    },
+    "awakening_chance": 0.05,
+    "realm_skip": false,
+    "awakened_ability": "Flame Aura - Passive fire damage to nearby enemies"
+  },
+  {
+    "id": "spirit_water",
+    "name": "Flowing Currents",
+    "description": "Water element ancestry. Calm mind and adaptive techniques.",
+    "rarity": "Spirit",
+    "element": "Water",
+    "passive_effects": {
+      "spirit_bonus": 3,
+      "mind_bonus": 2,
+      "cultivation_speed_modifier": 0.1,
+      "breakthrough_modifier": 0.1,
+      "diplomacy_modifier": 0.15,
+      "injury_modifier": -0.05
+    },
+    "awakening_chance": 0.05,
+    "realm_skip": false,
+    "awakened_ability": "Tidal Recovery - Regenerate health when near water"
+  },
+  {
+    "id": "spirit_metal",
+    "name": "Iron Blood",
+    "description": "Metal element lineage. Unyielding defense and sharp will.",
+    "rarity": "Spirit",
+    "element": "Metal",
+    "passive_effects": {
+      "body_bonus": 4,
+      "spirit_bonus": 2,
+      "combat_modifier": 0.15,
+      "injury_modifier": -0.1,
+      "breakthrough_modifier": 0.0
+    },
+    "awakening_chance": 0.05,
+    "realm_skip": false,
+    "awakened_ability": "Steel Skin - Temporary invulnerability"
+  },
+  {
+    "id": "spirit_wood",
+    "name": "Verdant Heart",
+    "description": "Wood element heritage. Strong vitality and growth potential.",
+    "rarity": "Spirit",
+    "element": "Wood",
+    "passive_effects": {
+      "body_bonus": 2,
+      "spirit_bonus": 3,
+      "cultivation_speed_modifier": 0.2,
+      "exploration_modifier": 0.15,
+      "injury_modifier": -0.05
+    },
+    "awakening_chance": 0.05,
+    "realm_skip": false,
+    "awakened_ability": "Nature's Blessing - Accelerated healing from herbs"
+  },
+  {
+    "id": "spirit_earth",
+    "name": "Mountain Root",
+    "description": "Earth element bloodline. Unshakeable foundation and endurance.",
+    "rarity": "Spirit",
+    "element": "Earth",
+    "passive_effects": {
+      "body_bonus": 5,
+      "hp_multiplier": 1.2,
+      "injury_modifier": -0.1,
+      "breakthrough_modifier": 0.05,
+      "work_speed_modifier": 0.1
+    },
+    "awakening_chance": 0.05,
+    "realm_skip": false,
+    "awakened_ability": "Earthen Shield - Absorb damage into Qi"
+  },
+  {
+    "id": "ancient_dragon",
+    "name": "Dragon Descendant",
+    "description": "Carries the bloodline of ancient dragons. Immense power potential.",
+    "rarity": "Ancient",
+    "element": "Fire",
+    "passive_effects": {
+      "body_bonus": 8,
+      "spirit_bonus": 5,
+      "hp_multiplier": 1.5,
+      "combat_modifier": 0.25,
+      "breakthrough_modifier": 0.15,
+      "cultivation_speed_modifier": 0.1,
+      "injury_modifier": -0.1
+    },
+    "awakening_chance": 0.1,
+    "realm_skip": true,
+    "realm_skip_chance": 0.1,
+    "awakened_ability": "Dragon Breath - Devastating fire attack"
+  },
+  {
+    "id": "ancient_phoenix",
+    "name": "Phoenix Heir",
+    "description": "Phoenix blood grants rebirth. Cannot truly die while flames burn.",
+    "rarity": "Ancient",
+    "element": "Fire",
+    "passive_effects": {
+      "spirit_bonus": 8,
+      "cultivation_speed_modifier": 0.2,
+      "breakthrough_modifier": 0.2,
+      "injury_modifier": -0.15,
+      "survivor": true
+    },
+    "awakening_chance": 0.1,
+    "realm_skip": false,
+    "awakened_ability": "Rebirth Flames - Revive once per tribulation"
+  },
+  {
+    "id": "ancient_qilin",
+    "name": "Qilin Blessed",
+    "description": "The auspicious beast's blessing. Brings fortune and harmony.",
+    "rarity": "Ancient",
+    "element": "Earth",
+    "passive_effects": {
+      "mind_bonus": 6,
+      "spirit_bonus": 6,
+      "diplomacy_modifier": 0.3,
+      "exploration_modifier": 0.2,
+      "breakthrough_modifier": 0.15,
+      "cultivation_speed_modifier": 0.15
+    },
+    "awakening_chance": 0.1,
+    "realm_skip": false,
+    "awakened_ability": "Auspicious Aura - Improve sect-wide fortune"
+  },
+  {
+    "id": "ancient_turtle",
+    "name": "Black Tortoise Line",
+    "description": "Ancient defensive bloodline. Nearly indestructible when awakened.",
+    "rarity": "Ancient",
+    "element": "Water",
+    "passive_effects": {
+      "body_bonus": 10,
+      "hp_multiplier": 1.8,
+      "injury_modifier": -0.2,
+      "breakthrough_modifier": 0.1,
+      "cultivation_speed_modifier": -0.1,
+      "combat_modifier": 0.1
+    },
+    "awakening_chance": 0.1,
+    "realm_skip": false,
+    "awakened_ability": "Shell of Ages - Massive damage reduction"
+  },
+  {
+    "id": "ancient_tiger",
+    "name": "White Tiger Blood",
+    "description": "Ferocious combat bloodline. Excels in battle and suppression.",
+    "rarity": "Ancient",
+    "element": "Metal",
+    "passive_effects": {
+      "body_bonus": 7,
+      "spirit_bonus": 3,
+      "combat_modifier": 0.35,
+      "breakthrough_modifier": 0.05,
+      "injury_modifier": 0.05,
+      "diplomacy_modifier": -0.1
+    },
+    "awakening_chance": 0.1,
+    "realm_skip": false,
+    "awakened_ability": "Tiger's Roar - Fear and stun enemies"
+  },
+  {
+    "id": "ancient_serpent",
+    "name": "Azure Dragon Vein",
+    "description": "Eastern dragon bloodline. Mastery over water and weather.",
+    "rarity": "Ancient",
+    "element": "Water",
+    "passive_effects": {
+      "spirit_bonus": 8,
+      "mind_bonus": 4,
+      "cultivation_speed_modifier": 0.2,
+      "breakthrough_modifier": 0.15,
+      "diplomacy_modifier": 0.15
+    },
+    "awakening_chance": 0.1,
+    "realm_skip": false,
+    "awakened_ability": "Storm Caller - Control weather in domain"
+  },
+  {
+    "id": "primordial_chaos",
+    "name": "Chaos Primordial",
+    "description": "Born from primordial chaos. Unpredictable but immensely powerful.",
+    "rarity": "Primordial",
+    "element": "None",
+    "passive_effects": {
+      "body_bonus": 10,
+      "mind_bonus": 10,
+      "spirit_bonus": 10,
+      "cultivation_speed_modifier": 0.25,
+      "breakthrough_modifier": 0.2,
+      "combat_modifier": 0.2,
+      "injury_modifier": 0.1
+    },
+    "awakening_chance": 0.15,
+    "realm_skip": true,
+    "realm_skip_chance": 0.15,
+    "awakened_ability": "Chaos Manifestation - Random powerful effects"
+  },
+  {
+    "id": "primordial_void",
+    "name": "Void Walker",
+    "description": "Connected to the primordial void. Space bends to their will.",
+    "rarity": "Primordial",
+    "element": "None",
+    "passive_effects": {
+      "spirit_bonus": 12,
+      "mind_bonus": 8,
+      "exploration_modifier": 0.4,
+      "breakthrough_modifier": 0.15,
+      "cultivation_speed_modifier": 0.15,
+      "injury_modifier": -0.1
+    },
+    "awakening_chance": 0.15,
+    "realm_skip": true,
+    "realm_skip_chance": 0.1,
+    "awakened_ability": "Void Step - Teleportation ability"
+  },
+  {
+    "id": "primordial_time",
+    "name": "Temporal Lineage",
+    "description": "Touched by the river of time. Ages differently from mortals.",
+    "rarity": "Primordial",
+    "element": "None",
+    "passive_effects": {
+      "mind_bonus": 12,
+      "spirit_bonus": 8,
+      "cultivation_speed_modifier": 0.3,
+      "breakthrough_modifier": 0.25,
+      "lifespan_multiplier": 2.0,
+      "injury_modifier": -0.05
+    },
+    "awakening_chance": 0.15,
+    "realm_skip": false,
+    "awakened_ability": "Time Dilation - Slow enemies or speed self"
+  },
+  {
+    "id": "mythic_creator",
+    "name": "Creator's Fragment",
+    "description": "A fragment of a creator being. Reality itself responds to their will.",
+    "rarity": "Mythic",
+    "element": "None",
+    "passive_effects": {
+      "body_bonus": 15,
+      "mind_bonus": 15,
+      "spirit_bonus": 15,
+      "cultivation_speed_modifier": 0.4,
+      "breakthrough_modifier": 0.3,
+      "combat_modifier": 0.25,
+      "diplomacy_modifier": 0.25,
+      "exploration_modifier": 0.25,
+      "injury_modifier": -0.2,
+      "survivor": true
+    },
+    "awakening_chance": 0.2,
+    "realm_skip": true,
+    "realm_skip_chance": 0.2,
+    "awakened_ability": "Reality Weave - Alter local laws of nature"
+  },
+  {
+    "id": "mythic_heavenly",
+    "name": "Heavenly Constitution",
+    "description": "Born with the blessing of the heavens themselves. Destined for greatness.",
+    "rarity": "Mythic",
+    "element": "None",
+    "passive_effects": {
+      "spirit_bonus": 20,
+      "cultivation_speed_modifier": 0.5,
+      "breakthrough_modifier": 0.35,
+      "tribulation_resistance": 0.5,
+      "injury_modifier": -0.15
+    },
+    "awakening_chance": 0.2,
+    "realm_skip": true,
+    "realm_skip_chance": 0.25,
+    "awakened_ability": "Heaven's Favor - Tribulations become opportunities"
+  },
+  {
+    "id": "cursed_demon",
+    "name": "Demon Taint",
+    "description": "Corrupted by demonic essence. Great power at a terrible cost.",
+    "rarity": "Ancient",
+    "element": "Fire",
+    "passive_effects": {
+      "body_bonus": 6,
+      "spirit_bonus": 6,
+      "combat_modifier": 0.4,
+      "cultivation_speed_modifier": 0.15,
+      "breakthrough_modifier": -0.1,
+      "injury_modifier": 0.15,
+      "diplomacy_modifier": -0.3
+    },
+    "awakening_chance": 0.12,
+    "realm_skip": false,
+    "corrupted": true,
+    "awakened_ability": "Demonic Transformation - Massive power boost with sanity cost"
+  },
+  {
+    "id": "cursed_ghost",
+    "name": "Spectral Lineage",
+    "description": "Touched by death. Walks between worlds.",
+    "rarity": "Spirit",
+    "element": "Water",
+    "passive_effects": {
+      "spirit_bonus": 8,
+      "mind_bonus": 4,
+      "exploration_modifier": 0.25,
+      "combat_modifier": 0.1,
+      "breakthrough_modifier": 0.05,
+      "injury_modifier": 0.1,
+      "diplomacy_modifier": -0.15
+    },
+    "awakening_chance": 0.08,
+    "realm_skip": false,
+    "corrupted": true,
+    "awakened_ability": "Phase Walk - Become intangible temporarily"
+  }
+]

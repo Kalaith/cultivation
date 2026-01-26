@@ -15,7 +15,17 @@ pub const TEXT_HIGHLIGHT: Color = Color::new(1.0, 0.9, 0.4, 1.0); // Text Gold
 pub const SUCCESS: Color = Color::new(0.3, 0.8, 0.3, 1.0);
 pub const FAILURE: Color = Color::new(0.8, 0.3, 0.3, 1.0);
 
+pub const BUTTON_NORMAL: Color = Color::new(0.2, 0.25, 0.3, 1.0);
+pub const BUTTON_HOVER: Color = Color::new(0.3, 0.35, 0.4, 1.0);
+pub const BUTTON_PRESS: Color = Color::new(0.15, 0.2, 0.25, 1.0);
+
 pub const FONT_TITLE_SIZE: f32 = 40.0;
 pub const FONT_HEADER_SIZE: f32 = 28.0;
 pub const FONT_BODY_SIZE: f32 = 20.0;
 pub const FONT_SMALL_SIZE: f32 = 16.0;
+
+// Feng Shui Feedback Colors
+pub const FENG_SHUI_POSITIVE: Color = Color::new(0.3, 0.9, 0.4, 1.0);   // Bright green
+pub const FENG_SHUI_NEGATIVE: Color = Color::new(0.9, 0.2, 0.2, 1.0);   // Bright red
+pub const FENG_SHUI_NEUTRAL: Color = Color::new(0.5, 0.5, 0.55, 1.0);   // Gray
+pub const FENG_SHUI_EXCELLENT: Color = Color::new(1.0, 0.85, 0.2, 1.0); // Gold

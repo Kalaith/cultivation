@@ -1,0 +1,30 @@
+[
+    {
+        "id": "recipe_healing_pill",
+        "name": "Refine Spirit Healing Pill",
+        "output_item_id": "spirit_healing_pill",
+        "output_amount": 1,
+        "ingredients": [
+            [
+                "herbs",
+                5
+            ]
+        ],
+        "craft_time": 0,
+        "required_building": "AlchemyFurnace"
+    },
+    {
+        "id": "recipe_iron_sword",
+        "name": "Forge Iron Sword",
+        "output_item_id": "iron_sword",
+        "output_amount": 1,
+        "ingredients": [
+            [
+                "spirit_stones",
+                10
+            ]
+        ],
+        "craft_time": 0,
+        "required_building": "ArtifactForge"
+    }
+]

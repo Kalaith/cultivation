@@ -23,7 +23,8 @@ impl MainMenuState {
         self.load_btn.x = screen_width() / 2.0 - 100.0;
 
         if draw_button(self.start_btn, "Start Journey", true) {
-            return UpdateResult::new().with_transition(StateTransition::ToSectCreation);
+            // User requested to skip Sect Creation screen for now and default to "Test"
+            return UpdateResult::new().with_action(crate::engine::actions::Action::StartNewGame("Test".to_string()));
         }
 
         if draw_button(self.load_btn, "Load Game", true) {
