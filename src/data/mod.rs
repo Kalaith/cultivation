@@ -2,6 +2,7 @@ pub mod bloodlines;
 pub mod buildings;
 pub mod disciples;
 pub mod history;
+pub mod herbs;
 pub mod laws;
 pub mod loader;
 pub mod missions;

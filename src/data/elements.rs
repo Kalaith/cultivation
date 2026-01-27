@@ -12,6 +12,19 @@ pub enum Element {
     None,
 }
 
+impl std::fmt::Display for Element {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Element::Metal => write!(f, "Metal"),
+            Element::Wood => write!(f, "Wood"),
+            Element::Water => write!(f, "Water"),
+            Element::Fire => write!(f, "Fire"),
+            Element::Earth => write!(f, "Earth"),
+            Element::None => write!(f, "None"),
+        }
+    }
+}
+
 #[derive(Debug, PartialEq, Eq)]
 pub enum InteractionResult {
     Feeds,

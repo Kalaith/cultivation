@@ -57,6 +57,9 @@ pub enum DiscipleRank {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Disciple {
+    /// Unique identifier for the disciple
+    #[serde(default)]
+    pub id: u64,
     pub name: String,
     pub rank: DiscipleRank,
     /// ID of the cultivation stage (references stages.json)

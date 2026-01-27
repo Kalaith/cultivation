@@ -22,7 +22,7 @@ impl MissionResolutionState {
             if let Some(outcome) = completed_missions.pop() {
                 self.current_outcome = Some(outcome);
             } else {
-                return UpdateResult::new().with_transition(StateTransition::ToWorldMap);
+                return UpdateResult::new().with_transition(StateTransition::ToSectBase);
             }
         }
 

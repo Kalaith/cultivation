@@ -34,6 +34,7 @@ pub fn generate_disciple(game_data: &GameData) -> Disciple {
     let bloodline = generate_bloodline(game_data, &mut rng);
 
     Disciple {
+        id: rng.gen(), // Generate random unique ID
         name,
         rank: DiscipleRank::Outer,
         realm: "Mortal".to_string(),

@@ -5,9 +5,7 @@
         "description": "A basic pill that soothes internal injuries.",
         "item_type": "Pill",
         "effects": [
-            {
-                "Heal": 20
-            }
+            { "Heal": 20 }
         ]
     },
     {
@@ -16,9 +14,26 @@
         "description": "Concentrates spiritual energy to aid cultivation.",
         "item_type": "Pill",
         "effects": [
-            {
-                "BoostQi": 100
-            }
+            { "BoostQi": 100 }
+        ]
+    },
+    {
+        "id": "body_tempering_pill",
+        "name": "Body Tempering Pill",
+        "description": "Strengthens the physical body and meridians.",
+        "item_type": "Pill",
+        "effects": [
+            { "BoostBody": 10 }
+        ]
+    },
+    {
+        "id": "foundation_pill",
+        "name": "Foundation Establishment Pill",
+        "description": "Aids cultivators in establishing their foundation. Greatly boosts cultivation.",
+        "item_type": "Pill",
+        "effects": [
+            { "BoostQi": 200 },
+            { "BoostSpirit": 5 }
         ]
     },
     {
@@ -27,9 +42,7 @@
         "description": "A common sword forged from mortal iron.",
         "item_type": "Artifact",
         "effects": [
-            {
-                "BoostBody": 5
-            }
+            { "BoostBody": 5 }
         ]
     },
     {
@@ -37,5 +50,99 @@
         "name": "Spirit Ore",
         "description": "Ore infused with spiritual energy. Used for forging.",
         "item_type": "Resource"
+    },
+    {
+        "id": "spirit_grass",
+        "name": "Spirit Grass",
+        "description": "Common herb that absorbs ambient Qi. Can be consumed directly for minor cultivation boost.",
+        "item_type": "Resource",
+        "effects": [
+            { "BoostQi": 10 }
+        ]
+    },
+    {
+        "id": "ember_root",
+        "name": "Ember Root",
+        "description": "A root that smolders with inner fire. Can be consumed to temper the body.",
+        "item_type": "Resource",
+        "effects": [
+            { "BoostBody": 5 }
+        ]
+    },
+    {
+        "id": "moonwell_lotus",
+        "name": "Moonwell Lotus",
+        "description": "Blooms only under moonlight. Consuming it calms the spirit.",
+        "item_type": "Resource",
+        "effects": [
+            { "BoostMind": 10 },
+            { "BoostSpirit": 5 }
+        ]
+    },
+    {
+        "id": "iron_bark_fungus",
+        "name": "Iron Bark Fungus",
+        "description": "Grows on ancient metal-rich trees. Strengthens meridians when consumed.",
+        "item_type": "Resource",
+        "effects": [
+            { "BoostBody": 15 }
+        ]
+    },
+    {
+        "id": "yellow_earth_ginseng",
+        "name": "Yellow Earth Ginseng",
+        "description": "Century-old root that stabilizes cultivation foundation. Highly potent when consumed raw.",
+        "item_type": "Resource",
+        "effects": [
+            { "BoostQi": 50 },
+            { "Heal": 30 }
+        ]
+    },
+    {
+        "id": "dried_spirit_grass",
+        "name": "Dried Spirit Grass",
+        "description": "Preserved spirit grass. Lasts longer and is more stable for alchemy.",
+        "item_type": "Resource",
+        "effects": [
+            { "BoostQi": 8 }
+        ]
+    },
+    {
+        "id": "dried_ember_root",
+        "name": "Dried Ember Root",
+        "description": "Preserved ember root. The fire essence is concentrated.",
+        "item_type": "Resource",
+        "effects": [
+            { "BoostBody": 4 }
+        ]
+    },
+    {
+        "id": "dried_moonwell_lotus",
+        "name": "Dried Moonwell Lotus",
+        "description": "Preserved moonwell lotus. Retains its calming properties.",
+        "item_type": "Resource",
+        "effects": [
+            { "BoostMind": 8 },
+            { "BoostSpirit": 4 }
+        ]
+    },
+    {
+        "id": "dried_iron_bark_fungus",
+        "name": "Dried Iron Bark Fungus",
+        "description": "Preserved iron bark fungus. Metal essence is stabilized.",
+        "item_type": "Resource",
+        "effects": [
+            { "BoostBody": 12 }
+        ]
+    },
+    {
+        "id": "dried_yellow_earth_ginseng",
+        "name": "Dried Yellow Earth Ginseng",
+        "description": "Preserved earth ginseng. Foundation essence is sealed for later use.",
+        "item_type": "Resource",
+        "effects": [
+            { "BoostQi": 40 },
+            { "Heal": 25 }
+        ]
     }
 ]

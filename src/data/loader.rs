@@ -2,6 +2,7 @@ use crate::data::{
     bloodlines::Bloodline,
     buildings::Building,
     disciples::FateTrait,
+    herbs::Herb,
     missions::{MapNode, Mission},
     stages::StageDefinition,
 };
@@ -22,6 +23,8 @@ pub struct GameData {
     pub stages: std::collections::HashMap<String, StageDefinition>,
     /// Ordered list of stage IDs for progression
     pub stages_order: Vec<String>,
+    /// Herb definitions for the herb system
+    pub herbs: std::collections::HashMap<String, Herb>,
 }
 
 #[derive(Clone, serde::Deserialize)]
@@ -91,6 +94,10 @@ impl GameData {
         let bloodlines_list: Vec<Bloodline> = serde_json::from_str(&bloodlines_json)?;
         let bloodlines = bloodlines_list.into_iter().map(|b| (b.id.clone(), b)).collect();
 
+        let herbs_json = std::fs::read_to_string("assets/data/herbs.json").unwrap_or_else(|_| "[]".to_string());
+        let herbs_list: Vec<Herb> = serde_json::from_str(&herbs_json)?;
+        let herbs = herbs_list.into_iter().map(|h| (h.id.clone(), h)).collect();
+
         Ok(GameData {
             buildings,
             building_definitions,
@@ -104,6 +111,7 @@ impl GameData {
             techs,
             stages,
             stages_order,
+            herbs,
         })
     }
 }

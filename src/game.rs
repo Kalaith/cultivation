@@ -1,6 +1,7 @@
 use crate::data::disciples::{Disciple, DiscipleRank, Talent};
 use crate::data::grid::Grid;
-use crate::data::buildings::BuildingType;
+use crate::data::buildings::{BuildingStatus, BuildingType};
+use crate::data::herbs::{Season, GrowingHerb, DIRECT_CONSUMPTION_EFFICIENCY, RAW_HERB_DECAY_RATE};
 use crate::data::history::DeceasedDisciple;
 use crate::data::loader::GameData;
 use crate::data::missions::{MissionOutcome, MissionRewards, OngoingMission, RelevantStat};
@@ -46,7 +47,12 @@ pub struct Game {
     pub completed_missions: Vec<MissionOutcome>,
     pub completed_history: Vec<String>, // List of descriptions of successfully completed missions
     pub event_log: Vec<String>,
+    pub tutorial: crate::state::TutorialState,
     tick: u64,
+    /// Current season for herb growth
+    pub current_season: Season,
+    /// Ticks until next season change (3600 ticks = 1 minute at 60 fps)
+    pub season_ticks: u32,
 }
 
 impl Game {
@@ -89,8 +95,24 @@ impl Game {
             completed_missions: Vec::new(),
             completed_history: Vec::new(),
             event_log: vec!["The sect has fallen... We must rebuild.".to_string()],
+            tutorial: crate::state::TutorialState::new(),
             tick: 0,
+            current_season: Season::Spring,
+            season_ticks: 3600, // 1 minute per season at 60 fps
         }
+    }
+
+    fn get_population_capacity(&self) -> u32 {
+        self.data
+            .buildings
+            .iter()
+            .filter(|b| b.status == BuildingStatus::Active)
+            .map(|b| match b.building_type {
+                BuildingType::SectHall => b.get_max_disciples(),
+                BuildingType::Dormitory => b.get_dorm_capacity(),
+                _ => 0,
+            })
+            .sum()
     }
 
     pub fn update(&mut self) {
@@ -250,6 +272,9 @@ impl Game {
                 }
             }
 
+            // Herb Garden growth and harvest logic
+            self.process_herb_gardens();
+
             // Mission Tick
             let mut completed_indices = Vec::new();
             for (i, mission) in self.ongoing_missions.iter_mut().enumerate() {
@@ -267,6 +292,18 @@ impl Game {
             }
         }
         
+        // Season change logic
+        self.season_ticks = self.season_ticks.saturating_sub(1);
+        if self.season_ticks == 0 {
+            let old_season = self.current_season.clone();
+            self.current_season = self.current_season.next();
+            self.season_ticks = 3600; // Reset for next season
+            self.event_log.push(format!("The season has changed from {} to {}.", old_season, self.current_season));
+
+            // Apply herb decay at season change
+            self.apply_herb_decay();
+        }
+
         // World Evolution Tick (every 5 seconds approx)
         if self.tick % 300 == 0 {
             let mut rng = rand::thread_rng();
@@ -278,7 +315,7 @@ impl Game {
                     }
                 }
             }
-            
+
             // Salary Tick (Every 300 ticks or 600? Let's do 600 ~ 10sec for daily salary)
         }
         
@@ -300,7 +337,7 @@ impl Game {
 
         let update_result = match &mut self.state {
             GameState::MainMenu(s) => s.update(),
-            GameState::SectBase(s) => s.update(&mut self.data, &mut self.grid, self.spirit_stones, self.herbs, self.influence, self.relics, &self.inventory, &self.unlocked_techs, &self.event_log, &self.ongoing_missions, &self.completed_missions, &self.completed_history),
+            GameState::SectBase(s) => s.update(&mut self.data, &mut self.grid, self.spirit_stones, self.herbs, self.influence, self.relics, &self.inventory, &self.unlocked_techs, &self.event_log, &self.ongoing_missions, &self.completed_missions, &self.completed_history, &self.disciples, &self.current_season, self.season_ticks, &mut self.tutorial),
             GameState::DiscipleRoster(s) => s.update(&self.data, &self.disciples, &self.inventory),
             GameState::WorldMap(s) => s.update(&self.data),
             GameState::MissionResolution(s) => s.update(&mut self.completed_missions),
@@ -627,9 +664,14 @@ impl Game {
                 }
             }
             Action::RecruitDisciple => {
-                let new_disciple = generate_disciple(&self.data);
-                self.event_log.push(format!("Recruited: {}", new_disciple.name));
-                self.disciples.push(new_disciple);
+                let capacity = self.get_population_capacity();
+                if capacity == 0 || self.disciples.len() as u32 >= capacity {
+                    self.event_log.push("Population cap reached. Build Dormitories or upgrade the Sect Hall.".to_string());
+                } else {
+                    let new_disciple = generate_disciple(&self.data);
+                    self.event_log.push(format!("Recruited: {}", new_disciple.name));
+                    self.disciples.push(new_disciple);
+                }
             }
             Action::PromoteDisciple(idx) => {
                 if let Some(disciple) = self.disciples.get_mut(idx) {
@@ -751,33 +793,47 @@ impl Game {
                 let count = *self.inventory.get(&item_id).unwrap_or(&0);
                 if count > 0 {
                     if let Some(disciple) = self.disciples.get_mut(disciple_idx) {
-                        if let Some(item) = self.data.items.get(&item_id) {
-                            // Apply effects
+                        if let Some(item) = self.data.items.get(&item_id).cloned() {
+                            // Determine efficiency: herbs (Resources) have 50% efficiency when consumed directly
+                            let is_herb = item.item_type == crate::data::items::ItemType::Resource &&
+                                         self.data.herbs.contains_key(&item_id);
+                            let efficiency = if is_herb { DIRECT_CONSUMPTION_EFFICIENCY } else { 1.0 };
+
+                            // Apply effects with efficiency modifier
                             for effect in &item.effects {
                                 match effect {
-                                    crate::data::items::ItemEffect::Heal(_amt) => {
+                                    crate::data::items::ItemEffect::Heal(amt) => {
+                                        let effective_amt = ((*amt as f32) * efficiency) as u32;
                                         // No HP yet, maybe clear injury trait?
-                                        self.event_log.push(format!("Used {} on {}. (Heal not fully impl)", item.name, disciple.name));
+                                        self.event_log.push(format!("Used {} on {}. Healed {} (Heal not fully impl)", item.name, disciple.name, effective_amt));
                                     },
                                     crate::data::items::ItemEffect::BoostQi(amt) => {
-                                        disciple.exp += amt; // Treat Qi Boost as XP for now
-                                        self.event_log.push(format!("{} gained {} Cultivation XP from {}.", disciple.name, amt, item.name));
+                                        let effective_amt = ((*amt as f32) * efficiency) as u32;
+                                        disciple.exp += effective_amt;
+                                        if is_herb {
+                                            self.event_log.push(format!("{} gained {} Cultivation XP from {} (50% herb efficiency).", disciple.name, effective_amt, item.name));
+                                        } else {
+                                            self.event_log.push(format!("{} gained {} Cultivation XP from {}.", disciple.name, effective_amt, item.name));
+                                        }
                                     },
                                     crate::data::items::ItemEffect::BoostBody(amt) => {
-                                        disciple.attributes.body += amt;
-                                        self.event_log.push(format!("{}'s Body increased by {}!", disciple.name, amt));
+                                        let effective_amt = ((*amt as f32) * efficiency).max(1.0) as u32;
+                                        disciple.attributes.body += effective_amt;
+                                        self.event_log.push(format!("{}'s Body increased by {}!", disciple.name, effective_amt));
                                     },
                                     crate::data::items::ItemEffect::BoostMind(amt) => {
-                                        disciple.attributes.mind += amt;
-                                        self.event_log.push(format!("{}'s Mind increased by {}!", disciple.name, amt));
+                                        let effective_amt = ((*amt as f32) * efficiency).max(1.0) as u32;
+                                        disciple.attributes.mind += effective_amt;
+                                        self.event_log.push(format!("{}'s Mind increased by {}!", disciple.name, effective_amt));
                                     },
                                     crate::data::items::ItemEffect::BoostSpirit(amt) => {
-                                        disciple.attributes.spirit += amt;
-                                        self.event_log.push(format!("{}'s Spirit increased by {}!", disciple.name, amt));
+                                        let effective_amt = ((*amt as f32) * efficiency).max(1.0) as u32;
+                                        disciple.attributes.spirit += effective_amt;
+                                        self.event_log.push(format!("{}'s Spirit increased by {}!", disciple.name, effective_amt));
                                     },
                                 }
                             }
-                            
+
                             // Deduct item
                             if let Some(c) = self.inventory.get_mut(&item_id) {
                                 *c -= 1;
@@ -878,16 +934,112 @@ impl Game {
                 self.completed_history.clear();
                 self.deceased_disciples.clear();
                 self.event_log = vec!["The sect has fallen... We must rebuild.".to_string()];
+                self.tutorial = crate::state::TutorialState::new();
                 self.tick = 0;
+                self.current_season = Season::Spring;
+                self.season_ticks = 3600;
                 self.grid = Grid::new(20, 20); // Reset Grid
-                
-                // Reset Buildings (manually for now as they are part of GameData which is shared... wait. 
+
+                // Reset Buildings (manually for now as they are part of GameData which is shared... wait.
                 // GameData is loaded once. Building STATE (levels) is inside GameData.buildings.
                 // We need to reset the levels.
                 // Resetting to empty is better for blank map start.
                 self.data.buildings.clear();
 
+                // Start with a ruined Sect Hall to restore
+                let mut sect_hall = crate::data::buildings::Building::new(BuildingType::SectHall);
+                sect_hall.id = rand::random();
+                sect_hall.x = 10;
+                sect_hall.y = 10;
+                sect_hall.element = self
+                    .data
+                    .building_definitions
+                    .get(&BuildingType::SectHall)
+                    .map(|d| d.element.clone())
+                    .unwrap_or_default();
+                sect_hall.status = crate::data::buildings::BuildingStatus::Ruined;
+                self.data.buildings.push(sect_hall);
+
                 self.transition(StateTransition::ToSectBase);
+            }
+            Action::PlantHerb(building_id, plot_index, herb_id) => {
+                self.plant_herb(building_id, plot_index, &herb_id);
+            }
+            Action::AssignDiscipleToBuilding(building_id, disciple_id) => {
+                self.assign_disciple_to_building(building_id, disciple_id);
+            }
+            Action::ProcessDryingPavilion(building_id, herb_id) => {
+                self.process_drying(building_id, &herb_id);
+            }
+            Action::SetGreenhouseInfusion(building_id, element) => {
+                self.set_greenhouse_infusion(building_id, element);
+            }
+        }
+    }
+
+    /// Process herbs in the drying pavilion
+    fn process_drying(&mut self, building_id: u64, herb_id: &str) {
+        // Find building
+        let building = match self.data.buildings.iter().find(|b| b.id == building_id) {
+            Some(b) => b.clone(),
+            None => {
+                self.event_log.push("Building not found.".to_string());
+                return;
+            }
+        };
+
+        if building.building_type != BuildingType::DryingPavilion {
+            self.event_log.push("This is not a Drying Pavilion.".to_string());
+            return;
+        }
+
+        // Check if we have the herb (and it's not already dried)
+        if herb_id.starts_with("dried_") {
+            self.event_log.push("Already dried.".to_string());
+            return;
+        }
+
+        let current_count = *self.inventory.get(herb_id).unwrap_or(&0);
+        if current_count < 5 {
+            self.event_log.push(format!("Need at least 5 {} to dry (have {}).", herb_id, current_count));
+            return;
+        }
+
+        // Process: 5 raw -> 4 dried (with loss reduction from level)
+        let loss_rate = building.get_drying_loss_rate();
+        let output_amount = ((5.0 * (1.0 - loss_rate)).ceil() as u32).max(1);
+
+        // Deduct raw herbs
+        if let Some(count) = self.inventory.get_mut(herb_id) {
+            *count -= 5;
+        }
+
+        // Add dried herbs
+        let dried_id = format!("dried_{}", herb_id);
+        *self.inventory.entry(dried_id.clone()).or_insert(0) += output_amount;
+
+        self.event_log.push(format!(
+            "Dried 5 {} -> {} {}.",
+            herb_id, output_amount, dried_id
+        ));
+    }
+
+    /// Set or clear greenhouse elemental infusion
+    fn set_greenhouse_infusion(&mut self, building_id: u64, element: Option<crate::data::elements::Element>) {
+        if let Some(building) = self.data.buildings.iter_mut().find(|b| b.id == building_id) {
+            if building.building_type != BuildingType::Greenhouse {
+                self.event_log.push("This is not a Greenhouse.".to_string());
+                return;
+            }
+
+            if let Some(ref elem) = element {
+                // Check for required materials (simplified: 1 herb of matching element per season)
+                // For MVP, just set it - material cost could be checked per season tick
+                building.infused_element = Some(elem.clone());
+                self.event_log.push(format!("Greenhouse infused with {} element.", elem));
+            } else {
+                building.infused_element = None;
+                self.event_log.push("Greenhouse infusion cleared.".to_string());
             }
         }
     }
@@ -937,7 +1089,7 @@ impl Game {
             {
                 fs::read_to_string("savegame.json").ok()
             }
-            
+
             #[cfg(target_arch = "wasm32")]
             {
                 LocalStorage::get("cultivation_save")
@@ -950,7 +1102,7 @@ impl Game {
                 let data = self.data.clone(); // In a real engine, we might reload data, but here we reuse
                 // Important: We need to overwrite building states in data with saved ones
                 // But data is shared immutable usually? In this struct it's owned `data: GameData`.
-                
+
                 let mut new_game = Self {
                     state: GameState::SectBase(SectBaseState::new()), // Default to base on load
                     data: data.clone(),
@@ -968,17 +1120,233 @@ impl Game {
                     completed_missions: save_data.completed_missions,
                     completed_history: save_data.completed_history,
                     event_log: Vec::new(),
-                    tick: save_data.tick, 
+                    tutorial: crate::state::TutorialState::new(),
+                    tick: save_data.tick,
+                    current_season: Season::Spring, // TODO: save/load season
+                    season_ticks: 3600,
                 };
-                
+
                 // Restore building states
                 // save_data.buildings has the modified buildings.
                 // data.buildings (from json) has defaults.
                 new_game.data.buildings = save_data.buildings;
-                
+
                 return Some(new_game);
             }
         }
         None
+    }
+
+    /// Process herb growth and harvesting in herb gardens
+    fn process_herb_gardens(&mut self) {
+        let mut harvested_herbs: Vec<(String, u32)> = Vec::new();
+        let mut log_messages: Vec<String> = Vec::new();
+
+        // Get disciple info for quality calculation
+        let disciple_spirits: std::collections::HashMap<u64, u32> = self.disciples.iter()
+            .map(|d| (d.id, d.attributes.spirit))
+            .collect();
+
+        for building in self.data.buildings.iter_mut() {
+            if building.building_type != BuildingType::HerbGarden &&
+               building.building_type != BuildingType::Greenhouse {
+                continue;
+            }
+
+            // Sync plots with building level
+            building.sync_herb_plots();
+
+            let growth_multiplier = building.get_growth_speed_multiplier();
+            let has_worker = building.assigned_disciple.is_some();
+            let worker_spirit = building.assigned_disciple
+                .and_then(|id| disciple_spirits.get(&id).copied())
+                .unwrap_or(0);
+
+            for plot in building.herb_plots.iter_mut() {
+                if let Some(ref mut growing) = plot.growing {
+                    // Apply growth
+                    let growth = (1.0 * growth_multiplier) as u32;
+                    growing.ticks_remaining = growing.ticks_remaining.saturating_sub(growth.max(1));
+
+                    // Check for harvest
+                    if growing.is_mature() {
+                        if has_worker {
+                            // Harvest with quality bonus from worker Spirit
+                            let quality_bonus = 1.0 + (worker_spirit as f32 / 100.0);
+                            let final_quality = (growing.quality * quality_bonus).min(2.0);
+                            let harvest_amount = (final_quality).ceil() as u32;
+
+                            harvested_herbs.push((growing.herb_id.clone(), harvest_amount));
+                            log_messages.push(format!(
+                                "Harvested {}x {} from {}.",
+                                harvest_amount, growing.herb_id, building.building_type
+                            ));
+
+                            // Clear plot for replanting
+                            plot.growing = None;
+                            plot.decay_ticks = 0;
+                        } else {
+                            // No worker - herb decays on vine
+                            plot.decay_ticks += 1;
+                            if plot.decay_ticks > 60 {
+                                log_messages.push(format!(
+                                    "A {} withered in {} - no worker to harvest!",
+                                    growing.herb_id, building.building_type
+                                ));
+                                plot.growing = None;
+                                plot.decay_ticks = 0;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Apply harvests to inventory
+        for (herb_id, amount) in harvested_herbs {
+            *self.inventory.entry(herb_id).or_insert(0) += amount;
+        }
+
+        // Add log messages
+        for msg in log_messages {
+            self.event_log.push(msg);
+        }
+    }
+
+    /// Apply herb decay at season change
+    fn apply_herb_decay(&mut self) {
+        // Calculate total decay reduction from Herb Storage buildings
+        let storage_reduction: f32 = self.data.buildings.iter()
+            .filter(|b| b.building_type == BuildingType::HerbStorage &&
+                       b.status == crate::data::buildings::BuildingStatus::Active)
+            .map(|b| b.get_decay_reduction())
+            .max_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal))
+            .unwrap_or(0.0);
+
+        let final_decay_rate = RAW_HERB_DECAY_RATE * (1.0 - storage_reduction);
+
+        if final_decay_rate <= 0.001 {
+            return; // Effectively no decay
+        }
+
+        // Get list of raw herb IDs from data
+        let raw_herb_ids: Vec<String> = self.data.herbs.keys().cloned().collect();
+
+        let mut decay_messages: Vec<String> = Vec::new();
+
+        for herb_id in raw_herb_ids {
+            // Only decay raw herbs (not dried)
+            if herb_id.starts_with("dried_") {
+                continue;
+            }
+
+            if let Some(count) = self.inventory.get_mut(&herb_id) {
+                if *count > 0 {
+                    let decay_amount = ((*count as f32) * final_decay_rate).ceil() as u32;
+                    let actual_decay = decay_amount.min(*count);
+                    if actual_decay > 0 {
+                        *count -= actual_decay;
+                        decay_messages.push(format!("{} {} decayed.", actual_decay, herb_id));
+                    }
+                }
+            }
+        }
+
+        for msg in decay_messages {
+            self.event_log.push(msg);
+        }
+    }
+
+    /// Plant an herb in a garden plot
+    pub fn plant_herb(&mut self, building_id: u64, plot_index: usize, herb_id: &str) -> bool {
+        // Validate herb exists
+        let herb = match self.data.herbs.get(herb_id) {
+            Some(h) => h.clone(),
+            None => return false,
+        };
+
+        // Find building
+        let building = match self.data.buildings.iter_mut().find(|b| b.id == building_id) {
+            Some(b) => b,
+            None => return false,
+        };
+
+        // Validate building type
+        if building.building_type != BuildingType::HerbGarden &&
+           building.building_type != BuildingType::Greenhouse {
+            return false;
+        }
+
+        // Check tier restrictions
+        if herb.tier > building.get_max_herb_tier() {
+            self.event_log.push(format!(
+                "Cannot plant {} - tier {} exceeds {} capacity.",
+                herb.name, herb.tier, building.building_type
+            ));
+            return false;
+        }
+
+        // Check season (unless greenhouse with infusion)
+        let can_grow_this_season = herb.grow_seasons.contains(&self.current_season) ||
+            (building.building_type == BuildingType::Greenhouse &&
+             building.infused_element.as_ref() == Some(&herb.element));
+
+        if !can_grow_this_season {
+            self.event_log.push(format!(
+                "Cannot plant {} - wrong season ({}).",
+                herb.name, self.current_season
+            ));
+            return false;
+        }
+
+        // Check plot availability
+        building.sync_herb_plots();
+        if plot_index >= building.herb_plots.len() {
+            return false;
+        }
+
+        if building.herb_plots[plot_index].growing.is_some() {
+            self.event_log.push("Plot is already occupied.".to_string());
+            return false;
+        }
+
+        // Plant the herb
+        let growing = GrowingHerb::new(herb_id.to_string(), herb.grow_time_ticks);
+        building.herb_plots[plot_index].growing = Some(growing);
+        self.event_log.push(format!("Planted {} in {}.", herb.name, building.building_type));
+        true
+    }
+
+    /// Assign a disciple to work a building
+    pub fn assign_disciple_to_building(&mut self, building_id: u64, disciple_id: Option<u64>) -> bool {
+        // If assigning, validate disciple exists and is Outer rank
+        if let Some(d_id) = disciple_id {
+            let is_valid_worker = self.disciples.iter()
+                .any(|d| d.id == d_id && d.rank == DiscipleRank::Outer);
+            if !is_valid_worker {
+                self.event_log.push("Only Outer Disciples can be assigned to work buildings.".to_string());
+                return false;
+            }
+
+            // Check if disciple is already assigned elsewhere
+            let already_assigned = self.data.buildings.iter()
+                .any(|b| b.assigned_disciple == Some(d_id));
+            if already_assigned {
+                self.event_log.push("This disciple is already assigned to another building.".to_string());
+                return false;
+            }
+        }
+
+        // Find and update building
+        if let Some(building) = self.data.buildings.iter_mut().find(|b| b.id == building_id) {
+            building.assigned_disciple = disciple_id;
+            if disciple_id.is_some() {
+                self.event_log.push(format!("Assigned disciple to {}.", building.building_type));
+            } else {
+                self.event_log.push(format!("Removed assignment from {}.", building.building_type));
+            }
+            return true;
+        }
+        false
     }
 }

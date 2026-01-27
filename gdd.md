@@ -25,6 +25,7 @@ The main loop combines deep colony simulation (base building, logistics) with hi
 * **Elemental Harmony (Feng Shui)** – The environment itself is part of your build. Room layout, facing, and materials matter.
 * **Exponential Power Growth** – From struggling to chop wood to shattering mountains with a thought.
 * **Living World** – Sects, politics, and the environment evolve without you.
+* **Mastery, Not Gatekeeping** – Core systems (Feng Shui, Wu Xing) reward deep engagement but never block progress. A casual player can reach mid-game; the peak is earned through understanding, not grinding.
 
 ## Game Modes
 * **Story Mode (Rise of the Sect):** Narrative tutorial campaign. Rebuild your sect (named by the player), investigate the destruction, and seek revenge.

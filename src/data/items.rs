@@ -8,7 +8,7 @@ pub enum ItemType {
     Artifact,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ItemEffect {
     Heal(u32),        // Restore HP/Injury (Visual only for now unless HP added)
     BoostQi(u32),     // Add XP/Qi

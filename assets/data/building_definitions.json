@@ -9,6 +9,15 @@
         "unique": true
     },
     {
+        "type": "Dormitory",
+        "cost": 120,
+        "name": "Dormitory",
+        "description": "Houses disciples and increases sect population capacity.",
+        "tech_required": "dormitories",
+        "element": "Earth",
+        "unique": false
+    },
+    {
         "type": "TrainingYard",
         "cost": 100,
         "name": "Training Yard",
@@ -58,8 +67,44 @@
         "cost": 50,
         "name": "Mission Board",
         "description": "Assign disciples to missions.",
-        "tech_required": "sect_restoration",
+        "tech_required": "sect_administration",
         "element": "None",
         "unique": true
+    },
+    {
+        "type": "HerbGarden",
+        "cost": 100,
+        "name": "Herb Garden",
+        "description": "Grows Tier 1-2 herbs when tended by Outer Disciples. Assign a disciple to harvest mature herbs.",
+        "tech_required": "basic_infrastructure",
+        "element": "Wood",
+        "unique": false
+    },
+    {
+        "type": "Greenhouse",
+        "cost": 250,
+        "name": "Greenhouse",
+        "description": "Controlled environment for Tier 2-3 herbs. Can override seasonal restrictions with elemental infusion.",
+        "tech_required": "advanced_facilities",
+        "element": "Wood",
+        "unique": false
+    },
+    {
+        "type": "DryingPavilion",
+        "cost": 150,
+        "name": "Drying Pavilion",
+        "description": "Processes raw herbs into dried ingredients. Dried herbs have longer shelf life and are used in alchemy.",
+        "tech_required": "basic_infrastructure",
+        "element": "Fire",
+        "unique": false
+    },
+    {
+        "type": "HerbStorage",
+        "cost": 120,
+        "name": "Herb Storage",
+        "description": "Prevents herb decay. Raw herbs decay 10% per season without storage. Higher levels reduce decay further.",
+        "tech_required": "basic_infrastructure",
+        "element": "Earth",
+        "unique": false
     }
 ]

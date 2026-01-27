@@ -1,11 +1,15 @@
 use crate::data::buildings::{BuildingStatus, BuildingType};
+use crate::data::disciples::Disciple;
 use crate::data::elements::Element;
+use crate::data::herbs::Season;
 use crate::data::loader::GameData;
 use crate::data::grid::Grid;
 use crate::data::missions::{MissionOutcome, OngoingMission};
 use crate::engine::actions::Action;
-use crate::state::{StateTransition, UpdateResult};
+use crate::state::{StateTransition, TutorialState, UpdateResult};
 use crate::ui::components::*;
+use crate::ui::herbs;
+use crate::ui::tech::{self, TechTreeState};
 use crate::ui::theme::*;
 use macroquad::prelude::*;
 
@@ -21,8 +25,13 @@ pub struct SectBaseState {
     feng_shui_overlay_active: bool,
     crafting_modal_open: bool,
     tech_tree_open: bool,
+    tech_tree_state: TechTreeState,
     placement_mode: Option<crate::data::buildings::BuildingType>,
     hovered_tile: Option<(i32, i32)>,
+    // Herb system modals
+    herb_planting_modal: Option<usize>, // Some(plot_index) when open
+    disciple_assignment_modal: bool,
+    infusion_modal_open: bool,
 }
 
 impl SectBaseState {
@@ -33,26 +42,34 @@ impl SectBaseState {
             feng_shui_overlay_active: false,
             crafting_modal_open: false,
             tech_tree_open: false,
+            tech_tree_state: TechTreeState::new(),
             placement_mode: None,
             hovered_tile: None,
+            herb_planting_modal: None,
+            disciple_assignment_modal: false,
+            infusion_modal_open: false,
         }
     }
 
     /// Update handling immediate mode UI
     pub fn update(
-        &mut self, 
-        data: &mut GameData, 
-        grid: &mut Grid, 
-        spirit_stones: u32, 
-        herbs: u32, 
-        influence: u32, 
-        relics: u32, 
-        inventory: &std::collections::HashMap<String, u32>, 
-        unlocked_techs: &[String], 
-        event_log: &[String], 
-        ongoing_missions: &[OngoingMission], 
-        completed_missions: &[MissionOutcome], 
-        completed_history: &[String]
+        &mut self,
+        data: &mut GameData,
+        grid: &mut Grid,
+        spirit_stones: u32,
+        herbs: u32,
+        influence: u32,
+        relics: u32,
+        inventory: &std::collections::HashMap<String, u32>,
+        unlocked_techs: &[String],
+        event_log: &[String],
+        ongoing_missions: &[OngoingMission],
+        completed_missions: &[MissionOutcome],
+        completed_history: &[String],
+        disciples: &[Disciple],
+        current_season: &Season,
+        season_ticks: u32,
+        tutorial: &mut TutorialState,
     ) -> UpdateResult {
         
         // --- 1. Global Input & Navigation ---
@@ -69,7 +86,7 @@ impl SectBaseState {
         let center_w = screen_w - left_panel_w - right_panel_w - 20.0;
         
         // --- 3. Draw Header ---
-        self.draw_header(screen_w, header_h, spirit_stones, herbs, influence, relics);
+        self.draw_header(screen_w, header_h, spirit_stones, herbs, influence, relics, current_season, season_ticks, tutorial);
 
         // --- 4. Draw Left Panel (Buildings & Navigation) ---
         if let Some(res) = self.draw_left_panel(header_h, screen_h, left_panel_w, data) {
@@ -79,22 +96,30 @@ impl SectBaseState {
         // --- 5. Draw Center Panel (Main Content) ---
         let center_rect = Rect::new(left_panel_w, header_h, center_w, screen_h - header_h);
         if let Some(res) = self.draw_center_panel(
-            center_rect, 
-            data, 
-            grid, 
-            spirit_stones, 
+            center_rect,
+            data,
+            grid,
+            spirit_stones,
             herbs,
-            inventory, 
-            unlocked_techs, 
-            ongoing_missions, 
-            completed_missions, 
-            completed_history
+            inventory,
+            unlocked_techs,
+            ongoing_missions,
+            completed_missions,
+            completed_history,
+            disciples,
+            current_season,
         ) {
             return res;
         }
 
         // --- 6. Draw Right Panel (Event Log) ---
+        self.update_tutorial_progress(tutorial, data, unlocked_techs, disciples, ongoing_missions, completed_history);
         self.draw_right_panel(header_h, screen_h, left_panel_w, center_w, right_panel_w, event_log);
+
+        // --- 6.5 Tutorial Overlay (Centered) ---
+        if tutorial.active && !tutorial.hidden {
+            self.draw_tutorial_overlay(screen_w, screen_h, tutorial);
+        }
 
         // --- 7. Modals (Settings, etc) ---
         if self.settings_open {
@@ -132,14 +157,24 @@ impl SectBaseState {
         None
     }
 
-    fn draw_header(&mut self, screen_w: f32, header_h: f32, spirit_stones: u32, herbs: u32, influence: u32, relics: u32) {
+    fn draw_header(&mut self, screen_w: f32, header_h: f32, spirit_stones: u32, herbs: u32, influence: u32, relics: u32, current_season: &Season, season_ticks: u32, tutorial: &mut TutorialState) {
         draw_panel(Rect::new(0.0, 0.0, screen_w, header_h), None);
         draw_text("SECT MANAGEMENT", 20.0, 40.0, FONT_TITLE_SIZE, PRIMARY);
-        
+
+        // Season indicator
+        herbs::draw_season_indicator(250.0, 40.0, current_season, season_ticks);
+
         let res_text = format!("SS: {}  Herbs: {}  Infl: {}  Relics: {}", spirit_stones, herbs, influence, relics);
         let res_dims = measure_text(&res_text, None, FONT_HEADER_SIZE as u16, 1.0);
-        
+
         draw_text(&res_text, screen_w - res_dims.width - 60.0, 40.0, FONT_HEADER_SIZE, TEXT_HIGHLIGHT);
+
+        // Tutorial toggle (if hidden)
+        if tutorial.active && tutorial.hidden {
+            if draw_button(Rect::new(screen_w - 100.0, 10.0, 40.0, 40.0), "?", false) {
+                tutorial.hidden = false;
+            }
+        }
 
         // Cog Button (Settings)
         if draw_button(Rect::new(screen_w - 50.0, 10.0, 40.0, 40.0), "O", false) {
@@ -189,31 +224,35 @@ impl SectBaseState {
     }
 
     fn draw_center_panel(
-        &mut self, 
-        rect: Rect, 
-        data: &mut GameData, 
-        grid: &mut Grid, 
-        spirit_stones: u32, 
+        &mut self,
+        rect: Rect,
+        data: &mut GameData,
+        grid: &mut Grid,
+        spirit_stones: u32,
         herbs: u32,
-        inventory: &std::collections::HashMap<String, u32>, 
-        unlocked_techs: &[String], 
-        ongoing_missions: &[OngoingMission], 
-        completed_missions: &[MissionOutcome], 
-        completed_history: &[String]
+        inventory: &std::collections::HashMap<String, u32>,
+        unlocked_techs: &[String],
+        ongoing_missions: &[OngoingMission],
+        completed_missions: &[MissionOutcome],
+        completed_history: &[String],
+        disciples: &[Disciple],
+        current_season: &Season,
     ) -> Option<UpdateResult> {
         match self.view {
             SectView::Map => self.draw_map_view(rect, data, grid, spirit_stones, unlocked_techs),
             SectView::BuildingDetails(id) => self.draw_building_details(
-                rect, 
-                id, 
-                data, 
-                spirit_stones, 
+                rect,
+                id,
+                data,
+                spirit_stones,
                 herbs,
-                inventory, 
-                unlocked_techs, 
-                ongoing_missions, 
-                completed_missions, 
-                completed_history
+                inventory,
+                unlocked_techs,
+                ongoing_missions,
+                completed_missions,
+                completed_history,
+                disciples,
+                current_season,
             ),
         }
     }
@@ -428,51 +467,91 @@ impl SectBaseState {
     }
 
     fn draw_building_details(
-        &mut self, 
-        rect: Rect, 
-        id: u64, 
-        data: &mut GameData, 
+        &mut self,
+        rect: Rect,
+        id: u64,
+        data: &mut GameData,
         spirit_stones: u32,
         herbs: u32,
         inventory: &std::collections::HashMap<String, u32>,
         unlocked_techs: &[String],
-        ongoing_missions: &[OngoingMission], 
-        completed_missions: &[MissionOutcome], 
-        completed_history: &[String]
+        ongoing_missions: &[OngoingMission],
+        completed_missions: &[MissionOutcome],
+        completed_history: &[String],
+        disciples: &[Disciple],
+        current_season: &Season,
     ) -> Option<UpdateResult> {
-        
-        let building = data.buildings.iter().find(|b| b.id == id)?; // If not found, do nothing
-        let b_type = &building.building_type;
-        
-        draw_text(&format!("{:?}", b_type), rect.x + 20.0, rect.y + 60.0, FONT_HEADER_SIZE, PRIMARY);
+
+        let building = data.buildings.iter().find(|b| b.id == id)?.clone();
+        let b_type = building.building_type.clone();
+
+        draw_text(&format!("{}", b_type), rect.x + 20.0, rect.y + 60.0, FONT_HEADER_SIZE, PRIMARY);
         let d_y = rect.y + 100.0;
-        
+
         draw_text(&format!("Level: {}", building.level), rect.x + 20.0, d_y, FONT_BODY_SIZE, TEXT_PRIMARY);
         draw_text(&format!("Element: {:?}", building.element), rect.x + 20.0, d_y + 30.0, FONT_BODY_SIZE, TEXT_SECONDARY);
-        draw_text(&format!("Feng Shui: {:.1}", building.feng_shui_score), rect.x + 20.0, d_y + 60.0, FONT_BODY_SIZE, 
-            if building.feng_shui_score > 0.0 { Color::new(0.2, 0.8, 0.2, 1.0) } 
-            else if building.feng_shui_score < 0.0 { Color::new(0.8, 0.2, 0.2, 1.0) } 
+        draw_text(&format!("Feng Shui: {:.1}", building.feng_shui_score), rect.x + 20.0, d_y + 60.0, FONT_BODY_SIZE,
+            if building.feng_shui_score > 0.0 { Color::new(0.2, 0.8, 0.2, 1.0) }
+            else if building.feng_shui_score < 0.0 { Color::new(0.8, 0.2, 0.2, 1.0) }
             else { TEXT_SECONDARY }
         );
 
         // Close Button for Details
         if draw_button(Rect::new(rect.x + rect.w - 80.0, rect.y + 10.0, 60.0, 30.0), "Back", false) {
             self.view = SectView::Map;
+            self.herb_planting_modal = None;
+            self.disciple_assignment_modal = false;
+            self.infusion_modal_open = false;
             return None;
         }
 
         // Specialized Building Actions
-        let action_y = d_y + 100.0;
-        
+        let mut action_y = d_y + 100.0;
+        if b_type == BuildingType::SectHall {
+            let capacity: u32 = data
+                .buildings
+                .iter()
+                .filter(|b| b.status == BuildingStatus::Active)
+                .map(|b| match b.building_type {
+                    BuildingType::SectHall => b.get_max_disciples(),
+                    BuildingType::Dormitory => b.get_dorm_capacity(),
+                    _ => 0,
+                })
+                .sum();
+            let current = disciples.len() as u32;
+            draw_text(
+                &format!("Population: {}/{}", current, capacity),
+                rect.x + 20.0,
+                d_y + 90.0,
+                FONT_BODY_SIZE,
+                TEXT_SECONDARY,
+            );
+            action_y = d_y + 130.0;
+        }
+
         if building.status == BuildingStatus::Ruined {
             draw_text("(Ruined)", rect.x + 200.0, rect.y + 60.0, FONT_HEADER_SIZE, Color::new(0.8, 0.2, 0.2, 1.0));
-            if draw_button(Rect::new(rect.x + 20.0, action_y, 200.0, 40.0), "Repair (50 SS)", false) {
+            let repair_label = if b_type == BuildingType::SectHall {
+                "Restore (50 SS)"
+            } else {
+                "Repair (50 SS)"
+            };
+            if draw_button(Rect::new(rect.x + 20.0, action_y, 200.0, 40.0), repair_label, false) {
                  return Some(UpdateResult::new().with_action(Action::RepairBuilding(building.id)));
             }
-        } else if *b_type == BuildingType::MissionBoard {
+        } else if b_type == BuildingType::MissionBoard {
             if let Some(res) = self.draw_mission_list(rect, data, ongoing_missions, completed_missions, completed_history, action_y) {
                 return Some(res);
             }
+        } else if matches!(b_type, BuildingType::HerbGarden | BuildingType::Greenhouse) {
+            // Herb garden/greenhouse specific UI
+            return self.draw_herb_building_details(rect, &building, data, disciples, current_season, action_y);
+        } else if b_type == BuildingType::DryingPavilion {
+            // Drying Pavilion UI
+            return self.draw_drying_pavilion_details(rect, &building, data, inventory, action_y);
+        } else if b_type == BuildingType::HerbStorage {
+            // Herb Storage UI
+            return self.draw_herb_storage_details(rect, &building, data, inventory, action_y);
         } else {
              // Upgrade Button
              if draw_button(Rect::new(rect.x + 20.0, action_y, 150.0, 40.0), "Upgrade (50 SS)", false) {
@@ -480,7 +559,7 @@ impl SectBaseState {
              }
 
              // Specific Buttons
-             if *b_type == BuildingType::SectHall {
+             if b_type == BuildingType::SectHall {
                   if draw_button(Rect::new(rect.x + 180.0, action_y, 150.0, 40.0), "Recruit", false) {
                       return Some(UpdateResult::new().with_action(Action::RecruitDisciple));
                   }
@@ -496,16 +575,154 @@ impl SectBaseState {
 
         // Modals overlaying details
         if self.tech_tree_open {
-             if let Some(res) = self.draw_tech_tree_modal(data, unlocked_techs) {
+            let (screen_w, screen_h) = (screen_width(), screen_height());
+            let modal_w = 650.0;
+            let modal_x = (screen_w - modal_w) / 2.0;
+            let modal_y = (screen_h - 550.0) / 2.0;
+
+            let action = tech::draw_tech_tree_modal(&mut self.tech_tree_state, data, unlocked_techs, spirit_stones);
+
+            if tech::check_tech_tree_close(modal_x, modal_y, modal_w) {
+                self.tech_tree_open = false;
+            } else if let Some(action) = action {
+                return Some(UpdateResult::new().with_action(action));
+            }
+        }
+
+        if self.crafting_modal_open {
+             if let Some(res) = self.draw_crafting_modal(data, &b_type, spirit_stones, herbs, inventory) {
                  return Some(res);
              }
         }
 
-        if self.crafting_modal_open {
-             if let Some(res) = self.draw_crafting_modal(data, b_type, spirit_stones, herbs, inventory) {
-                 return Some(res);
-             }
+        None
+    }
+
+    /// Draw herb garden or greenhouse building details
+    fn draw_herb_building_details(
+        &mut self,
+        rect: Rect,
+        building: &crate::data::buildings::Building,
+        data: &GameData,
+        disciples: &[Disciple],
+        current_season: &Season,
+        action_y: f32,
+    ) -> Option<UpdateResult> {
+        let b_type = &building.building_type;
+
+        // Action buttons row
+        if draw_button(Rect::new(rect.x + 20.0, action_y, 140.0, 40.0), "Upgrade (50 SS)", false) {
+            return Some(UpdateResult::new().with_action(Action::UpgradeBuilding(b_type.clone())));
         }
+
+        if draw_button(Rect::new(rect.x + 170.0, action_y, 140.0, 40.0), "Assign Worker", false) {
+            self.disciple_assignment_modal = true;
+        }
+
+        // Greenhouse-specific: infusion button
+        if *b_type == BuildingType::Greenhouse {
+            if draw_button(Rect::new(rect.x + 320.0, action_y, 140.0, 40.0), "Set Infusion", false) {
+                self.infusion_modal_open = true;
+            }
+        }
+
+        // Draw herb garden panel
+        let panel_y = action_y + 60.0;
+        if *b_type == BuildingType::Greenhouse {
+            herbs::draw_greenhouse_panel(building, data, disciples, current_season, rect.x + 20.0, panel_y, rect.w - 40.0);
+        } else {
+            herbs::draw_herb_garden_panel(building, data, disciples, current_season, rect.x + 20.0, panel_y, rect.w - 40.0);
+        }
+
+        // Plant buttons for each empty plot
+        let mut plot_btn_y = panel_y + 30.0;
+        for (i, plot) in building.herb_plots.iter().enumerate() {
+            if i >= building.get_max_herb_plots() {
+                break;
+            }
+            if plot.growing.is_none() {
+                // Show plant button next to the plot display
+                if draw_button(Rect::new(rect.x + rect.w - 120.0, plot_btn_y + 10.0, 80.0, 30.0), "Plant", false) {
+                    self.herb_planting_modal = Some(i);
+                }
+            }
+            plot_btn_y += 65.0;
+        }
+
+        // Handle modals
+        if let Some(plot_idx) = self.herb_planting_modal {
+            let result = herbs::draw_herb_planting_modal(building, data, current_season, plot_idx);
+            if result.close_modal {
+                self.herb_planting_modal = None;
+            }
+            if let Some(action) = result.action {
+                return Some(UpdateResult::new().with_action(action));
+            }
+        }
+
+        if self.disciple_assignment_modal {
+            let result = herbs::draw_disciple_assignment_modal(building, disciples, &data.buildings);
+            if result.close_modal {
+                self.disciple_assignment_modal = false;
+            }
+            if let Some(action) = result.action {
+                return Some(UpdateResult::new().with_action(action));
+            }
+        }
+
+        if self.infusion_modal_open {
+            let result = herbs::draw_infusion_modal(building);
+            if result.close_modal {
+                self.infusion_modal_open = false;
+            }
+            if let Some(action) = result.action {
+                return Some(UpdateResult::new().with_action(action));
+            }
+        }
+
+        None
+    }
+
+    /// Draw drying pavilion building details
+    fn draw_drying_pavilion_details(
+        &mut self,
+        rect: Rect,
+        building: &crate::data::buildings::Building,
+        data: &GameData,
+        inventory: &std::collections::HashMap<String, u32>,
+        action_y: f32,
+    ) -> Option<UpdateResult> {
+        // Upgrade button
+        if draw_button(Rect::new(rect.x + 20.0, action_y, 150.0, 40.0), "Upgrade (50 SS)", false) {
+            return Some(UpdateResult::new().with_action(Action::UpgradeBuilding(building.building_type.clone())));
+        }
+
+        // Draw drying panel
+        let panel_y = action_y + 60.0;
+        if let Some(action) = herbs::draw_drying_pavilion_panel(building, data, inventory, rect.x + 20.0, panel_y, rect.w - 40.0) {
+            return Some(UpdateResult::new().with_action(action));
+        }
+
+        None
+    }
+
+    /// Draw herb storage building details
+    fn draw_herb_storage_details(
+        &mut self,
+        rect: Rect,
+        building: &crate::data::buildings::Building,
+        data: &GameData,
+        inventory: &std::collections::HashMap<String, u32>,
+        action_y: f32,
+    ) -> Option<UpdateResult> {
+        // Upgrade button
+        if draw_button(Rect::new(rect.x + 20.0, action_y, 150.0, 40.0), "Upgrade (50 SS)", false) {
+            return Some(UpdateResult::new().with_action(Action::UpgradeBuilding(building.building_type.clone())));
+        }
+
+        // Draw storage panel
+        let panel_y = action_y + 60.0;
+        herbs::draw_herb_storage_panel(building, data, inventory, rect.x + 20.0, panel_y, rect.w - 40.0);
 
         None
     }
@@ -581,51 +798,6 @@ impl SectBaseState {
          None
     }
 
-    fn draw_tech_tree_modal(&mut self, data: &GameData, unlocked_techs: &[String]) -> Option<UpdateResult> {
-        let (screen_w, screen_h) = (screen_width(), screen_height());
-        draw_rectangle(0.0, 0.0, screen_w, screen_h, Color::new(0.0, 0.0, 0.0, 0.8));
-        
-        let modal_w = 600.0;
-        let modal_h = 600.0;
-        let modal_x = (screen_w - modal_w) / 2.0;
-        let modal_y = (screen_h - modal_h) / 2.0;
-        
-        draw_panel(Rect::new(modal_x, modal_y, modal_w, modal_h), Some("Sect Knowledge Tree"));
-        
-        if draw_button(Rect::new(modal_x + modal_w - 60.0, modal_y + 10.0, 50.0, 30.0), "Close", false) {
-            self.tech_tree_open = false;
-        }
-        
-        let mut t_y = modal_y + 50.0;
-        for tech in data.techs.values() {
-            let unlocked = unlocked_techs.contains(&tech.id);
-            let can_unlock = !unlocked && tech.prerequisites.iter().all(|p| unlocked_techs.contains(p));
-            
-            let color = if unlocked { Color::new(0.5, 1.0, 0.5, 1.0) } else if can_unlock { Color::new(1.0, 1.0, 0.5, 1.0) } else { Color::new(0.5, 0.5, 0.5, 1.0) };
-            
-            draw_text(&tech.name, modal_x + 20.0, t_y, FONT_HEADER_SIZE, color);
-            draw_text(&format!("Cost: {} SS", tech.cost_spirit_stones), modal_x + 300.0, t_y, FONT_BODY_SIZE, TEXT_SECONDARY);
-            t_y += 25.0;
-            draw_text(&tech.description, modal_x + 20.0, t_y, FONT_SMALL_SIZE, TEXT_SECONDARY);
-            t_y += 25.0;
-            
-            if can_unlock {
-                if draw_button(Rect::new(modal_x + 450.0, t_y - 40.0, 120.0, 30.0), "Research", false) {
-                     return Some(UpdateResult::new().with_action(Action::ResearchTech(tech.id.clone())));
-                }
-            } else if unlocked {
-                draw_text("(Learned)", modal_x + 450.0, t_y - 35.0, FONT_SMALL_SIZE, TEXT_HIGHLIGHT);
-            } else {
-                draw_text("Locked", modal_x + 450.0, t_y - 35.0, FONT_SMALL_SIZE, TEXT_SECONDARY);
-            }
-            
-            t_y += 20.0;
-            draw_line(modal_x + 10.0, t_y, modal_x + modal_w - 10.0, t_y, 1.0, SECONDARY);
-            t_y += 10.0;
-        }
-        None
-    }
-
     fn draw_crafting_modal(&mut self, data: &GameData, b_type: &BuildingType, spirit_stones: u32, herbs: u32, inventory: &std::collections::HashMap<String, u32>) -> Option<UpdateResult> {
         let (screen_w, screen_h) = (screen_width(), screen_height());
         draw_rectangle(0.0, 0.0, screen_w, screen_h, Color::new(0.0, 0.0, 0.0, 0.8));
@@ -693,28 +865,32 @@ impl SectBaseState {
 
     fn draw_right_panel(&self, header_h: f32, screen_h: f32, left_w: f32, center_w: f32, width: f32, event_log: &[String]) {
         let rect = Rect::new(left_w + center_w, header_h, width, screen_h - header_h);
+        self.draw_event_log_panel(rect, event_log, screen_h);
+    }
+
+    fn draw_event_log_panel(&self, rect: Rect, event_log: &[String], screen_h: f32) {
         draw_panel(rect, Some("Event Log"));
-        
+
         let mut log_y = rect.y + 50.0;
-        let max_width = width - 20.0;
-        
+        let max_width = rect.w - 20.0;
+
         for event in event_log.iter().rev().take(20) {
             let words: Vec<&str> = event.split_whitespace().collect();
             let mut current_line = String::new();
-            
+
             for word in words {
                 let test_line = if current_line.is_empty() {
                     word.to_string()
                 } else {
                     format!("{} {}", current_line, word)
                 };
-                
-                if test_line.len() as f32 * 7.0 > max_width { 
-                     draw_text(&current_line, rect.x + 10.0, log_y, FONT_SMALL_SIZE, TEXT_SECONDARY);
-                     log_y += 18.0;
-                     current_line = word.to_string();
+
+                if test_line.len() as f32 * 7.0 > max_width {
+                    draw_text(&current_line, rect.x + 10.0, log_y, FONT_SMALL_SIZE, TEXT_SECONDARY);
+                    log_y += 18.0;
+                    current_line = word.to_string();
                 } else {
-                     current_line = test_line;
+                    current_line = test_line;
                 }
             }
             if !current_line.is_empty() {
@@ -723,6 +899,146 @@ impl SectBaseState {
             }
             log_y += 4.0;
             if log_y > screen_h - 20.0 { break; }
+        }
+    }
+
+    fn draw_tutorial_overlay(&self, screen_w: f32, screen_h: f32, tutorial: &mut TutorialState) {
+        let total_steps = 5;
+        let (title, body) = self.get_tutorial_step_text(tutorial.step);
+        let header = format!("Tutorial {}/{}", (tutorial.step + 1).min(total_steps), total_steps);
+
+        let overlay_w = 700.0;
+        let overlay_h = 220.0;
+        let overlay_x = (screen_w - overlay_w) / 2.0;
+        let overlay_y = screen_h - overlay_h - 10.0;
+        let rect = Rect::new(overlay_x, overlay_y, overlay_w, overlay_h);
+
+        draw_panel(rect, Some(&header));
+
+        // Portrait placeholders (left/right)
+        let portrait_w = 110.0;
+        let portrait_h = 140.0;
+        let portrait_y = rect.y + 50.0;
+        let left_portrait = Rect::new(rect.x + 10.0, portrait_y, portrait_w, portrait_h);
+        let right_portrait = Rect::new(rect.x + rect.w - portrait_w - 10.0, portrait_y, portrait_w, portrait_h);
+        draw_panel(left_portrait, Some("Portrait"));
+        draw_panel(right_portrait, Some("Portrait"));
+
+        let text_x = rect.x + portrait_w + 25.0;
+        let text_w = rect.w - (portrait_w * 2.0) - 50.0;
+
+        draw_text(title, text_x, rect.y + 60.0, FONT_HEADER_SIZE, TEXT_HIGHLIGHT);
+
+        let mut text_y = rect.y + 85.0;
+        let max_width = text_w;
+        let words: Vec<&str> = body.split_whitespace().collect();
+        let mut current_line = String::new();
+
+        for word in words {
+            let test_line = if current_line.is_empty() {
+                word.to_string()
+            } else {
+                format!("{} {}", current_line, word)
+            };
+
+            if test_line.len() as f32 * 7.0 > max_width {
+                draw_text(&current_line, text_x, text_y, FONT_SMALL_SIZE, TEXT_SECONDARY);
+                text_y += 18.0;
+                current_line = word.to_string();
+            } else {
+                current_line = test_line;
+            }
+        }
+        if !current_line.is_empty() {
+            draw_text(&current_line, text_x, text_y, FONT_SMALL_SIZE, TEXT_SECONDARY);
+        }
+
+        // Controls
+        let btn_y = rect.y + rect.h - 40.0;
+        if draw_button(Rect::new(rect.x + rect.w - 190.0, btn_y, 80.0, 30.0), "Hide", false) {
+            tutorial.hidden = true;
+        }
+        if draw_button(Rect::new(rect.x + rect.w - 100.0, btn_y, 80.0, 30.0), "Skip", false) {
+            tutorial.active = false;
+        }
+    }
+
+    fn update_tutorial_progress(
+        &self,
+        tutorial: &mut TutorialState,
+        data: &GameData,
+        unlocked_techs: &[String],
+        disciples: &[Disciple],
+        ongoing_missions: &[OngoingMission],
+        completed_history: &[String],
+    ) {
+        if !tutorial.active {
+            return;
+        }
+
+        let total_steps = 5;
+        while tutorial.step < total_steps
+            && self.is_tutorial_step_complete(
+                tutorial.step,
+                data,
+                unlocked_techs,
+                disciples,
+                ongoing_missions,
+                completed_history,
+            )
+        {
+            tutorial.step += 1;
+        }
+
+        if tutorial.step >= total_steps {
+            tutorial.active = false;
+        }
+    }
+
+    fn is_tutorial_step_complete(
+        &self,
+        step: usize,
+        data: &GameData,
+        unlocked_techs: &[String],
+        disciples: &[Disciple],
+        ongoing_missions: &[OngoingMission],
+        completed_history: &[String],
+    ) -> bool {
+        match step {
+            0 => data.buildings.iter().any(|b| {
+                b.building_type == BuildingType::SectHall && b.status == BuildingStatus::Active
+            }),
+            1 => unlocked_techs.iter().any(|t| t == "sect_administration"),
+            2 => data.buildings.iter().any(|b| b.building_type == BuildingType::MissionBoard),
+            3 => disciples.len() > 1,
+            4 => !ongoing_missions.is_empty() || !completed_history.is_empty(),
+            _ => true,
+        }
+    }
+
+    fn get_tutorial_step_text(&self, step: usize) -> (&'static str, &'static str) {
+        match step {
+            0 => (
+                "Restore the Sect Hall",
+                "Select the ruined Sect Hall and choose Restore (50 SS).",
+            ),
+            1 => (
+                "Unlock the Mission Board",
+                "Open Research / Tech and learn Sect Administration (0 SS).",
+            ),
+            2 => (
+                "Build the Mission Board",
+                "Open Construction and place a Mission Board on the map.",
+            ),
+            3 => (
+                "Recruit a Disciple",
+                "Select the Sect Hall and press Recruit to bring in help.",
+            ),
+            4 => (
+                "Send a Mission",
+                "Open the Mission Board, assign a team, and depart on a mission.",
+            ),
+            _ => ("Tutorial Complete", "All steps finished."),
         }
     }
 

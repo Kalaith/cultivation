@@ -1,24 +1,21 @@
 [
     {
-        "id": "sect_restoration",
-        "name": "Sect Restoration",
-        "description": "Basic knowledge required to repair the Sect Hall and begin rebuilding.",
-        "cost_spirit_stones": 0,
-        "unlocks_buildings": [
-            "SectHall"
-        ],
-        "unlocks_missions": []
-    },
-    {
         "id": "geomancy",
         "name": "Geomancy",
         "description": "Learn to see the flow of Qi in the land. Unlocks Feng Shui view (Press F).",
         "cost_spirit_stones": 50,
         "unlocks_buildings": [],
-        "unlocks_missions": [],
-        "prerequisites": [
-            "sect_restoration"
-        ]
+        "unlocks_missions": []
+    },
+    {
+        "id": "sect_administration",
+        "name": "Sect Administration",
+        "description": "Re-establish the sect's command structure and postings.",
+        "cost_spirit_stones": 0,
+        "unlocks_buildings": [
+            "MissionBoard"
+        ],
+        "unlocks_missions": []
     },
     {
         "id": "basic_infrastructure",
@@ -31,9 +28,19 @@
         ],
         "unlocks_missions": [
             "ResourceGathering"
+        ]
+    },
+    {
+        "id": "dormitories",
+        "name": "Dormitories",
+        "description": "Construct dormitories to expand sect population capacity.",
+        "cost_spirit_stones": 150,
+        "unlocks_buildings": [
+            "Dormitory"
         ],
+        "unlocks_missions": [],
         "prerequisites": [
-            "sect_restoration"
+            "basic_infrastructure"
         ]
     },
     {

@@ -1,0 +1,64 @@
+[
+    {
+        "id": "spirit_grass",
+        "name": "Spirit Grass",
+        "description": "Common herb that absorbs ambient Qi. Foundation of most pills.",
+        "element": "Wood",
+        "tier": 1,
+        "effects": [
+            { "BoostQi": 10 }
+        ],
+        "grow_seasons": ["Spring", "Summer"],
+        "grow_time_ticks": 100
+    },
+    {
+        "id": "ember_root",
+        "name": "Ember Root",
+        "description": "A root that smolders with inner fire. Used in Yang-enhancing pills.",
+        "element": "Fire",
+        "tier": 1,
+        "effects": [
+            { "BoostBody": 5 }
+        ],
+        "grow_seasons": ["Summer"],
+        "grow_time_ticks": 150
+    },
+    {
+        "id": "moonwell_lotus",
+        "name": "Moonwell Lotus",
+        "description": "Blooms only under moonlight. Calms the spirit and aids breakthroughs.",
+        "element": "Water",
+        "tier": 2,
+        "effects": [
+            { "BoostMind": 10 },
+            { "BoostSpirit": 5 }
+        ],
+        "grow_seasons": ["Autumn", "Winter"],
+        "grow_time_ticks": 200
+    },
+    {
+        "id": "iron_bark_fungus",
+        "name": "Iron Bark Fungus",
+        "description": "Grows on ancient metal-rich trees. Strengthens the body's meridians.",
+        "element": "Metal",
+        "tier": 2,
+        "effects": [
+            { "BoostBody": 15 }
+        ],
+        "grow_seasons": ["Autumn"],
+        "grow_time_ticks": 250
+    },
+    {
+        "id": "yellow_earth_ginseng",
+        "name": "Yellow Earth Ginseng",
+        "description": "Century-old root that stabilizes cultivation foundation.",
+        "element": "Earth",
+        "tier": 3,
+        "effects": [
+            { "BoostQi": 50 },
+            { "Heal": 30 }
+        ],
+        "grow_seasons": ["Spring", "Autumn"],
+        "grow_time_ticks": 400
+    }
+]

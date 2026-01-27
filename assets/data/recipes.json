@@ -5,10 +5,45 @@
         "output_item_id": "spirit_healing_pill",
         "output_amount": 1,
         "ingredients": [
-            [
-                "herbs",
-                5
-            ]
+            ["spirit_grass", 3],
+            ["ember_root", 1]
+        ],
+        "craft_time": 0,
+        "required_building": "AlchemyFurnace"
+    },
+    {
+        "id": "recipe_qi_gathering_pill",
+        "name": "Refine Qi Gathering Pill",
+        "output_item_id": "gathering_qi_pill",
+        "output_amount": 1,
+        "ingredients": [
+            ["spirit_grass", 5],
+            ["moonwell_lotus", 1]
+        ],
+        "craft_time": 0,
+        "required_building": "AlchemyFurnace"
+    },
+    {
+        "id": "recipe_body_tempering_pill",
+        "name": "Refine Body Tempering Pill",
+        "output_item_id": "body_tempering_pill",
+        "output_amount": 1,
+        "ingredients": [
+            ["iron_bark_fungus", 2],
+            ["ember_root", 2]
+        ],
+        "craft_time": 0,
+        "required_building": "AlchemyFurnace"
+    },
+    {
+        "id": "recipe_foundation_pill",
+        "name": "Refine Foundation Establishment Pill",
+        "output_item_id": "foundation_pill",
+        "output_amount": 1,
+        "ingredients": [
+            ["yellow_earth_ginseng", 1],
+            ["spirit_grass", 5],
+            ["moonwell_lotus", 2]
         ],
         "craft_time": 0,
         "required_building": "AlchemyFurnace"
@@ -19,10 +54,7 @@
         "output_item_id": "iron_sword",
         "output_amount": 1,
         "ingredients": [
-            [
-                "spirit_stones",
-                10
-            ]
+            ["spirit_stones", 10]
         ],
         "craft_time": 0,
         "required_building": "ArtifactForge"

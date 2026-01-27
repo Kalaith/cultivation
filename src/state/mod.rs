@@ -43,6 +43,18 @@ pub enum StateTransition {
 }
 //...
 
+pub struct TutorialState {
+    pub active: bool,
+    pub step: usize,
+    pub hidden: bool,
+}
+
+impl TutorialState {
+    pub fn new() -> Self {
+        Self { active: true, step: 0, hidden: false }
+    }
+}
+
 pub struct UpdateResult {
     pub transition: Option<StateTransition>,
     pub action: Option<Action>,
