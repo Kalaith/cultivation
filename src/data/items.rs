@@ -10,7 +10,7 @@ pub enum ItemType {
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ItemEffect {
-    Heal(u32),        // Restore HP/Injury (Visual only for now unless HP added)
+    Heal(u32),        // Reduce injury recovery time by this amount (ticks)
     BoostQi(u32),     // Add XP/Qi
     BoostBody(u32),   // Perm stat boost
     BoostMind(u32),

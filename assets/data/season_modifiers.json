@@ -1,0 +1,70 @@
+{
+    "spring": {
+        "herb_growth_mult": {
+            "spirit_herb": 1.2,
+            "jade_moss": 1.3,
+            "moonflower": 1.0,
+            "sunfire_root": 0.8
+        },
+        "mission_difficulty_mod": 0.9,
+        "trade_activity_mod": 1.1,
+        "cultivation_speed_mod": 1.1,
+        "event_weights": [
+            ["SeasonalFestival", 1.5],
+            ["MerchantCaravan", 1.2],
+            ["WanderingMaster", 1.0],
+            ["NaturalDisaster", 0.5]
+        ]
+    },
+    "summer": {
+        "herb_growth_mult": {
+            "spirit_herb": 1.0,
+            "jade_moss": 0.8,
+            "moonflower": 0.7,
+            "sunfire_root": 1.5
+        },
+        "mission_difficulty_mod": 1.0,
+        "trade_activity_mod": 1.0,
+        "cultivation_speed_mod": 1.0,
+        "event_weights": [
+            ["BeastTide", 1.5],
+            ["ResourceBoom", 1.2],
+            ["NaturalDisaster", 0.8],
+            ["TreasureAppearance", 1.0]
+        ]
+    },
+    "autumn": {
+        "herb_growth_mult": {
+            "spirit_herb": 1.1,
+            "jade_moss": 1.0,
+            "moonflower": 1.2,
+            "sunfire_root": 0.9
+        },
+        "mission_difficulty_mod": 1.0,
+        "trade_activity_mod": 1.2,
+        "cultivation_speed_mod": 1.0,
+        "event_weights": [
+            ["SeasonalFestival", 2.0],
+            ["MerchantCaravan", 1.5],
+            ["FactionConflict", 1.0],
+            ["ImperialDecree", 1.2]
+        ]
+    },
+    "winter": {
+        "herb_growth_mult": {
+            "spirit_herb": 0.6,
+            "jade_moss": 0.5,
+            "moonflower": 1.4,
+            "sunfire_root": 0.4
+        },
+        "mission_difficulty_mod": 1.2,
+        "trade_activity_mod": 0.7,
+        "cultivation_speed_mod": 0.9,
+        "event_weights": [
+            ["DemonIncursion", 2.0],
+            ["NaturalDisaster", 1.5],
+            ["MerchantCaravan", 0.5],
+            ["ResourceBoom", 0.3]
+        ]
+    }
+}

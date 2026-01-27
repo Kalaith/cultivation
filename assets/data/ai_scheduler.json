@@ -1,0 +1,35 @@
+{
+  "needs": {
+    "max": 100.0,
+    "hunger_decay": 0.02,
+    "hunger_urgent": 45.0,
+    "rest_decay": 0.015,
+    "rest_urgent": 40.0,
+    "qi_decay": 0.01,
+    "qi_urgent": 35.0,
+    "morale_decay": 0.005,
+    "morale_urgent": 30.0
+  },
+  "tasks": {
+    "eat_base": 80.0,
+    "eat_urgency_weight": 100.0,
+    "eat_duration": 60,
+    "rest_base": 70.0,
+    "rest_urgency_weight": 90.0,
+    "rest_duration": 120,
+    "morale_base": 50.0,
+    "morale_urgency_weight": 70.0,
+    "morale_duration": 60,
+    "cultivate_base": 30.0,
+    "cultivate_urgency_weight": 80.0,
+    "cultivate_duration": 180,
+    "work_base": 25.0,
+    "work_morale_weight": 10.0,
+    "work_duration": 180,
+    "idle_base": 1.0,
+    "idle_duration": 60
+  },
+  "cooldown_on_fail": 60,
+  "reservation_grace": 60,
+  "timeout_grace": 60
+}

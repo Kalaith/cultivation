@@ -1,0 +1,138 @@
+{
+    "nodes": [
+        {
+            "id": "sect_market",
+            "name": "Sect Market",
+            "map_node_id": "serene_forest",
+            "controller_faction_id": "",
+            "base_prices": {
+                "spirit_herb": 50,
+                "healing_pill": 100,
+                "cultivation_pill": 200,
+                "spirit_stone_fragment": 10,
+                "iron_ore": 20,
+                "spirit_wood": 30,
+                "beast_core": 150,
+                "formation_flag": 80
+            },
+            "supply": {
+                "spirit_herb": 100,
+                "healing_pill": 50,
+                "cultivation_pill": 20,
+                "spirit_stone_fragment": 200,
+                "iron_ore": 150,
+                "spirit_wood": 80,
+                "beast_core": 30,
+                "formation_flag": 40
+            },
+            "demand": {
+                "spirit_herb": 1.0,
+                "healing_pill": 1.2,
+                "cultivation_pill": 1.5,
+                "spirit_stone_fragment": 0.8,
+                "iron_ore": 1.0,
+                "spirit_wood": 1.1,
+                "beast_core": 1.3,
+                "formation_flag": 1.0
+            }
+        },
+        {
+            "id": "guild_emporium",
+            "name": "Guild Emporium",
+            "map_node_id": "",
+            "controller_faction_id": "golden_merchant_guild",
+            "base_prices": {
+                "spirit_herb": 45,
+                "healing_pill": 90,
+                "cultivation_pill": 180,
+                "spirit_stone_fragment": 8,
+                "iron_ore": 18,
+                "spirit_wood": 25,
+                "beast_core": 140,
+                "formation_flag": 70,
+                "rare_scroll": 500,
+                "ancient_text": 1000
+            },
+            "supply": {
+                "spirit_herb": 200,
+                "healing_pill": 100,
+                "cultivation_pill": 50,
+                "spirit_stone_fragment": 500,
+                "iron_ore": 300,
+                "spirit_wood": 200,
+                "beast_core": 60,
+                "formation_flag": 80,
+                "rare_scroll": 10,
+                "ancient_text": 5
+            },
+            "demand": {
+                "spirit_herb": 0.9,
+                "healing_pill": 1.0,
+                "cultivation_pill": 1.2,
+                "spirit_stone_fragment": 0.7,
+                "iron_ore": 0.8,
+                "spirit_wood": 0.9,
+                "beast_core": 1.1,
+                "formation_flag": 0.9,
+                "rare_scroll": 1.5,
+                "ancient_text": 2.0
+            }
+        },
+        {
+            "id": "border_outpost",
+            "name": "Border Outpost",
+            "map_node_id": "haunted_ruins",
+            "controller_faction_id": "crimson_fang_sect",
+            "base_prices": {
+                "spirit_herb": 60,
+                "healing_pill": 120,
+                "cultivation_pill": 250,
+                "beast_core": 120,
+                "weapon_material": 100,
+                "armor_material": 90
+            },
+            "supply": {
+                "spirit_herb": 50,
+                "healing_pill": 30,
+                "cultivation_pill": 10,
+                "beast_core": 80,
+                "weapon_material": 60,
+                "armor_material": 50
+            },
+            "demand": {
+                "spirit_herb": 1.3,
+                "healing_pill": 1.5,
+                "cultivation_pill": 1.8,
+                "beast_core": 0.8,
+                "weapon_material": 0.9,
+                "armor_material": 0.9
+            }
+        }
+    ],
+    "routes": [
+        {
+            "id": "sect_to_guild",
+            "from_node": "sect_market",
+            "to_node": "guild_emporium",
+            "safety_rating": 0.9,
+            "travel_ticks": 600,
+            "active": true
+        },
+        {
+            "id": "guild_to_border",
+            "from_node": "guild_emporium",
+            "to_node": "border_outpost",
+            "safety_rating": 0.6,
+            "travel_ticks": 1200,
+            "active": true
+        },
+        {
+            "id": "sect_to_border",
+            "from_node": "sect_market",
+            "to_node": "border_outpost",
+            "safety_rating": 0.5,
+            "travel_ticks": 900,
+            "active": true
+        }
+    ]
+}

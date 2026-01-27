@@ -1,0 +1,13 @@
+{
+    "relation_drift_rate": 1,
+    "drift_interval_ticks": 1000,
+    "treaty_break_penalty": -30,
+    "hostility_threshold": -50,
+    "price_elasticity": 0.1,
+    "supply_regen_rate": 0.05,
+    "trade_route_base_time": 600,
+    "random_event_chance_per_tick": 0.001,
+    "season_event_guaranteed": true,
+    "faction_action_interval": 3000,
+    "war_duration_ticks": 5000
+}

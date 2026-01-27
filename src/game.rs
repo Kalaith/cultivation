@@ -1,22 +1,31 @@
-use crate::data::disciples::{Disciple, DiscipleRank, Talent};
+use crate::data::disciples::{Disciple, DiscipleRank, Injury, Talent};
 use crate::data::grid::Grid;
 use crate::data::buildings::{BuildingStatus, BuildingType};
 use crate::data::herbs::{Season, GrowingHerb, DIRECT_CONSUMPTION_EFFICIENCY, RAW_HERB_DECAY_RATE};
 use crate::data::history::DeceasedDisciple;
 use crate::data::loader::GameData;
 use crate::data::missions::{MissionOutcome, MissionRewards, OngoingMission, RelevantStat};
+use crate::data::relations::DiplomaticAction;
+use crate::data::world_events::EventEffect;
 use crate::engine::actions::Action;
 use crate::engine::proc_gen::generate_disciple;
+use crate::engine::scheduler::Scheduler;
 use crate::engine::tribulation::{TribulationState, TribulationType};
+use crate::engine::world_sim::{WorldSim, WorldSimResult};
 use crate::state::{
+    faction_screen::FactionScreenState,
     library::LibraryState, main_menu::MainMenuState,
     mission_assignment::MissionAssignmentState, mission_resolution::MissionResolutionState,
     roster::DiscipleRosterState, sect_base::SectBaseState, sect_creation::SectCreationState,
+    trade_screen::TradeScreenState,
     world_map::WorldMapState, tribulation::TribulationEncounterState, GameState,
     StateTransition,
 };
 use rand::Rng;
-use crate::save::SaveData;
+use macroquad::prelude::{is_key_pressed, KeyCode, Rect, screen_height, screen_width, draw_text};
+use crate::ui::components::{draw_panel, draw_progress_bar};
+use crate::ui::theme::*;
+use crate::save::{SaveData, SavedTutorialState, SAVE_VERSION, storage};
 
 /// Result of a breakthrough attempt
 pub enum BreakthroughResult {
@@ -25,10 +34,6 @@ pub enum BreakthroughResult {
     Injured,           // Survived but didn't advance
     Tribulation(TribulationType), // Needs tribulation
 }
-#[cfg(not(target_arch = "wasm32"))]
-use std::fs;
-#[cfg(target_arch = "wasm32")]
-use quad_storage::LocalStorage;
 
 pub struct Game {
     pub state: GameState,
@@ -53,6 +58,12 @@ pub struct Game {
     pub current_season: Season,
     /// Ticks until next season change (3600 ticks = 1 minute at 60 fps)
     pub season_ticks: u32,
+    /// World simulation for factions, diplomacy, economy, and events
+    pub world_sim: WorldSim,
+    /// AI scheduler for disciple tasks
+    pub scheduler: Scheduler,
+    /// Toggle for AI debug overlay
+    show_ai_debug: bool,
 }
 
 impl Game {
@@ -78,6 +89,18 @@ impl Game {
         
         let grid = Grid::new(20, 20);
 
+        // Initialize world simulation
+        let world_sim = WorldSim::new(
+            data.factions.clone(),
+            data.economy_nodes.clone(),
+            data.trade_routes.clone(),
+            data.world_events.clone(),
+            data.balance.clone(),
+        );
+
+        // Clone ai_scheduler config before moving data
+        let ai_scheduler_config = data.ai_scheduler.clone();
+
         Self {
             state: GameState::MainMenu(MainMenuState::new()),
             data,
@@ -99,6 +122,9 @@ impl Game {
             tick: 0,
             current_season: Season::Spring,
             season_ticks: 3600, // 1 minute per season at 60 fps
+            world_sim,
+            scheduler: Scheduler::new(ai_scheduler_config),
+            show_ai_debug: false,
         }
     }
 
@@ -116,15 +142,21 @@ impl Game {
     }
 
     pub fn update(&mut self) {
+        if is_key_pressed(KeyCode::F9) {
+            self.show_ai_debug = !self.show_ai_debug;
+        }
+
         self.tick += 1;
 
-        if self.tick % 60 == 0 {
-            // Collect indices of disciples currently on missions (they don't cultivate)
-            let disciples_on_mission: std::collections::HashSet<usize> = self.ongoing_missions
-                .iter()
-                .flat_map(|m| m.disciple_indices.iter().copied())
-                .collect();
+        let disciples_on_mission: std::collections::HashSet<usize> = self.ongoing_missions
+            .iter()
+            .flat_map(|m| m.disciple_indices.iter().copied())
+            .collect();
 
+        self.scheduler
+            .tick(&mut self.disciples, &self.data.buildings, &disciples_on_mission);
+
+        if self.tick % 60 == 0 {
             // Cultivation Tick - check for breakthroughs (only for disciples not on missions)
             let mut disciples_to_breakthrough = Vec::new();
             for (i, disciple) in self.disciples.iter().enumerate() {
@@ -190,6 +222,20 @@ impl Game {
             for (i, disciple) in self.disciples.iter_mut().enumerate() {
                 // Skip disciples on missions - they don't cultivate while away
                 if disciples_on_mission.contains(&i) {
+                    continue;
+                }
+
+                // Process healing for injured disciples
+                if disciple.is_injured() {
+                    let was_injured = disciple.injury.as_ref().map(|inj| inj.recovery_ticks_remaining).unwrap_or(0);
+                    disciple.heal_tick();
+
+                    // Check if just healed
+                    if !disciple.is_injured() && was_injured > 0 {
+                        self.event_log.push(format!("{} has recovered from their injuries.", disciple.name));
+                    }
+
+                    // Injured disciples cannot cultivate
                     continue;
                 }
 
@@ -318,6 +364,14 @@ impl Game {
 
             // Salary Tick (Every 300 ticks or 600? Let's do 600 ~ 10sec for daily salary)
         }
+
+        // World Simulation Tick (every 60 ticks = 1 game second)
+        if self.tick % 60 == 0 {
+            let results = self.world_sim.tick(self.tick, &self.current_season);
+            for result in results {
+                self.handle_world_sim_result(result);
+            }
+        }
         
         if self.tick % 600 == 0 {
              let inner_count = self.disciples.iter().filter(|d| d.rank == DiscipleRank::Inner || d.rank == DiscipleRank::SectLeader).count();
@@ -345,6 +399,8 @@ impl Game {
             GameState::MissionAssignment(s) => s.update(&self.data, &self.disciples),
             GameState::SectCreation(s) => s.update(),
             GameState::Tribulation(s) => s.update(&self.disciples),
+            GameState::FactionScreen(s) => s.update(&self.world_sim),
+            GameState::TradeScreen(s) => s.update(&self.world_sim, self.spirit_stones, &self.inventory),
         };
 
         if let Some(action) = update_result.action {
@@ -366,6 +422,91 @@ impl Game {
             GameState::MissionAssignment(s) => s.draw(&self.data, &self.disciples, self.spirit_stones),
             GameState::SectCreation(s) => s.draw(&self.data),
             GameState::Tribulation(s) => s.draw(&self.data, &self.disciples),
+            GameState::FactionScreen(s) => s.draw(&self.world_sim),
+            GameState::TradeScreen(s) => s.draw(&self.world_sim),
+        }
+
+        if self.show_ai_debug {
+            self.draw_ai_debug();
+        }
+    }
+
+    fn draw_ai_debug(&self) {
+        let panel_w = 420.0;
+        let panel_h = screen_height() - 20.0;
+        let panel_x = screen_width() - panel_w - 10.0;
+        let panel_y = 10.0;
+
+        draw_panel(Rect::new(panel_x, panel_y, panel_w, panel_h), Some("AI Debug (F9)"));
+
+        let mut y = panel_y + 55.0;
+        draw_text(
+            &format!(
+                "Assignments: {}  Reservations: {}",
+                self.scheduler.assignment_count(),
+                self.scheduler.reservation_count()
+            ),
+            panel_x + 15.0,
+            y,
+            FONT_SMALL_SIZE,
+            TEXT_SECONDARY,
+        );
+        y += 25.0;
+
+        for disciple in &self.disciples {
+            if y > panel_y + panel_h - 120.0 {
+                break;
+            }
+
+            let task_label = self
+                .scheduler
+                .get_assignment(disciple.id)
+                .map(|a| format!("{} ({}t)", a.task.task_type, a.ticks_remaining))
+                .unwrap_or_else(|| "Idle".to_string());
+
+            draw_text(
+                &format!("{} [{}]", disciple.name, task_label),
+                panel_x + 15.0,
+                y,
+                FONT_BODY_SIZE,
+                TEXT_PRIMARY,
+            );
+            y += 22.0;
+
+            let bar_w = panel_w - 30.0;
+            let bar_h = 10.0;
+
+            draw_text("Hunger", panel_x + 15.0, y + 10.0, FONT_SMALL_SIZE, TEXT_SECONDARY);
+            draw_progress_bar(
+                Rect::new(panel_x + 85.0, y, bar_w - 70.0, bar_h),
+                disciple.needs.hunger.current / disciple.needs.hunger.max,
+                SECONDARY,
+            );
+            y += 16.0;
+
+            draw_text("Rest", panel_x + 15.0, y + 10.0, FONT_SMALL_SIZE, TEXT_SECONDARY);
+            draw_progress_bar(
+                Rect::new(panel_x + 85.0, y, bar_w - 70.0, bar_h),
+                disciple.needs.rest.current / disciple.needs.rest.max,
+                PRIMARY,
+            );
+            y += 16.0;
+
+            draw_text("Qi", panel_x + 15.0, y + 10.0, FONT_SMALL_SIZE, TEXT_SECONDARY);
+            draw_progress_bar(
+                Rect::new(panel_x + 85.0, y, bar_w - 70.0, bar_h),
+                disciple.needs.qi.current / disciple.needs.qi.max,
+                SUCCESS,
+            );
+            y += 16.0;
+
+            draw_text("Morale", panel_x + 15.0, y + 10.0, FONT_SMALL_SIZE, TEXT_SECONDARY);
+            draw_progress_bar(
+                Rect::new(panel_x + 85.0, y, bar_w - 70.0, bar_h),
+                disciple.needs.morale.current / disciple.needs.morale.max,
+                ACCENT,
+            );
+            y += 24.0;
         }
     }
 
@@ -386,6 +527,8 @@ impl Game {
             StateTransition::ToTribulation(trib_state, disciple_idx) => {
                 GameState::Tribulation(TribulationEncounterState::new(trib_state, disciple_idx))
             }
+            StateTransition::ToFactionScreen => GameState::FactionScreen(FactionScreenState::new()),
+            StateTransition::ToTradeScreen => GameState::TradeScreen(TradeScreenState::new()),
         };
     }
 
@@ -503,13 +646,24 @@ impl Game {
                 BreakthroughResult::Failure // Died
             } else {
                 // Survivor trait or lucky - just injured
+                let injury = Injury::from_breakthrough(&disciple.realm, is_survivor);
+                let recovery_time = injury.recovery_ticks_remaining;
+
                 if is_survivor {
-                    self.event_log.push(format!("{}'s indomitable will saved them! Suffered severe injuries but survived.", disciple.name));
+                    self.event_log.push(format!(
+                        "{}'s indomitable will saved them! Suffered {} {} (recovery: {} ticks).",
+                        disciple.name, injury.severity_str(), injury.injury_type, recovery_time
+                    ));
                     disciple.exp = (disciple.exp as f32 * 0.25) as u32; // Lose 75% EXP - harsher penalty for cheating death
                 } else {
-                    self.event_log.push(format!("{} failed breakthrough and suffered internal injuries.", disciple.name));
+                    self.event_log.push(format!(
+                        "{} failed breakthrough and suffered {} {} (recovery: {} ticks).",
+                        disciple.name, injury.severity_str(), injury.injury_type, recovery_time
+                    ));
                     disciple.exp = (disciple.exp as f32 * 0.5) as u32; // Lose 50% EXP
                 }
+
+                disciple.injure(injury);
                 BreakthroughResult::Injured
             }
         }
@@ -732,12 +886,20 @@ impl Game {
             }
             Action::SaveGame => {
                 self.save();
+                self.event_log.push("Game saved successfully.".to_string());
             }
             Action::LoadGame => {
                 let loaded_game = self.load(); // This needs to be sync for now, or we handle it differently
                 if let Some(mut game) = loaded_game {
-                     // Preserve data that isn't saved but needed
-                     game.data = self.data.clone(); 
+                     // Preserve loaded buildings before restoring base data definitions
+                     let loaded_buildings = game.data.buildings.clone();
+
+                     // Restore base data definitions (stages, techs, items, etc.) that aren't saved
+                     game.data = self.data.clone();
+
+                     // Restore the loaded buildings
+                     game.data.buildings = loaded_buildings;
+
                      *self = game;
                      self.event_log.push("Game loaded successfully.".to_string());
                 }
@@ -804,8 +966,30 @@ impl Game {
                                 match effect {
                                     crate::data::items::ItemEffect::Heal(amt) => {
                                         let effective_amt = ((*amt as f32) * efficiency) as u32;
-                                        // No HP yet, maybe clear injury trait?
-                                        self.event_log.push(format!("Used {} on {}. Healed {} (Heal not fully impl)", item.name, disciple.name, effective_amt));
+                                        if disciple.is_injured() {
+                                            let before_ticks = disciple.injury.as_ref()
+                                                .map(|i| i.recovery_ticks_remaining).unwrap_or(0);
+                                            disciple.apply_healing(effective_amt);
+                                            if disciple.is_injured() {
+                                                let after_ticks = disciple.injury.as_ref()
+                                                    .map(|i| i.recovery_ticks_remaining).unwrap_or(0);
+                                                self.event_log.push(format!(
+                                                    "{} used {} on {}. Recovery time reduced by {} ticks ({} remaining).",
+                                                    item.name, effective_amt, disciple.name,
+                                                    before_ticks - after_ticks, after_ticks
+                                                ));
+                                            } else {
+                                                self.event_log.push(format!(
+                                                    "{} fully healed {} with {}!",
+                                                    disciple.name, disciple.name, item.name
+                                                ));
+                                            }
+                                        } else {
+                                            self.event_log.push(format!(
+                                                "{} is not injured. {} had no effect.",
+                                                disciple.name, item.name
+                                            ));
+                                        }
                                     },
                                     crate::data::items::ItemEffect::BoostQi(amt) => {
                                         let effective_amt = ((*amt as f32) * efficiency) as u32;
@@ -929,6 +1113,10 @@ impl Game {
                 self.sect_name = name;
                 self.spirit_stones = 50; // Reduced to 50 check
                 self.herbs = 10;
+                self.influence = 0;
+                self.relics = 0;
+                self.inventory.clear();
+                self.unlocked_techs.clear();
                 self.ongoing_missions.clear();
                 self.completed_missions.clear();
                 self.completed_history.clear();
@@ -939,6 +1127,15 @@ impl Game {
                 self.current_season = Season::Spring;
                 self.season_ticks = 3600;
                 self.grid = Grid::new(20, 20); // Reset Grid
+
+                // Reset world simulation
+                self.world_sim = WorldSim::new(
+                    self.data.factions.clone(),
+                    self.data.economy_nodes.clone(),
+                    self.data.trade_routes.clone(),
+                    self.data.world_events.clone(),
+                    self.data.balance.clone(),
+                );
 
                 // Reset Buildings (manually for now as they are part of GameData which is shared... wait.
                 // GameData is loaded once. Building STATE (levels) is inside GameData.buildings.
@@ -973,6 +1170,18 @@ impl Game {
             }
             Action::SetGreenhouseInfusion(building_id, element) => {
                 self.set_greenhouse_infusion(building_id, element);
+            }
+            Action::SendDiplomat { faction_id, action } => {
+                let results = self.world_sim.process_diplomatic_action(&faction_id, action);
+                for result in results {
+                    self.handle_world_sim_result(result);
+                }
+            }
+            Action::RespondToEvent { event_id, choice_idx } => {
+                let effects = self.world_sim.respond_to_event(&event_id, choice_idx);
+                for effect in effects {
+                    self.apply_event_effect(&effect);
+                }
             }
         }
     }
@@ -1045,9 +1254,10 @@ impl Game {
     }
 
     fn save(&self) {
-        let buildings_to_save = self.data.buildings.clone();
+        use crate::engine::world_sim::SavedWorldSim;
 
         let save_data = SaveData {
+            version: SAVE_VERSION,
             grid: Some(self.grid.clone()),
             sect_name: self.sect_name.clone(),
             spirit_stones: self.spirit_stones,
@@ -1058,55 +1268,56 @@ impl Game {
             unlocked_techs: self.unlocked_techs.clone(),
             disciples: self.disciples.clone(),
             deceased_disciples: self.deceased_disciples.clone(),
-            buildings: buildings_to_save,
+            buildings: self.data.buildings.clone(),
             ongoing_missions: self.ongoing_missions.clone(),
             completed_missions: self.completed_missions.clone(),
             completed_history: self.completed_history.clone(),
             tick: self.tick,
+            current_season: self.current_season.clone(),
+            season_ticks: self.season_ticks,
+            tutorial: SavedTutorialState::from_tutorial(&self.tutorial),
+            world_sim: Some(SavedWorldSim::from(&self.world_sim)),
+            scheduler: Some(self.scheduler.to_saved()),
         };
 
-        // Platform specific save
-        #[cfg(not(target_arch = "wasm32"))]
-        {
-            let json = serde_json::to_string_pretty(&save_data).expect("Failed to serialize save");
-            if let Err(e) = fs::write("savegame.json", json) {
-                // Cant log to self.event_log here easily as self is immutable ref
-                println!("Failed to save: {}", e);
+        match storage::save(&save_data) {
+            Ok(()) => {
+                // Success - logged in event_log by caller
             }
-        }
-
-        #[cfg(target_arch = "wasm32")]
-        {
-            let json = serde_json::to_string(&save_data).expect("Failed to serialize save");
-            LocalStorage::set("cultivation_save", &json);
+            Err(e) => {
+                eprintln!("Failed to save: {}", e);
+            }
         }
     }
 
     fn load(&self) -> Option<Self> {
-        // Platform specific load
-        let json_content = {
-            #[cfg(not(target_arch = "wasm32"))]
-            {
-                fs::read_to_string("savegame.json").ok()
-            }
+        match storage::load() {
+            Ok(save_data) => {
+                // Reconstruct world simulation (will be properly restored in Phase 6)
+                let world_sim = if let Some(saved_world_sim) = save_data.world_sim {
+                    WorldSim::from_saved(saved_world_sim, self.data.world_events.clone())
+                } else {
+                    // Legacy save without world sim - create new one
+                    WorldSim::new(
+                        self.data.factions.clone(),
+                        self.data.economy_nodes.clone(),
+                        self.data.trade_routes.clone(),
+                        self.data.world_events.clone(),
+                        self.data.balance.clone(),
+                    )
+                };
 
-            #[cfg(target_arch = "wasm32")]
-            {
-                LocalStorage::get("cultivation_save")
-            }
-        };
-
-        if let Some(json) = json_content {
-            if let Ok(save_data) = serde_json::from_str::<SaveData>(&json) {
-                // Reconstruct Game
-                let data = self.data.clone(); // In a real engine, we might reload data, but here we reuse
-                // Important: We need to overwrite building states in data with saved ones
-                // But data is shared immutable usually? In this struct it's owned `data: GameData`.
+                // Reconstruct Game from saved data
+                let scheduler = if let Some(saved_scheduler) = save_data.scheduler {
+                    Scheduler::from_saved(saved_scheduler, self.data.ai_scheduler.clone())
+                } else {
+                    Scheduler::new(self.data.ai_scheduler.clone())
+                };
 
                 let mut new_game = Self {
-                    state: GameState::SectBase(SectBaseState::new()), // Default to base on load
-                    data: data.clone(),
-                    grid: save_data.grid.unwrap_or(Grid::new(20, 20)),
+                    state: GameState::SectBase(SectBaseState::new()),
+                    data: self.data.clone(),
+                    grid: save_data.grid.unwrap_or_else(|| Grid::new(20, 20)),
                     sect_name: save_data.sect_name,
                     spirit_stones: save_data.spirit_stones,
                     herbs: save_data.herbs,
@@ -1119,22 +1330,26 @@ impl Game {
                     ongoing_missions: save_data.ongoing_missions,
                     completed_missions: save_data.completed_missions,
                     completed_history: save_data.completed_history,
-                    event_log: Vec::new(),
-                    tutorial: crate::state::TutorialState::new(),
+                    event_log: vec!["Game loaded successfully.".to_string()],
+                    tutorial: save_data.tutorial.to_tutorial(),
                     tick: save_data.tick,
-                    current_season: Season::Spring, // TODO: save/load season
-                    season_ticks: 3600,
+                    current_season: save_data.current_season,
+                    season_ticks: save_data.season_ticks,
+                    world_sim,
+                    scheduler,
+                    show_ai_debug: false,
                 };
 
                 // Restore building states
-                // save_data.buildings has the modified buildings.
-                // data.buildings (from json) has defaults.
                 new_game.data.buildings = save_data.buildings;
 
-                return Some(new_game);
+                Some(new_game)
+            }
+            Err(e) => {
+                eprintln!("Failed to load: {}", e);
+                None
             }
         }
-        None
     }
 
     /// Process herb growth and harvesting in herb gardens
@@ -1348,5 +1563,163 @@ impl Game {
             return true;
         }
         false
+    }
+
+    /// Handle results from the world simulation
+    fn handle_world_sim_result(&mut self, result: WorldSimResult) {
+        match result {
+            WorldSimResult::EventTriggered(event) => {
+                self.event_log.push(format!("[World Event] {}: {}", event.name, event.description));
+                // Apply immediate effects if no choices required
+                if !event.requires_choice() {
+                    for effect in &event.effects {
+                        self.apply_event_effect(effect);
+                    }
+                }
+            }
+            WorldSimResult::EventResolved { event_id, effects } => {
+                for effect in effects {
+                    self.apply_event_effect(&effect);
+                }
+            }
+            WorldSimResult::FactionAction { faction_id, action } => {
+                if let Some(faction) = self.world_sim.get_faction(&faction_id) {
+                    self.event_log.push(format!("[Faction] {} took action: {:?}", faction.name, action));
+                }
+            }
+            WorldSimResult::WarDeclared { aggressor, defender } => {
+                let aggressor_name = self.world_sim.get_faction(&aggressor)
+                    .map(|f| f.name.clone())
+                    .unwrap_or(aggressor.clone());
+                let defender_name = self.world_sim.get_faction(&defender)
+                    .map(|f| f.name.clone())
+                    .unwrap_or(defender.clone());
+                self.event_log.push(format!("[War] {} has declared war on {}!", aggressor_name, defender_name));
+            }
+            WorldSimResult::WarEnded { faction_a, faction_b, victor } => {
+                let a_name = self.world_sim.get_faction(&faction_a)
+                    .map(|f| f.name.clone())
+                    .unwrap_or(faction_a.clone());
+                let b_name = self.world_sim.get_faction(&faction_b)
+                    .map(|f| f.name.clone())
+                    .unwrap_or(faction_b.clone());
+                if let Some(v) = victor {
+                    let v_name = self.world_sim.get_faction(&v)
+                        .map(|f| f.name.clone())
+                        .unwrap_or(v);
+                    self.event_log.push(format!("[War] The war between {} and {} has ended. {} is victorious!", a_name, b_name, v_name));
+                } else {
+                    self.event_log.push(format!("[War] The war between {} and {} has ended in a truce.", a_name, b_name));
+                }
+            }
+            WorldSimResult::TerritoryChanged { node_id, old_faction, new_faction } => {
+                self.event_log.push(format!("[Territory] {} has changed hands from {} to {}.", node_id, old_faction, new_faction));
+            }
+            WorldSimResult::PriceChanged { item_id, old_price, new_price } => {
+                // Silent unless significant change
+                if (new_price as i32 - old_price as i32).abs() > 10 {
+                    self.event_log.push(format!("[Market] {} prices changed: {} -> {}.", item_id, old_price, new_price));
+                }
+            }
+            WorldSimResult::RouteDisrupted { route_id, reason } => {
+                self.event_log.push(format!("[Trade] Route {} disrupted: {}", route_id, reason));
+            }
+            WorldSimResult::Notification(msg) => {
+                self.event_log.push(msg);
+            }
+        }
+    }
+
+    /// Apply an event effect to the game state
+    fn apply_event_effect(&mut self, effect: &EventEffect) {
+        match effect {
+            EventEffect::ModifyRelation { faction_id, delta } => {
+                if let Some(relation) = self.world_sim.get_relation_mut(faction_id) {
+                    relation.modify_reputation(*delta);
+                }
+            }
+            EventEffect::ModifyPrices { item_id, modifier, duration_ticks } => {
+                // Add price modifier to world sim
+                let price_mod = crate::data::economy::PriceModifier::new(
+                    item_id.clone(),
+                    *modifier,
+                    "Event".to_string(),
+                    Some(*duration_ticks),
+                    self.tick,
+                );
+                self.world_sim.economy.add_price_modifier(price_mod);
+            }
+            EventEffect::SpawnMission { mission_id } => {
+                self.event_log.push(format!("New mission available: {}", mission_id));
+                // Would need to add the mission to available missions
+            }
+            EventEffect::ModifyResource { resource, delta } => {
+                match resource {
+                    crate::data::world_events::ResourceType::SpiritStones => {
+                        if *delta >= 0 {
+                            self.spirit_stones += *delta as u32;
+                        } else {
+                            self.spirit_stones = self.spirit_stones.saturating_sub((-*delta) as u32);
+                        }
+                    }
+                    crate::data::world_events::ResourceType::Influence => {
+                        if *delta >= 0 {
+                            self.influence += *delta as u32;
+                        } else {
+                            self.influence = self.influence.saturating_sub((-*delta) as u32);
+                        }
+                    }
+                    crate::data::world_events::ResourceType::Relics => {
+                        if *delta >= 0 {
+                            self.relics += *delta as u32;
+                        } else {
+                            self.relics = self.relics.saturating_sub((-*delta) as u32);
+                        }
+                    }
+                }
+            }
+            EventEffect::TriggerCombat { enemy_power, description } => {
+                self.event_log.push(format!("Combat triggered: {} (Power: {})", description, enemy_power));
+                // Would need combat system integration
+            }
+            EventEffect::UnlockTech { tech_id } => {
+                if !self.unlocked_techs.contains(tech_id) {
+                    self.unlocked_techs.push(tech_id.clone());
+                    self.event_log.push(format!("Technology unlocked: {}", tech_id));
+                }
+            }
+            EventEffect::ModifyCorruption { node_id, delta } => {
+                if let Some(node) = self.data.map_nodes.iter_mut().find(|n| n.id == *node_id) {
+                    if *delta >= 0 {
+                        node.corruption += *delta as u32;
+                    } else {
+                        node.corruption = node.corruption.saturating_sub((-*delta) as u32);
+                    }
+                }
+            }
+            EventEffect::ChangeFactionTerritory { faction_id, node_id, gain } => {
+                // Update faction territory in world sim
+                if let Some(faction) = self.world_sim.factions.iter_mut().find(|f| f.id == *faction_id) {
+                    if *gain {
+                        if !faction.territory_nodes.contains(node_id) {
+                            faction.territory_nodes.push(node_id.clone());
+                        }
+                    } else {
+                        faction.territory_nodes.retain(|n| n != node_id);
+                    }
+                }
+            }
+            EventEffect::GiveItem { item_id, amount } => {
+                *self.inventory.entry(item_id.clone()).or_insert(0) += amount;
+                self.event_log.push(format!("Received {}x {}", amount, item_id));
+            }
+            EventEffect::ModifyCultivationSpeed { modifier, duration_ticks } => {
+                self.event_log.push(format!("Cultivation speed modified by {}x for {} ticks", modifier, duration_ticks));
+                // Would need cultivation speed modifier tracking
+            }
+            EventEffect::ChainEvent { event_id, delay_ticks } => {
+                self.world_sim.queue_event(event_id.clone(), *delay_ticks);
+            }
+        }
     }
 }

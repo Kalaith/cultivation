@@ -53,10 +53,18 @@ impl DiscipleRosterState {
                 crate::data::disciples::DiscipleRank::Elder => "[Elder]",
                 crate::data::disciples::DiscipleRank::SectLeader => "[Leader]",
             };
-            // Simplification: removed Realm from button to prevent overflow
-            let label = format!("{} {}", rank_prefix, disciple.name);
-            
-            if draw_button(Rect::new(left_rect.x + 10.0, btn_y, left_w - 20.0, 40.0), &label, active) {
+            // Add injury indicator if injured
+            let injury_indicator = if disciple.is_injured() { " [INJURED]" } else { "" };
+            let label = format!("{} {}{}", rank_prefix, disciple.name, injury_indicator);
+
+            // Color injured disciples differently
+            let btn_rect = Rect::new(left_rect.x + 10.0, btn_y, left_w - 20.0, 40.0);
+            if disciple.is_injured() {
+                // Draw injury tint behind button
+                draw_rectangle(btn_rect.x, btn_rect.y, btn_rect.w, btn_rect.h, Color::new(0.5, 0.2, 0.2, 0.3));
+            }
+
+            if draw_button(btn_rect, &label, active) {
                 self.selected_index = Some(i);
             }
             btn_y += 50.0;
@@ -95,6 +103,24 @@ impl DiscipleRosterState {
                 y += 30.0;
                 draw_text(&format!("Talent: {:?}", disciple.talent), x, y, FONT_BODY_SIZE, TEXT_SECONDARY);
                 y += 30.0;
+
+                // Injury Status
+                if let Some(ref injury) = disciple.injury {
+                    draw_rectangle(x - 5.0, y - 5.0, 420.0, 70.0, Color::new(0.5, 0.2, 0.2, 0.3));
+                    draw_text(&format!("INJURED: {} {}", injury.severity_str(), injury.injury_type), x, y, FONT_HEADER_SIZE, FAILURE);
+                    y += 25.0;
+                    draw_text(&injury.description, x + 10.0, y, FONT_SMALL_SIZE, TEXT_SECONDARY);
+                    y += 20.0;
+
+                    let recovery_secs = injury.recovery_ticks_remaining / 60;
+                    let recovery_rate = crate::data::disciples::Injury::get_recovery_rate(disciple.attributes.body);
+                    draw_text(
+                        &format!("Recovery: {} ticks (~{} sec) | Heal rate: {}/tick (Body bonus)",
+                            injury.recovery_ticks_remaining, recovery_secs, recovery_rate),
+                        x + 10.0, y, FONT_SMALL_SIZE, WARNING
+                    );
+                    y += 30.0;
+                }
 
                 // Stats
                 draw_text("Attributes:", x, y, FONT_HEADER_SIZE, TEXT_HIGHLIGHT);

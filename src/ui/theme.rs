@@ -29,3 +29,11 @@ pub const FENG_SHUI_POSITIVE: Color = Color::new(0.3, 0.9, 0.4, 1.0);   // Brigh
 pub const FENG_SHUI_NEGATIVE: Color = Color::new(0.9, 0.2, 0.2, 1.0);   // Bright red
 pub const FENG_SHUI_NEUTRAL: Color = Color::new(0.5, 0.5, 0.55, 1.0);   // Gray
 pub const FENG_SHUI_EXCELLENT: Color = Color::new(1.0, 0.85, 0.2, 1.0); // Gold
+
+// Panel colors (aliases and variants)
+pub const PANEL: Color = PANEL_BG;
+pub const PANEL_DARK: Color = Color::new(0.08, 0.09, 0.12, 0.95); // Darker panel
+pub const BORDER: Color = PANEL_BORDER;
+
+// Status colors
+pub const WARNING: Color = Color::new(0.9, 0.7, 0.2, 1.0); // Amber/Yellow

@@ -1,4 +1,5 @@
 use crate::data::buildings::BuildingType;
+use crate::data::relations::{DiplomaticAction, Treaty};
 
 #[derive(Debug)]
 pub enum Action {
@@ -21,4 +22,7 @@ pub enum Action {
     AssignDiscipleToBuilding(u64, Option<u64>), // Building ID, Disciple ID (None to unassign)
     ProcessDryingPavilion(u64, String), // Building ID, Herb ID to dry
     SetGreenhouseInfusion(u64, Option<crate::data::elements::Element>), // Building ID, Element
+    // Diplomacy and world simulation actions
+    SendDiplomat { faction_id: String, action: DiplomaticAction },
+    RespondToEvent { event_id: String, choice_idx: usize },
 }

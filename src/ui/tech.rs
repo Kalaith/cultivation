@@ -134,12 +134,24 @@ pub fn draw_tech_tree_modal(
         y_pos += entry_height;
     }
 
-    // Draw scroll indicators if needed
-    if state.scroll_offset > 0.0 {
-        draw_text("^ Scroll up ^", modal_x + modal_w / 2.0 - 40.0, content_y + 15.0, FONT_SMALL_SIZE, TEXT_SECONDARY);
-    }
-    if total_height > content_h && state.scroll_offset < total_height - content_h {
-        draw_text("v Scroll down v", modal_x + modal_w / 2.0 - 45.0, modal_y + modal_h - 15.0, FONT_SMALL_SIZE, TEXT_SECONDARY);
+    // Draw scroll indicators and scrollbar if needed
+    if total_height > content_h {
+        if state.scroll_offset > 0.0 {
+            draw_text("^ Scroll up ^", modal_x + modal_w / 2.0 - 40.0, content_y + 15.0, FONT_SMALL_SIZE, TEXT_SECONDARY);
+        }
+        if state.scroll_offset < total_height - content_h {
+            draw_text("v Scroll down v", modal_x + modal_w / 2.0 - 45.0, modal_y + modal_h - 15.0, FONT_SMALL_SIZE, TEXT_SECONDARY);
+        }
+
+        let track_x = content_x + content_w - 6.0;
+        let track_y = content_y;
+        let track_h = content_h;
+        draw_rectangle(track_x, track_y, 4.0, track_h, PANEL_BORDER);
+
+        let handle_h = (content_h * content_h / total_height).max(20.0);
+        let max_offset = (total_height - content_h).max(1.0);
+        let handle_y = track_y + (state.scroll_offset / max_offset) * (track_h - handle_h);
+        draw_rectangle(track_x - 1.0, handle_y, 6.0, handle_h, TEXT_HIGHLIGHT);
     }
 
     // Draw tooltip for hovered tech

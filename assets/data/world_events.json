@@ -1,0 +1,310 @@
+[
+    {
+        "id": "spring_awakening",
+        "name": "Spiritual Awakening",
+        "description": "The world stirs with renewed spiritual energy as spring arrives. Cultivation becomes easier for all.",
+        "event_type": "SeasonalFestival",
+        "trigger": {"SeasonChange": "Spring"},
+        "effects": [
+            {"ModifyCultivationSpeed": {"modifier": 1.15, "duration_ticks": 1800}}
+        ],
+        "duration_ticks": 1800,
+        "choices": [],
+        "repeatable": true,
+        "min_tick": 0
+    },
+    {
+        "id": "summer_beast_activity",
+        "name": "Beast Tide Warning",
+        "description": "Summer heat drives spiritual beasts from their lairs. Dangerous creatures roam the wilds.",
+        "event_type": "BeastTide",
+        "trigger": {"SeasonChange": "Summer"},
+        "effects": [],
+        "duration_ticks": null,
+        "choices": [
+            {
+                "label": "Send hunters to cull the beasts",
+                "description": "Dispatch disciples to reduce the threat",
+                "requirements": [{"MinDiscipleCount": 3}],
+                "effects": [
+                    {"ModifyResource": {"resource": "SpiritStones", "delta": 200}},
+                    {"ModifyRelation": {"faction_id": "golden_merchant_guild", "delta": 5}}
+                ]
+            },
+            {
+                "label": "Strengthen sect defenses",
+                "description": "Focus on protecting your own territory",
+                "requirements": [],
+                "effects": [
+                    {"ModifyResource": {"resource": "Influence", "delta": 10}}
+                ]
+            }
+        ],
+        "repeatable": true,
+        "min_tick": 0
+    },
+    {
+        "id": "autumn_harvest_festival",
+        "name": "Harvest Festival",
+        "description": "Cultivators gather to celebrate the autumn harvest and trade rare goods.",
+        "event_type": "SeasonalFestival",
+        "trigger": {"SeasonChange": "Autumn"},
+        "effects": [
+            {"ModifyPrices": {"item_id": "spirit_herb", "modifier": 0.8, "duration_ticks": 1800}}
+        ],
+        "duration_ticks": 1800,
+        "choices": [
+            {
+                "label": "Host a grand celebration",
+                "description": "Spend resources to improve relations with all factions",
+                "requirements": [{"MinSpiritStones": 500}],
+                "effects": [
+                    {"ModifyResource": {"resource": "SpiritStones", "delta": -500}},
+                    {"ModifyRelation": {"faction_id": "azure_cloud_sect", "delta": 10}},
+                    {"ModifyRelation": {"faction_id": "golden_merchant_guild", "delta": 10}},
+                    {"ModifyRelation": {"faction_id": "jade_lotus_pavilion", "delta": 10}}
+                ]
+            },
+            {
+                "label": "Focus on trading",
+                "description": "Use the festival as an opportunity to profit",
+                "requirements": [],
+                "effects": [
+                    {"ModifyResource": {"resource": "SpiritStones", "delta": 150}}
+                ]
+            }
+        ],
+        "repeatable": true,
+        "min_tick": 0
+    },
+    {
+        "id": "winter_demon_incursion",
+        "name": "Demon Incursion",
+        "description": "As winter descends, demons grow bold and attack settlements across the region.",
+        "event_type": "DemonIncursion",
+        "trigger": {"SeasonChange": "Winter"},
+        "effects": [],
+        "duration_ticks": null,
+        "choices": [
+            {
+                "label": "Join the defense coalition",
+                "description": "Work with other sects to repel the demons",
+                "requirements": [{"MinDiscipleRealm": "foundation"}],
+                "effects": [
+                    {"ModifyRelation": {"faction_id": "azure_cloud_sect", "delta": 15}},
+                    {"ModifyRelation": {"faction_id": "crimson_fang_sect", "delta": 10}},
+                    {"ModifyRelation": {"faction_id": "imperial_envoy", "delta": 5}},
+                    {"ModifyResource": {"resource": "Influence", "delta": 20}}
+                ]
+            },
+            {
+                "label": "Seal your borders",
+                "description": "Focus on protecting your own sect",
+                "requirements": [],
+                "effects": [
+                    {"ModifyRelation": {"faction_id": "azure_cloud_sect", "delta": -5}}
+                ]
+            },
+            {
+                "label": "Strike a deal with the Shadow Moon Cult",
+                "description": "Perhaps they know how to redirect the demons...",
+                "requirements": [{"MinReputation": {"faction_id": "shadow_moon_cult", "min_rep": -20}}],
+                "effects": [
+                    {"ModifyRelation": {"faction_id": "shadow_moon_cult", "delta": 20}},
+                    {"ModifyRelation": {"faction_id": "azure_cloud_sect", "delta": -15}},
+                    {"ModifyRelation": {"faction_id": "imperial_envoy", "delta": -10}}
+                ]
+            }
+        ],
+        "repeatable": true,
+        "min_tick": 0
+    },
+    {
+        "id": "merchant_caravan",
+        "name": "Merchant Caravan Arrives",
+        "description": "A caravan from the Golden Merchant Guild offers rare goods at special prices.",
+        "event_type": "MerchantCaravan",
+        "trigger": {"TickInterval": 6000},
+        "effects": [
+            {"ModifyPrices": {"item_id": "spirit_stone", "modifier": 0.9, "duration_ticks": 600}}
+        ],
+        "duration_ticks": 600,
+        "choices": [],
+        "repeatable": true,
+        "min_tick": 1000
+    },
+    {
+        "id": "wandering_master",
+        "name": "Wandering Master",
+        "description": "A mysterious cultivator of great power passes through your territory.",
+        "event_type": "WanderingMaster",
+        "trigger": {"RandomChance": 0.0005},
+        "effects": [],
+        "duration_ticks": null,
+        "choices": [
+            {
+                "label": "Request guidance",
+                "description": "Ask the master to share wisdom with your disciples",
+                "requirements": [{"MinSpiritStones": 200}],
+                "effects": [
+                    {"ModifyResource": {"resource": "SpiritStones", "delta": -200}},
+                    {"ModifyCultivationSpeed": {"modifier": 1.25, "duration_ticks": 3600}}
+                ]
+            },
+            {
+                "label": "Offer hospitality",
+                "description": "Provide shelter and resources without asking for anything",
+                "requirements": [{"MinSpiritStones": 100}],
+                "effects": [
+                    {"ModifyResource": {"resource": "SpiritStones", "delta": -100}},
+                    {"ModifyResource": {"resource": "Influence", "delta": 15}}
+                ]
+            },
+            {
+                "label": "Politely decline interaction",
+                "description": "Best not to get involved with unknown cultivators",
+                "requirements": [],
+                "effects": []
+            }
+        ],
+        "repeatable": true,
+        "min_tick": 3000
+    },
+    {
+        "id": "spirit_vein_discovery",
+        "name": "Spirit Vein Discovery",
+        "description": "Scouts have discovered a rich spirit vein in unclaimed territory!",
+        "event_type": "SpiritVeinDiscovery",
+        "trigger": {"RandomChance": 0.0002},
+        "effects": [],
+        "duration_ticks": null,
+        "choices": [
+            {
+                "label": "Claim the vein immediately",
+                "description": "Rush to secure the resource before others",
+                "requirements": [{"MinDiscipleCount": 5}],
+                "effects": [
+                    {"ModifyResource": {"resource": "SpiritStones", "delta": 1000}},
+                    {"ModifyRelation": {"faction_id": "crimson_fang_sect", "delta": -20}}
+                ]
+            },
+            {
+                "label": "Negotiate with neighbors",
+                "description": "Share the discovery to maintain peace",
+                "requirements": [],
+                "effects": [
+                    {"ModifyResource": {"resource": "SpiritStones", "delta": 300}},
+                    {"ModifyRelation": {"faction_id": "azure_cloud_sect", "delta": 10}},
+                    {"ModifyResource": {"resource": "Influence", "delta": 10}}
+                ]
+            },
+            {
+                "label": "Sell the information",
+                "description": "Let others fight over it",
+                "requirements": [],
+                "effects": [
+                    {"ModifyResource": {"resource": "SpiritStones", "delta": 500}}
+                ]
+            }
+        ],
+        "repeatable": true,
+        "min_tick": 5000
+    },
+    {
+        "id": "ancient_ruin_opened",
+        "name": "Ancient Ruin Unsealed",
+        "description": "Seals on an ancient cultivation ruin have weakened. Treasures await within!",
+        "event_type": "AncientRuinOpened",
+        "trigger": {"RandomChance": 0.0001},
+        "effects": [],
+        "duration_ticks": null,
+        "choices": [
+            {
+                "label": "Send an elite expedition",
+                "description": "Risk your best disciples for the greatest rewards",
+                "requirements": [{"MinDiscipleRealm": "core_formation"}],
+                "effects": [
+                    {"ModifyResource": {"resource": "SpiritStones", "delta": 2000}},
+                    {"ModifyResource": {"resource": "Relics", "delta": 50}},
+                    {"SpawnMission": {"mission_id": "ruin_exploration"}}
+                ]
+            },
+            {
+                "label": "Send scouts first",
+                "description": "Careful exploration with lower risk",
+                "requirements": [{"MinDiscipleCount": 2}],
+                "effects": [
+                    {"ModifyResource": {"resource": "SpiritStones", "delta": 500}},
+                    {"ModifyResource": {"resource": "Relics", "delta": 10}}
+                ]
+            },
+            {
+                "label": "Warn other sects",
+                "description": "Share the danger and opportunity",
+                "requirements": [],
+                "effects": [
+                    {"ModifyRelation": {"faction_id": "azure_cloud_sect", "delta": 15}},
+                    {"ModifyRelation": {"faction_id": "jade_lotus_pavilion", "delta": 15}},
+                    {"ModifyResource": {"resource": "Influence", "delta": 25}}
+                ]
+            }
+        ],
+        "repeatable": true,
+        "min_tick": 10000
+    },
+    {
+        "id": "imperial_decree",
+        "name": "Imperial Decree",
+        "description": "The Imperial Court has issued a decree affecting all sects in the region.",
+        "event_type": "ImperialDecree",
+        "trigger": {"TickInterval": 15000},
+        "effects": [],
+        "duration_ticks": null,
+        "choices": [
+            {
+                "label": "Comply fully",
+                "description": "Show loyalty to the empire",
+                "requirements": [{"MinSpiritStones": 300}],
+                "effects": [
+                    {"ModifyResource": {"resource": "SpiritStones", "delta": -300}},
+                    {"ModifyRelation": {"faction_id": "imperial_envoy", "delta": 25}}
+                ]
+            },
+            {
+                "label": "Minimal compliance",
+                "description": "Do just enough to avoid trouble",
+                "requirements": [],
+                "effects": [
+                    {"ModifyResource": {"resource": "SpiritStones", "delta": -100}},
+                    {"ModifyRelation": {"faction_id": "imperial_envoy", "delta": 5}}
+                ]
+            },
+            {
+                "label": "Openly resist",
+                "description": "Stand against imperial overreach",
+                "requirements": [{"MinInfluence": 50}],
+                "effects": [
+                    {"ModifyRelation": {"faction_id": "imperial_envoy", "delta": -30}},
+                    {"ModifyRelation": {"faction_id": "shadow_moon_cult", "delta": 15}},
+                    {"ModifyResource": {"resource": "Influence", "delta": 20}}
+                ]
+            }
+        ],
+        "repeatable": true,
+        "min_tick": 5000
+    },
+    {
+        "id": "resource_boom",
+        "name": "Spiritual Energy Surge",
+        "description": "A surge of spiritual energy enriches the land, boosting herb growth and cultivation.",
+        "event_type": "ResourceBoom",
+        "trigger": {"RandomChance": 0.0003},
+        "effects": [
+            {"ModifyCultivationSpeed": {"modifier": 1.2, "duration_ticks": 2400}}
+        ],
+        "duration_ticks": 2400,
+        "choices": [],
+        "repeatable": true,
+        "min_tick": 2000
+    }
+]

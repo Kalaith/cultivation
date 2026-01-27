@@ -1,11 +1,16 @@
 use crate::data::{
+    ai::AiSchedulerTuning,
     bloodlines::Bloodline,
     buildings::Building,
     disciples::FateTrait,
+    economy::{EconomyNode, TradeRoute},
+    factions::Faction,
     herbs::Herb,
     missions::{MapNode, Mission},
     stages::StageDefinition,
+    world_events::WorldEvent,
 };
+use crate::engine::world_sim::WorldSimBalance;
 
 
 #[derive(Clone)]
@@ -25,6 +30,25 @@ pub struct GameData {
     pub stages_order: Vec<String>,
     /// Herb definitions for the herb system
     pub herbs: std::collections::HashMap<String, Herb>,
+    /// Faction definitions for world simulation
+    pub factions: Vec<Faction>,
+    /// Economy nodes for trading
+    pub economy_nodes: Vec<EconomyNode>,
+    /// Trade routes connecting economy nodes
+    pub trade_routes: Vec<TradeRoute>,
+    /// World event definitions
+    pub world_events: Vec<WorldEvent>,
+    /// Balance configuration
+    pub balance: WorldSimBalance,
+    /// AI scheduler tuning configuration
+    pub ai_scheduler: AiSchedulerTuning,
+}
+
+/// Economy data loaded from JSON
+#[derive(Clone, serde::Deserialize)]
+pub struct EconomyData {
+    pub nodes: Vec<EconomyNode>,
+    pub routes: Vec<TradeRoute>,
 }
 
 #[derive(Clone, serde::Deserialize)]
@@ -43,21 +67,11 @@ pub struct BuildingDefinition {
 
 impl GameData {
     pub fn load() -> Result<Self, Box<dyn std::error::Error>> {
-        let buildings_json = std::fs::read_to_string("assets/data/buildings.json")?;
-        let building_list: Vec<Building> = serde_json::from_str(&buildings_json)?;
-        let buildings = building_list
-            .into_iter()
-            .enumerate()
-            .map(|(i, mut b)| {
-                b.x = (i as i32 % 5) * 4 + 2;
-                b.y = (i as i32 / 5) * 4 + 2;
-                b.id = (i + 1) as u64; 
-                b
-            })
-            .collect();
+        // Buildings list starts empty - populated at runtime when player constructs
+        let buildings: Vec<Building> = Vec::new();
 
-        // Load Building Definitions
-        let defs_json = std::fs::read_to_string("assets/data/building_definitions.json")?;
+        // Load building definitions (templates for what can be built)
+        let defs_json = std::fs::read_to_string("assets/data/buildings.json")?;
         let defs_list: Vec<BuildingDefinition> = serde_json::from_str(&defs_json)?;
         let building_definitions = defs_list.into_iter().map(|d| (d.building_type.clone(), d)).collect();
 
@@ -98,6 +112,25 @@ impl GameData {
         let herbs_list: Vec<Herb> = serde_json::from_str(&herbs_json)?;
         let herbs = herbs_list.into_iter().map(|h| (h.id.clone(), h)).collect();
 
+        // Load faction data
+        let factions_json = std::fs::read_to_string("assets/data/factions.json").unwrap_or_else(|_| "[]".to_string());
+        let factions: Vec<Faction> = serde_json::from_str(&factions_json)?;
+
+        // Load economy data
+        let economy_json = std::fs::read_to_string("assets/data/economy.json").unwrap_or_else(|_| r#"{"nodes":[],"routes":[]}"#.to_string());
+        let economy_data: EconomyData = serde_json::from_str(&economy_json)?;
+
+        // Load world events
+        let events_json = std::fs::read_to_string("assets/data/world_events.json").unwrap_or_else(|_| "[]".to_string());
+        let world_events: Vec<WorldEvent> = serde_json::from_str(&events_json)?;
+
+        // Load balance configuration
+        let balance_json = std::fs::read_to_string("assets/data/balance.json").unwrap_or_else(|_| "{}".to_string());
+        let balance: WorldSimBalance = serde_json::from_str(&balance_json).unwrap_or_default();
+
+        let ai_json = std::fs::read_to_string("assets/data/ai_scheduler.json").unwrap_or_else(|_| "{}".to_string());
+        let ai_scheduler: AiSchedulerTuning = serde_json::from_str(&ai_json).unwrap_or_default();
+
         Ok(GameData {
             buildings,
             building_definitions,
@@ -112,6 +145,12 @@ impl GameData {
             stages,
             stages_order,
             herbs,
+            factions,
+            economy_nodes: economy_data.nodes,
+            trade_routes: economy_data.routes,
+            world_events,
+            balance,
+            ai_scheduler,
         })
     }
 }

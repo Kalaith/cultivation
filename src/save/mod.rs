@@ -1,18 +1,61 @@
+//! Save/Load System
+//!
+//! Cross-platform save system supporting desktop (file) and WebGL (LocalStorage).
+
 use crate::data::{
     buildings::Building,
     disciples::Disciple,
+    herbs::Season,
     history::DeceasedDisciple,
     missions::{MissionOutcome, OngoingMission},
-    grid::Grid, // Import Grid
+    grid::Grid,
 };
+use crate::engine::world_sim::SavedWorldSim;
+use crate::engine::scheduler::SavedScheduler;
 use serde::{Deserialize, Serialize};
+
+/// Save file version for migration support
+pub const SAVE_VERSION: u32 = 4;
+
+/// Tutorial state for save/load
+#[derive(Clone, Serialize, Deserialize, Default)]
+pub struct SavedTutorialState {
+    pub active: bool,
+    pub step: usize,
+    pub hidden: bool,
+}
+
+impl SavedTutorialState {
+    pub fn from_tutorial(tutorial: &crate::state::TutorialState) -> Self {
+        Self {
+            active: tutorial.active,
+            step: tutorial.step,
+            hidden: tutorial.hidden,
+        }
+    }
+
+    pub fn to_tutorial(&self) -> crate::state::TutorialState {
+        crate::state::TutorialState {
+            active: self.active,
+            step: self.step,
+            hidden: self.hidden,
+        }
+    }
+}
 
 #[derive(Serialize, Deserialize)]
 pub struct SaveData {
+    /// Save file version for migration
     #[serde(default)]
-    pub grid: Option<Grid>, // Optional for backward compatibility with old saves
+    pub version: u32,
+
+    // Grid and sect info
+    #[serde(default)]
+    pub grid: Option<Grid>,
     #[serde(default)]
     pub sect_name: String,
+
+    // Resources
     pub spirit_stones: u32,
     #[serde(default)]
     pub herbs: u32,
@@ -22,15 +65,156 @@ pub struct SaveData {
     pub relics: u32,
     #[serde(default)]
     pub inventory: std::collections::HashMap<String, u32>,
+
+    // Tech and disciples
     #[serde(default)]
     pub unlocked_techs: Vec<String>,
     pub disciples: Vec<Disciple>,
     #[serde(default)]
     pub deceased_disciples: Vec<DeceasedDisciple>,
+
+    // Buildings and missions
     pub buildings: Vec<Building>,
     pub ongoing_missions: Vec<OngoingMission>,
     pub completed_missions: Vec<MissionOutcome>,
     #[serde(default)]
     pub completed_history: Vec<String>,
+
+    // Time
     pub tick: u64,
+
+    // Season system (new in v2)
+    #[serde(default = "default_season")]
+    pub current_season: Season,
+    #[serde(default = "default_season_ticks")]
+    pub season_ticks: u32,
+
+    // Tutorial state (new in v2)
+    #[serde(default)]
+    pub tutorial: SavedTutorialState,
+
+    // World simulation state (new in v3)
+    #[serde(default)]
+    pub world_sim: Option<SavedWorldSim>,
+
+    // AI scheduler state (new in v4)
+    #[serde(default)]
+    pub scheduler: Option<SavedScheduler>,
+}
+
+fn default_season() -> Season {
+    Season::Spring
+}
+
+fn default_season_ticks() -> u32 {
+    3600
+}
+
+impl SaveData {
+    /// Migrate old save data to current version
+    pub fn migrate(mut self) -> Self {
+        if self.version < 2 {
+            // v1 -> v2: Add season and tutorial defaults
+            self.current_season = Season::Spring;
+            self.season_ticks = 3600;
+            self.tutorial = SavedTutorialState::default();
+        }
+        if self.version < 3 {
+            // v2 -> v3: Add world simulation (will be created fresh on load)
+            self.world_sim = None;
+        }
+        if self.version < 4 {
+            // v3 -> v4: Add scheduler state (will be created fresh on load)
+            self.scheduler = None;
+        }
+        self.version = SAVE_VERSION;
+        self
+    }
+}
+
+/// Platform-agnostic save operations
+pub mod storage {
+    use super::SaveData;
+
+    #[cfg(not(target_arch = "wasm32"))]
+    use std::fs;
+
+    #[cfg(target_arch = "wasm32")]
+    use quad_storage::LocalStorage;
+
+    const SAVE_FILE: &str = "savegame.json";
+    const SAVE_KEY: &str = "cultivation_save";
+
+    /// Save game data to persistent storage
+    pub fn save(data: &SaveData) -> Result<(), String> {
+        let json = serde_json::to_string_pretty(data)
+            .map_err(|e| format!("Serialization error: {}", e))?;
+
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            fs::write(SAVE_FILE, &json)
+                .map_err(|e| format!("File write error: {}", e))?;
+        }
+
+        #[cfg(target_arch = "wasm32")]
+        {
+            LocalStorage::set(SAVE_KEY, &json);
+        }
+
+        Ok(())
+    }
+
+    /// Load game data from persistent storage
+    pub fn load() -> Result<SaveData, String> {
+        let json = {
+            #[cfg(not(target_arch = "wasm32"))]
+            {
+                fs::read_to_string(SAVE_FILE)
+                    .map_err(|e| format!("File read error: {}", e))?
+            }
+
+            #[cfg(target_arch = "wasm32")]
+            {
+                LocalStorage::get(SAVE_KEY)
+                    .ok_or_else(|| "No save found".to_string())?
+            }
+        };
+
+        let save_data: SaveData = serde_json::from_str(&json)
+            .map_err(|e| format!("Deserialization error: {}", e))?;
+
+        // Apply migrations if needed
+        Ok(save_data.migrate())
+    }
+
+    /// Check if a save exists
+    pub fn exists() -> bool {
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            std::path::Path::new(SAVE_FILE).exists()
+        }
+
+        #[cfg(target_arch = "wasm32")]
+        {
+            LocalStorage::get(SAVE_KEY).is_some()
+        }
+    }
+
+    /// Delete save data
+    pub fn delete() -> Result<(), String> {
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            if std::path::Path::new(SAVE_FILE).exists() {
+                fs::remove_file(SAVE_FILE)
+                    .map_err(|e| format!("Delete error: {}", e))?;
+            }
+        }
+
+        #[cfg(target_arch = "wasm32")]
+        {
+            LocalStorage::remove(SAVE_KEY);
+        }
+
+        Ok(())
+    }
 }

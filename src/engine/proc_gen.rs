@@ -1,5 +1,5 @@
 use crate::data::bloodlines::{BloodlineRarity, DiscipleBloodline};
-use crate::data::disciples::{Attributes, Disciple, DiscipleRank, Talent};
+use crate::data::disciples::{Attributes, Disciple, DiscipleNeeds, DiscipleRank, Talent};
 use crate::data::loader::GameData;
 use rand::prelude::*;
 
@@ -49,6 +49,8 @@ pub fn generate_disciple(game_data: &GameData) -> Disciple {
         max_qi: 0,
         law_id: None,
         bloodline,
+        needs: DiscipleNeeds::from_tuning(&game_data.ai_scheduler),
+        injury: None,
     }
 }
 

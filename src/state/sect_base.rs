@@ -26,6 +26,7 @@ pub struct SectBaseState {
     crafting_modal_open: bool,
     tech_tree_open: bool,
     tech_tree_state: TechTreeState,
+    construction_scroll: f32,
     placement_mode: Option<crate::data::buildings::BuildingType>,
     hovered_tile: Option<(i32, i32)>,
     // Herb system modals
@@ -43,6 +44,7 @@ impl SectBaseState {
             crafting_modal_open: false,
             tech_tree_open: false,
             tech_tree_state: TechTreeState::new(),
+            construction_scroll: 0.0,
             placement_mode: None,
             hovered_tile: None,
             herb_planting_modal: None,
@@ -209,14 +211,20 @@ impl SectBaseState {
         }
 
         // Navigation buttons at bottom
-        let nav_y_start = rect.y + rect.h - 170.0;
+        let nav_y_start = rect.y + rect.h - 270.0;
         if draw_button(Rect::new(rect.x + 10.0, nav_y_start, width - 20.0, 40.0), "Disciples", false) {
              return Some(UpdateResult::new().with_transition(StateTransition::ToDiscipleRoster));
         }
         if draw_button(Rect::new(rect.x + 10.0, nav_y_start + 50.0, width - 20.0, 40.0), "World Map", false) {
              return Some(UpdateResult::new().with_transition(StateTransition::ToWorldMap));
         }
-        if draw_button(Rect::new(rect.x + 10.0, nav_y_start + 100.0, width - 20.0, 40.0), "Construction", false) {
+        if draw_button(Rect::new(rect.x + 10.0, nav_y_start + 100.0, width - 20.0, 40.0), "Factions", false) {
+             return Some(UpdateResult::new().with_transition(StateTransition::ToFactionScreen));
+        }
+        if draw_button(Rect::new(rect.x + 10.0, nav_y_start + 150.0, width - 20.0, 40.0), "Trade", false) {
+             return Some(UpdateResult::new().with_transition(StateTransition::ToTradeScreen));
+        }
+        if draw_button(Rect::new(rect.x + 10.0, nav_y_start + 200.0, width - 20.0, 40.0), "Construction", false) {
              self.view = SectView::Map;
              self.crafting_modal_open = true;
         }
@@ -773,27 +781,70 @@ impl SectBaseState {
              self.crafting_modal_open = false;
          }
 
-         let mut b_y = modal_y + 50.0;
+         let content_y = modal_y + 50.0;
+         let content_h = modal_h - 70.0;
+         let content_rect = Rect::new(modal_x + 10.0, content_y, modal_w - 20.0, content_h);
 
          // Use loaded definitions
          // Sort by cost for consistent display
          let mut build_opts: Vec<_> = data.building_definitions.values().collect();
          build_opts.sort_by_key(|a| a.cost);
 
-         for def in build_opts {
-             let req_tech = def.tech_required.clone().unwrap_or_default();
-             let tech_unlocked = unlocked_techs.contains(&req_tech) || req_tech.is_empty();
+         let available_defs: Vec<_> = build_opts
+             .into_iter()
+             .filter(|def| {
+                 let req_tech = def.tech_required.clone().unwrap_or_default();
+                 let tech_unlocked = unlocked_techs.contains(&req_tech) || req_tech.is_empty();
+                 let already_built = def.unique && data.buildings.iter().any(|b| b.building_type == def.building_type);
+                 tech_unlocked && !already_built
+             })
+             .collect();
 
-             // Skip unique buildings that already exist
-             let already_built = def.unique && data.buildings.iter().any(|b| b.building_type == def.building_type);
-
-             if tech_unlocked && !already_built {
-                 if draw_button(Rect::new(modal_x + 20.0, b_y, modal_w - 40.0, 40.0), &format!("{} ({} SS)", def.name, def.cost), false) {
-                     self.crafting_modal_open = false;
-                     self.placement_mode = Some(def.building_type.clone());
-                 }
-                 b_y += 50.0;
+         let total_height = available_defs.len() as f32 * 50.0;
+         if content_rect.contains(mouse_position().into()) {
+             let wheel = mouse_wheel().1;
+             if total_height > content_h {
+                 self.construction_scroll -= wheel * 30.0;
+                 self.construction_scroll = self.construction_scroll.clamp(0.0, (total_height - content_h).max(0.0));
+             } else {
+                 self.construction_scroll = 0.0;
              }
+         }
+
+         if available_defs.is_empty() {
+             draw_text("No available buildings.", modal_x + 20.0, content_y + 20.0, FONT_BODY_SIZE, TEXT_SECONDARY);
+             return None;
+         }
+
+         let mut b_y = content_y - self.construction_scroll;
+         for def in available_defs {
+             if b_y + 40.0 < content_y {
+                 b_y += 50.0;
+                 continue;
+             }
+             if b_y > content_y + content_h {
+                 break;
+             }
+
+             if draw_button(Rect::new(modal_x + 20.0, b_y, modal_w - 40.0, 40.0), &format!("{} ({} SS)", def.name, def.cost), false) {
+                 self.crafting_modal_open = false;
+                 self.placement_mode = Some(def.building_type.clone());
+             }
+             b_y += 50.0;
+         }
+
+         if total_height > content_h {
+             let track_x = modal_x + modal_w - 12.0;
+             let track_y = content_y;
+             let track_h = content_h;
+             draw_rectangle(track_x, track_y, 4.0, track_h, PANEL_BORDER);
+
+             let handle_h = (content_h * content_h / total_height).max(20.0);
+             let max_offset = (total_height - content_h).max(1.0);
+             let handle_y = track_y + (self.construction_scroll / max_offset) * (track_h - handle_h);
+             draw_rectangle(track_x - 1.0, handle_y, 6.0, handle_h, TEXT_HIGHLIGHT);
+
+             draw_text("Scroll", modal_x + 20.0, modal_y + modal_h - 15.0, FONT_SMALL_SIZE, TEXT_SECONDARY);
          }
          None
     }

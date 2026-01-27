@@ -1,0 +1,86 @@
+[
+    {
+        "id": "azure_cloud_sect",
+        "name": "Azure Cloud Sect",
+        "faction_type": "Sect",
+        "territory_nodes": ["serene_forest"],
+        "power_level": 50,
+        "wealth": 500,
+        "leader_realm": "core_formation",
+        "disposition": 20,
+        "specialty": "Alchemy",
+        "description": "A prestigious sect known for their mastery of pill refinement and healing arts."
+    },
+    {
+        "id": "golden_merchant_guild",
+        "name": "Golden Merchant Guild",
+        "faction_type": "MerchantGuild",
+        "territory_nodes": [],
+        "power_level": 20,
+        "wealth": 2000,
+        "leader_realm": "foundation",
+        "disposition": 40,
+        "specialty": "Trade",
+        "description": "A powerful trading consortium that controls most commerce in the region."
+    },
+    {
+        "id": "crimson_fang_sect",
+        "name": "Crimson Fang Sect",
+        "faction_type": "Sect",
+        "territory_nodes": ["haunted_ruins"],
+        "power_level": 65,
+        "wealth": 300,
+        "leader_realm": "core_formation",
+        "disposition": -20,
+        "specialty": "Combat",
+        "description": "A martial sect feared for their aggressive cultivation techniques and territorial ambitions."
+    },
+    {
+        "id": "shadow_moon_cult",
+        "name": "Shadow Moon Cult",
+        "faction_type": "DemonCult",
+        "territory_nodes": [],
+        "power_level": 40,
+        "wealth": 200,
+        "leader_realm": "nascent_soul",
+        "disposition": -60,
+        "specialty": "Intelligence",
+        "description": "A secretive organization practicing forbidden arts in the shadows."
+    },
+    {
+        "id": "imperial_envoy",
+        "name": "Imperial Court",
+        "faction_type": "ImperialCourt",
+        "territory_nodes": [],
+        "power_level": 100,
+        "wealth": 5000,
+        "leader_realm": "spirit_severing",
+        "disposition": 0,
+        "specialty": "Formations",
+        "description": "The mortal empire's presence in cultivation affairs, maintaining order and collecting tribute."
+    },
+    {
+        "id": "wild_boar_bandits",
+        "name": "Wild Boar Bandits",
+        "faction_type": "BanditClan",
+        "territory_nodes": [],
+        "power_level": 15,
+        "wealth": 100,
+        "leader_realm": "foundation",
+        "disposition": -40,
+        "specialty": "Combat",
+        "description": "Ruthless bandits who prey on caravans and isolated cultivators."
+    },
+    {
+        "id": "jade_lotus_pavilion",
+        "name": "Jade Lotus Pavilion",
+        "faction_type": "Sect",
+        "territory_nodes": [],
+        "power_level": 35,
+        "wealth": 800,
+        "leader_realm": "core_formation",
+        "disposition": 30,
+        "specialty": "Agriculture",
+        "description": "A peaceful sect focused on herb cultivation and natural harmony."
+    }
+]

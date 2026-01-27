@@ -1,48 +1,110 @@
 [
-  {
-    "building_type": "SectHall",
-    "level": 1
-  },
-  {
-    "building_type": "MissionBoard",
-    "level": 1,
-    "element": "Wood",
-    "material_element": "Earth"
-  },
-  {
-    "building_type": "Decoration",
-    "level": 1,
-    "element": "Water",
-    "material_element": "Metal"
-  },
-  {
-    "building_type": "Decoration",
-    "level": 1,
-    "element": "Fire",
-    "material_element": "Wood"
-  },
-  {
-    "building_type": "AlchemyFurnace",
-    "level": 1,
-    "element": "Fire",
-    "material_element": "Earth"
-  },
-  {
-    "building_type": "ArtifactForge",
-    "level": 1,
-    "element": "Metal",
-    "material_element": "Fire"
-  },
-  {
-    "building_type": "TrainingYard",
-    "level": 1
-  },
-  {
-    "building_type": "LibraryPavilion",
-    "level": 1
-  },
-  {
-    "building_type": "SpiritGarden",
-    "level": 1
-  }
+    {
+        "type": "SectHall",
+        "cost": 0,
+        "name": "Sect Hall",
+        "description": "The heart of the sect.",
+        "tech_required": null,
+        "element": "Earth",
+        "unique": true
+    },
+    {
+        "type": "Dormitory",
+        "cost": 120,
+        "name": "Dormitory",
+        "description": "Houses disciples and increases sect population capacity.",
+        "tech_required": "dormitories",
+        "element": "Earth",
+        "unique": false
+    },
+    {
+        "type": "TrainingYard",
+        "cost": 100,
+        "name": "Training Yard",
+        "description": "Where disciples cultivate.",
+        "tech_required": "basic_infrastructure",
+        "element": "Metal",
+        "unique": false
+    },
+    {
+        "type": "SpiritGarden",
+        "cost": 150,
+        "name": "Spirit Garden",
+        "description": "Grows spiritual herbs and gathers ambient Qi.",
+        "tech_required": "basic_infrastructure",
+        "element": "Wood",
+        "unique": false
+    },
+    {
+        "type": "LibraryPavilion",
+        "cost": 300,
+        "name": "Library Pavilion",
+        "description": "Store scriptures and record history.",
+        "tech_required": "advanced_facilities",
+        "element": "Water",
+        "unique": true
+    },
+    {
+        "type": "AlchemyFurnace",
+        "cost": 200,
+        "name": "Alchemy Furnace",
+        "description": "Refine pills and elixirs.",
+        "tech_required": "advanced_facilities",
+        "element": "Fire",
+        "unique": false
+    },
+    {
+        "type": "ArtifactForge",
+        "cost": 200,
+        "name": "Artifact Forge",
+        "description": "Craft magical artifacts.",
+        "tech_required": "advanced_facilities",
+        "element": "Metal",
+        "unique": false
+    },
+    {
+        "type": "MissionBoard",
+        "cost": 50,
+        "name": "Mission Board",
+        "description": "Assign disciples to missions.",
+        "tech_required": "sect_administration",
+        "element": "None",
+        "unique": true
+    },
+    {
+        "type": "HerbGarden",
+        "cost": 100,
+        "name": "Herb Garden",
+        "description": "Grows Tier 1-2 herbs when tended by Outer Disciples. Assign a disciple to harvest mature herbs.",
+        "tech_required": "basic_infrastructure",
+        "element": "Wood",
+        "unique": false
+    },
+    {
+        "type": "Greenhouse",
+        "cost": 250,
+        "name": "Greenhouse",
+        "description": "Controlled environment for Tier 2-3 herbs. Can override seasonal restrictions with elemental infusion.",
+        "tech_required": "advanced_facilities",
+        "element": "Wood",
+        "unique": false
+    },
+    {
+        "type": "DryingPavilion",
+        "cost": 150,
+        "name": "Drying Pavilion",
+        "description": "Processes raw herbs into dried ingredients. Dried herbs have longer shelf life and are used in alchemy.",
+        "tech_required": "basic_infrastructure",
+        "element": "Fire",
+        "unique": false
+    },
+    {
+        "type": "HerbStorage",
+        "cost": 120,
+        "name": "Herb Storage",
+        "description": "Prevents herb decay. Raw herbs decay 10% per season without storage. Higher levels reduce decay further.",
+        "tech_required": "basic_infrastructure",
+        "element": "Earth",
+        "unique": false
+    }
 ]

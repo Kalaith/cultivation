@@ -1,5 +1,6 @@
 use crate::engine::actions::Action;
 
+pub mod faction_screen;
 pub mod library;
 pub mod main_menu;
 pub mod mission_assignment;
@@ -7,15 +8,19 @@ pub mod mission_resolution;
 pub mod roster;
 pub mod sect_base;
 pub mod sect_creation;
-pub mod world_map;
+pub mod trade_screen;
 pub mod tribulation;
+pub mod world_map;
 
 use self::{
+    faction_screen::FactionScreenState,
     library::LibraryState, main_menu::MainMenuState,
     mission_assignment::MissionAssignmentState,
     mission_resolution::MissionResolutionState, roster::DiscipleRosterState,
-    sect_base::SectBaseState, sect_creation::SectCreationState, world_map::WorldMapState,
+    sect_base::SectBaseState, sect_creation::SectCreationState,
+    trade_screen::TradeScreenState,
     tribulation::TribulationEncounterState,
+    world_map::WorldMapState,
 };
 
 pub enum GameState {
@@ -28,6 +33,8 @@ pub enum GameState {
     MissionAssignment(MissionAssignmentState),
     SectCreation(SectCreationState),
     Tribulation(TribulationEncounterState),
+    FactionScreen(FactionScreenState),
+    TradeScreen(TradeScreenState),
 }
 
 pub enum StateTransition {
@@ -40,6 +47,8 @@ pub enum StateTransition {
     ToLibrary,
     ToSectCreation,
     ToTribulation(crate::engine::tribulation::TribulationState, usize),
+    ToFactionScreen,
+    ToTradeScreen,
 }
 //...
 

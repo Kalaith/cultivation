@@ -1,5 +1,89 @@
 use serde::{Deserialize, Serialize};
+use crate::data::ai::AiSchedulerTuning;
 use crate::data::bloodlines::DiscipleBloodline;
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct NeedState {
+    pub current: f32,
+    pub max: f32,
+    pub decay_per_tick: f32,
+    pub urgent_threshold: f32,
+}
+
+impl NeedState {
+    pub fn decay(&mut self) {
+        self.current = (self.current - self.decay_per_tick).max(0.0);
+    }
+
+    pub fn restore_full(&mut self) {
+        self.current = self.max;
+    }
+
+    pub fn urgency(&self) -> f32 {
+        if self.current >= self.urgent_threshold || self.urgent_threshold <= 0.0 {
+            0.0
+        } else {
+            (self.urgent_threshold - self.current) / self.urgent_threshold
+        }
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct DiscipleNeeds {
+    pub hunger: NeedState,
+    pub rest: NeedState,
+    pub qi: NeedState,
+    pub morale: NeedState,
+}
+
+impl DiscipleNeeds {
+    pub fn decay_all(&mut self) {
+        self.hunger.decay();
+        self.rest.decay();
+        self.qi.decay();
+        self.morale.decay();
+    }
+
+    pub fn from_tuning(tuning: &AiSchedulerTuning) -> Self {
+        let needs = &tuning.needs;
+        Self {
+            hunger: NeedState {
+                current: needs.max,
+                max: needs.max,
+                decay_per_tick: needs.hunger_decay,
+                urgent_threshold: needs.hunger_urgent,
+            },
+            rest: NeedState {
+                current: needs.max,
+                max: needs.max,
+                decay_per_tick: needs.rest_decay,
+                urgent_threshold: needs.rest_urgent,
+            },
+            qi: NeedState {
+                current: needs.max,
+                max: needs.max,
+                decay_per_tick: needs.qi_decay,
+                urgent_threshold: needs.qi_urgent,
+            },
+            morale: NeedState {
+                current: needs.max,
+                max: needs.max,
+                decay_per_tick: needs.morale_decay,
+                urgent_threshold: needs.morale_urgent,
+            },
+        }
+    }
+}
+
+fn default_needs() -> DiscipleNeeds {
+    DiscipleNeeds::from_tuning(&AiSchedulerTuning::default())
+}
+
+impl Default for DiscipleNeeds {
+    fn default() -> Self {
+        default_needs()
+    }
+}
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum Talent {
@@ -55,6 +139,107 @@ pub enum DiscipleRank {
     SectLeader,
 }
 
+/// Type of injury sustained
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+pub enum InjuryType {
+    /// From failed breakthrough attempt
+    QiDeviation,
+    /// From combat/mission failure
+    BattleWounds,
+    /// From overexertion
+    MeridianDamage,
+}
+
+impl std::fmt::Display for InjuryType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            InjuryType::QiDeviation => write!(f, "Qi Deviation"),
+            InjuryType::BattleWounds => write!(f, "Battle Wounds"),
+            InjuryType::MeridianDamage => write!(f, "Meridian Damage"),
+        }
+    }
+}
+
+/// Injury state for a disciple
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct Injury {
+    /// Type of injury
+    pub injury_type: InjuryType,
+    /// Severity 1-3: Minor, Moderate, Severe
+    pub severity: u32,
+    /// Ticks remaining until natural recovery
+    pub recovery_ticks_remaining: u32,
+    /// Description of the injury
+    pub description: String,
+}
+
+impl Injury {
+    /// Create a new injury from a failed breakthrough
+    pub fn from_breakthrough(realm: &str, is_survivor: bool) -> Self {
+        // Survivors get less severe injuries
+        let severity = if is_survivor { 2 } else { 2 }; // Moderate by default
+
+        // Base recovery time: 600 ticks (10 seconds) per severity level
+        // Higher realms = longer recovery
+        let realm_multiplier = match realm {
+            "Mortal" => 1.0,
+            "QiRefinement" => 1.2,
+            "FoundationEstablishment" => 1.5,
+            "CoreFormation" => 2.0,
+            "NascentSoul" => 2.5,
+            _ => 3.0,
+        };
+
+        let base_recovery = 600 * severity;
+        let recovery_ticks = (base_recovery as f32 * realm_multiplier) as u32;
+
+        Self {
+            injury_type: InjuryType::QiDeviation,
+            severity,
+            recovery_ticks_remaining: recovery_ticks,
+            description: format!("Suffered Qi deviation during breakthrough attempt"),
+        }
+    }
+
+    /// Create a new injury from combat/mission
+    pub fn from_combat(severity: u32) -> Self {
+        let recovery_ticks = 600 * severity;
+        Self {
+            injury_type: InjuryType::BattleWounds,
+            severity: severity.clamp(1, 3),
+            recovery_ticks_remaining: recovery_ticks,
+            description: format!("Wounded in battle"),
+        }
+    }
+
+    /// Get severity as a descriptive string
+    pub fn severity_str(&self) -> &'static str {
+        match self.severity {
+            1 => "Minor",
+            2 => "Moderate",
+            _ => "Severe",
+        }
+    }
+
+    /// Calculate natural recovery rate based on Body stat
+    /// Returns ticks to recover per game tick
+    pub fn get_recovery_rate(body: u32) -> u32 {
+        // Base rate: 1 tick per tick
+        // Body bonus: +1 per 20 Body
+        1 + (body / 20)
+    }
+
+    /// Apply healing from an item (reduces recovery time)
+    pub fn apply_healing(&mut self, healing_power: u32) {
+        self.recovery_ticks_remaining = self.recovery_ticks_remaining.saturating_sub(healing_power);
+    }
+
+    /// Check if fully healed
+    pub fn is_healed(&self) -> bool {
+        self.recovery_ticks_remaining == 0
+    }
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Disciple {
     /// Unique identifier for the disciple
@@ -84,15 +269,58 @@ pub struct Disciple {
     /// Bloodline inheritance and awakening state
     #[serde(default)]
     pub bloodline: DiscipleBloodline,
+    /// Basic needs for scheduling and behavior
+    #[serde(default = "default_needs")]
+    pub needs: DiscipleNeeds,
+    /// Current injury status (None = healthy)
+    #[serde(default)]
+    pub injury: Option<Injury>,
 }
 
 impl Disciple {
+    /// Check if disciple is injured
+    pub fn is_injured(&self) -> bool {
+        self.injury.is_some()
+    }
+
+    /// Apply natural healing based on Body stat
+    pub fn heal_tick(&mut self) {
+        if let Some(ref mut injury) = self.injury {
+            let rate = Injury::get_recovery_rate(self.attributes.body);
+            injury.recovery_ticks_remaining = injury.recovery_ticks_remaining.saturating_sub(rate);
+
+            if injury.is_healed() {
+                self.injury = None;
+            }
+        }
+    }
+
+    /// Apply healing from item/herb
+    pub fn apply_healing(&mut self, healing_power: u32) -> bool {
+        if let Some(ref mut injury) = self.injury {
+            injury.apply_healing(healing_power);
+            if injury.is_healed() {
+                self.injury = None;
+            }
+            true
+        } else {
+            false // Already healthy
+        }
+    }
+
+    /// Inflict an injury
+    pub fn injure(&mut self, injury: Injury) {
+        self.injury = Some(injury);
+    }
+
     pub fn promote(&mut self) {
         if self.rank == DiscipleRank::Outer {
             self.rank = DiscipleRank::Inner;
             // Initial Qi bonus or unlock
-            self.max_qi = 100; 
+            self.max_qi = 100;
             self.qi = 100;
+            self.needs.qi.max = 100.0;
+            self.needs.qi.current = 100.0;
         }
     }
 }
