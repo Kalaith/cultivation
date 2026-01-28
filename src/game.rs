@@ -157,56 +157,21 @@ impl Game {
             .tick(&mut self.disciples, &self.data.buildings, &disciples_on_mission);
 
         if self.tick % 60 == 0 {
-            // Cultivation Tick - check for breakthroughs (only for disciples not on missions)
-            let mut disciples_to_breakthrough = Vec::new();
-            for (i, disciple) in self.disciples.iter().enumerate() {
+            // Cultivation Tick - update breakthrough readiness for disciples at threshold
+            // (Breakthroughs are now player-controlled via Action::AttemptBreakthrough)
+            for (i, disciple) in self.disciples.iter_mut().enumerate() {
                 if !disciples_on_mission.contains(&i) && disciple.exp >= disciple.exp_to_next_level {
-                    disciples_to_breakthrough.push(i);
-                }
-            }
-            
-            // Process breakthroughs and handle results
-            let mut indices_to_remove = Vec::new();
-            let mut pending_tribulation: Option<(TribulationType, usize)> = None;
+                    let old_readiness = disciple.breakthrough_readiness;
+                    disciple.update_readiness();
 
-            for i in disciples_to_breakthrough {
-                let mut disciple = self.disciples[i].clone();
-                let result = self.attempt_breakthrough(&mut disciple);
-
-                match result {
-                    BreakthroughResult::Failure => {
-                        // Record in hall of fallen
-                        self.deceased_disciples.push(DeceasedDisciple::new(
-                            disciple.name.clone(),
-                            disciple.realm.clone(),
-                            "Failed Breakthrough".to_string(),
-                            self.tick,
+                    // Notify player when disciple first reaches breakthrough threshold
+                    if old_readiness == 0.0 && disciple.breakthrough_readiness > 0.0 {
+                        self.event_log.push(format!(
+                            "{} is ready for breakthrough! Visit Roster to attempt.",
+                            disciple.name
                         ));
-                        indices_to_remove.push(i);
-                    }
-                    BreakthroughResult::Tribulation(t_type) => {
-                        // Queue tribulation (only one per tick)
-                        if pending_tribulation.is_none() {
-                            pending_tribulation = Some((t_type, i));
-                        }
-                        self.disciples[i] = disciple;
-                    }
-                    _ => {
-                        // Success or Injured - update disciple
-                        self.disciples[i] = disciple;
                     }
                 }
-            }
-
-            // Remove dead disciples (in reverse to preserve indices)
-            for i in indices_to_remove.into_iter().rev() {
-                self.disciples.remove(i);
-            }
-
-            // Trigger tribulation if pending
-            if let Some((t_type, idx)) = pending_tribulation {
-                let trib_state = TribulationState::new(t_type, &self.disciples[idx]);
-                self.transition(StateTransition::ToTribulation(trib_state, idx));
             }
             // Apply Training Yard bonus
             // Apply Training Yard bonus
@@ -573,7 +538,17 @@ impl Game {
             }
         }
 
-        let success_chance = (base_chance + trait_modifier + law_modifier + bloodline_breakthrough_mod).clamp(0.05, 0.99);
+        // Readiness bonus from accumulated experience (0 to 0.5)
+        let readiness_bonus = disciple.get_readiness_bonus();
+
+        let success_chance = (base_chance + trait_modifier + law_modifier + bloodline_breakthrough_mod + readiness_bonus).clamp(0.05, 0.99);
+
+        self.event_log.push(format!(
+            "{} attempts breakthrough ({}% chance, readiness bonus: +{:.0}%)",
+            disciple.name,
+            (success_chance * 100.0) as u32,
+            readiness_bonus * 100.0
+        ));
 
         if rng.gen::<f32>() < success_chance {
             // Find current stage index using stages_order
@@ -836,14 +811,52 @@ impl Game {
                                  self.spirit_stones -= cost;
                                  disciple.rank = DiscipleRank::Inner;
                                  // Initialize Qi if 0 (should already be set by breakthrough but ensure here)
-                                 if disciple.max_qi == 0 { disciple.max_qi = 100; disciple.qi = 100; } 
-                                 
+                                 if disciple.max_qi == 0 { disciple.max_qi = 100; disciple.qi = 100; }
+
                                  self.event_log.push(format!("Promoted {} to Inner Disciple!", disciple.name));
                              } else {
                                  self.event_log.push("Cannot Promote: Must reach Qi Refinement first.".to_string());
                              }
                         } else {
                              self.event_log.push("Cannot Promote: Not enough Spirit Stones (100).".to_string());
+                        }
+                    }
+                }
+            }
+            Action::AttemptBreakthrough(idx) => {
+                if let Some(disciple) = self.disciples.get(idx).cloned() {
+                    if !disciple.can_attempt_breakthrough() {
+                        if disciple.is_injured() {
+                            self.event_log.push(format!("{} cannot attempt breakthrough while injured!", disciple.name));
+                        } else {
+                            self.event_log.push(format!("{} is not ready for breakthrough.", disciple.name));
+                        }
+                    } else {
+                        let mut disciple = disciple;
+                        let result = self.attempt_breakthrough(&mut disciple);
+
+                        match result {
+                            BreakthroughResult::Failure => {
+                                // Record in hall of fallen
+                                self.deceased_disciples.push(DeceasedDisciple::new(
+                                    disciple.name.clone(),
+                                    disciple.realm.clone(),
+                                    "Failed Breakthrough".to_string(),
+                                    self.tick,
+                                ));
+                                self.disciples.remove(idx);
+                            }
+                            BreakthroughResult::Tribulation(t_type) => {
+                                // Update disciple and trigger tribulation
+                                self.disciples[idx] = disciple.clone();
+                                let trib_state = TribulationState::new(t_type, &disciple);
+                                self.transition(StateTransition::ToTribulation(trib_state, idx));
+                            }
+                            _ => {
+                                // Success or Injured - update disciple and reset readiness
+                                disciple.breakthrough_readiness = 0.0;
+                                self.disciples[idx] = disciple;
+                            }
                         }
                     }
                 }

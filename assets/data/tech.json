@@ -1,5 +1,13 @@
 [
     {
+        "id": "sect_administration",
+        "name": "Sect Administration",
+        "description": "Re-establish the sect's command structure and postings.",
+        "cost_spirit_stones": 0,
+        "unlocks_buildings": ["MissionBoard"],
+        "unlocks_missions": []
+    },
+    {
         "id": "geomancy",
         "name": "Geomancy",
         "description": "Learn to see the flow of Qi in the land. Unlocks Feng Shui view (Press F).",
@@ -8,56 +16,92 @@
         "unlocks_missions": []
     },
     {
-        "id": "sect_administration",
-        "name": "Sect Administration",
-        "description": "Re-establish the sect's command structure and postings.",
-        "cost_spirit_stones": 0,
-        "unlocks_buildings": [
-            "MissionBoard"
-        ],
-        "unlocks_missions": []
+        "id": "basic_cultivation",
+        "name": "Basic Cultivation",
+        "description": "Establish proper cultivation grounds for disciples.",
+        "cost_spirit_stones": 50,
+        "unlocks_buildings": ["TrainingYard"],
+        "unlocks_missions": ["ResourceGathering"]
     },
     {
-        "id": "basic_infrastructure",
-        "name": "Basic Infrastructure",
-        "description": "Unlock construction of Training Yards and Spirit Gardens.",
-        "cost_spirit_stones": 100,
-        "unlocks_buildings": [
-            "TrainingYard",
-            "SpiritGarden"
-        ],
-        "unlocks_missions": [
-            "ResourceGathering"
-        ]
+        "id": "spirit_gardens",
+        "name": "Spirit Gardens",
+        "description": "Harness ambient Qi to generate passive income.",
+        "cost_spirit_stones": 75,
+        "unlocks_buildings": ["SpiritGarden"],
+        "unlocks_missions": [],
+        "prerequisites": ["basic_cultivation"]
     },
     {
         "id": "dormitories",
         "name": "Dormitories",
         "description": "Construct dormitories to expand sect population capacity.",
-        "cost_spirit_stones": 150,
-        "unlocks_buildings": [
-            "Dormitory"
-        ],
+        "cost_spirit_stones": 100,
+        "unlocks_buildings": ["Dormitory"],
         "unlocks_missions": [],
-        "prerequisites": [
-            "basic_infrastructure"
-        ]
+        "prerequisites": ["basic_cultivation"]
     },
     {
-        "id": "advanced_facilities",
-        "name": "Advanced Facilities",
-        "description": "Unlock specialized buildings like the Alchemy Furnace and Library.",
-        "cost_spirit_stones": 300,
-        "unlocks_buildings": [
-            "LibraryPavilion",
-            "AlchemyFurnace",
-            "ArtifactForge"
-        ],
-        "unlocks_missions": [
-            "Exploration"
-        ],
-        "prerequisites": [
-            "basic_infrastructure"
-        ]
+        "id": "herbalism",
+        "name": "Herbalism",
+        "description": "Cultivate spiritual herbs for alchemy and medicine.",
+        "cost_spirit_stones": 75,
+        "unlocks_buildings": ["HerbGarden"],
+        "unlocks_missions": [],
+        "prerequisites": ["basic_cultivation"]
+    },
+    {
+        "id": "herb_processing",
+        "name": "Herb Processing",
+        "description": "Process raw herbs into dried ingredients for longer shelf life.",
+        "cost_spirit_stones": 100,
+        "unlocks_buildings": ["DryingPavilion"],
+        "unlocks_missions": [],
+        "prerequisites": ["herbalism"]
+    },
+    {
+        "id": "herb_storage",
+        "name": "Herb Preservation",
+        "description": "Specialized storage to prevent herb decay.",
+        "cost_spirit_stones": 75,
+        "unlocks_buildings": ["HerbStorage"],
+        "unlocks_missions": [],
+        "prerequisites": ["herbalism"]
+    },
+    {
+        "id": "advanced_herbalism",
+        "name": "Advanced Herbalism",
+        "description": "Build greenhouses for year-round cultivation of rare herbs.",
+        "cost_spirit_stones": 175,
+        "unlocks_buildings": ["Greenhouse"],
+        "unlocks_missions": [],
+        "prerequisites": ["herb_processing"]
+    },
+    {
+        "id": "alchemy",
+        "name": "Alchemy",
+        "description": "The art of refining pills and elixirs from herbs.",
+        "cost_spirit_stones": 150,
+        "unlocks_buildings": ["AlchemyFurnace"],
+        "unlocks_missions": [],
+        "prerequisites": ["basic_cultivation"]
+    },
+    {
+        "id": "artifact_crafting",
+        "name": "Artifact Crafting",
+        "description": "Forge magical artifacts and weapons.",
+        "cost_spirit_stones": 150,
+        "unlocks_buildings": ["ArtifactForge"],
+        "unlocks_missions": [],
+        "prerequisites": ["basic_cultivation"]
+    },
+    {
+        "id": "sect_archives",
+        "name": "Sect Archives",
+        "description": "Preserve knowledge and record sect history.",
+        "cost_spirit_stones": 200,
+        "unlocks_buildings": ["LibraryPavilion"],
+        "unlocks_missions": ["Exploration"],
+        "prerequisites": ["basic_cultivation"]
     }
 ]

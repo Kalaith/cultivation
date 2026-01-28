@@ -800,7 +800,8 @@ impl SectBaseState {
              })
              .collect();
 
-         let total_height = available_defs.len() as f32 * 50.0;
+         let item_height = 70.0; // Increased to fit description
+         let total_height = available_defs.len() as f32 * item_height;
          if content_rect.contains(mouse_position().into()) {
              let wheel = mouse_wheel().1;
              if total_height > content_h {
@@ -819,7 +820,7 @@ impl SectBaseState {
          let mut b_y = content_y - self.construction_scroll;
          for def in available_defs {
              if b_y + 40.0 < content_y {
-                 b_y += 50.0;
+                 b_y += item_height;
                  continue;
              }
              if b_y > content_y + content_h {
@@ -830,7 +831,20 @@ impl SectBaseState {
                  self.crafting_modal_open = false;
                  self.placement_mode = Some(def.building_type.clone());
              }
-             b_y += 50.0;
+
+             // Show building description below button
+             let desc_y = b_y + 50.0;
+             if desc_y < content_y + content_h {
+                 // Truncate description if too long
+                 let desc = if def.description.len() > 50 {
+                     format!("{}...", &def.description[..47])
+                 } else {
+                     def.description.clone()
+                 };
+                 draw_text(&desc, modal_x + 25.0, desc_y, FONT_SMALL_SIZE, TEXT_SECONDARY);
+             }
+
+             b_y += item_height;
          }
 
          if total_height > content_h {

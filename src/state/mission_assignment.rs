@@ -44,7 +44,8 @@ impl MissionAssignmentState {
         let mut btn_y = list_rect.y + 50.0;
         for (i, disciple) in disciples.iter().enumerate() {
             let is_selected = self.selected_disciples.contains(&i);
-            
+            let is_injured = disciple.is_injured();
+
             let stage = data.stages.get(&disciple.realm);
             let stage_name = stage.map(|s| s.name.as_str()).unwrap_or("Unknown");
 
@@ -58,11 +59,18 @@ impl MissionAssignmentState {
                 .map(|s| (s.base_hp + s.base_qi) / 100)
                 .unwrap_or(1);
 
-            let label = format!("{} ({}{}) - Power estimate: {}", 
-                disciple.name, stage_name, sub_stage_name, stage_power
+            let injury_label = if is_injured { " [INJURED]" } else { "" };
+            let label = format!("{}{} ({}{}) - Power: {}",
+                disciple.name, injury_label, stage_name, sub_stage_name, stage_power
             );
 
-            if draw_button(Rect::new(list_rect.x + 10.0, btn_y, left_w - 20.0, 40.0), &label, is_selected) {
+            let btn_rect = Rect::new(list_rect.x + 10.0, btn_y, left_w - 20.0, 40.0);
+
+            // Draw injured disciples with red tint and disabled
+            if is_injured {
+                draw_rectangle(btn_rect.x, btn_rect.y, btn_rect.w, btn_rect.h, Color::new(0.4, 0.15, 0.15, 0.5));
+                draw_text(&label, btn_rect.x + 10.0, btn_rect.y + 25.0, FONT_BODY_SIZE, Color::new(0.5, 0.4, 0.4, 1.0));
+            } else if draw_button(btn_rect, &label, is_selected) {
                 if is_selected {
                     if let Some(pos) = self.selected_disciples.iter().position(|&idx| idx == i) {
                         self.selected_disciples.remove(pos);

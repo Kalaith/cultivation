@@ -25,4 +25,6 @@ pub enum Action {
     // Diplomacy and world simulation actions
     SendDiplomat { faction_id: String, action: DiplomaticAction },
     RespondToEvent { event_id: String, choice_idx: usize },
+    // Breakthrough action (player-controlled)
+    AttemptBreakthrough(usize), // Disciple Index
 }

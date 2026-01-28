@@ -51,6 +51,7 @@ pub fn generate_disciple(game_data: &GameData) -> Disciple {
         bloodline,
         needs: DiscipleNeeds::from_tuning(&game_data.ai_scheduler),
         injury: None,
+        breakthrough_readiness: 0.0,
     }
 }
 

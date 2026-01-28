@@ -179,25 +179,33 @@ impl Injury {
         // Survivors get less severe injuries
         let severity = if is_survivor { 2 } else { 2 }; // Moderate by default
 
-        // Base recovery time: 600 ticks (10 seconds) per severity level
-        // Higher realms = longer recovery
+        // Base recovery time: 300 ticks (5 seconds) per severity level
+        // Mortals recover faster (not dealing with Qi deviation, just exhaustion)
+        // Higher realms = longer recovery due to Qi complexity
         let realm_multiplier = match realm {
-            "Mortal" => 1.0,
-            "QiRefinement" => 1.2,
+            "Mortal" => 0.5,              // ~150 ticks per severity = 300 total for moderate
+            "QiRefinement" => 1.0,        // ~300 ticks per severity
             "FoundationEstablishment" => 1.5,
             "CoreFormation" => 2.0,
             "NascentSoul" => 2.5,
             _ => 3.0,
         };
 
-        let base_recovery = 600 * severity;
+        let base_recovery = 300 * severity;
         let recovery_ticks = (base_recovery as f32 * realm_multiplier) as u32;
 
+        // Different description for mortals vs cultivators
+        let description = if realm == "Mortal" {
+            "Exhausted from failed breakthrough attempt".to_string()
+        } else {
+            "Suffered Qi deviation during breakthrough attempt".to_string()
+        };
+
         Self {
-            injury_type: InjuryType::QiDeviation,
+            injury_type: if realm == "Mortal" { InjuryType::MeridianDamage } else { InjuryType::QiDeviation },
             severity,
             recovery_ticks_remaining: recovery_ticks,
-            description: format!("Suffered Qi deviation during breakthrough attempt"),
+            description,
         }
     }
 
@@ -275,6 +283,10 @@ pub struct Disciple {
     /// Current injury status (None = healthy)
     #[serde(default)]
     pub injury: Option<Injury>,
+    /// Breakthrough readiness (0.0 = just reached threshold, 1.0 = 100% over threshold)
+    /// Higher readiness improves breakthrough success chance
+    #[serde(default)]
+    pub breakthrough_readiness: f32,
 }
 
 impl Disciple {
@@ -311,6 +323,32 @@ impl Disciple {
     /// Inflict an injury
     pub fn injure(&mut self, injury: Injury) {
         self.injury = Some(injury);
+    }
+
+    /// Check if disciple can attempt breakthrough (has enough exp)
+    pub fn can_attempt_breakthrough(&self) -> bool {
+        self.exp >= self.exp_to_next_level && self.injury.is_none()
+    }
+
+    /// Update breakthrough readiness based on accumulated exp
+    /// Called each cultivation tick when exp >= exp_to_next_level
+    pub fn update_readiness(&mut self) {
+        if self.exp >= self.exp_to_next_level {
+            // Readiness is how much over the threshold we are
+            // At 100% over (2x exp needed), readiness = 1.0
+            let excess = self.exp.saturating_sub(self.exp_to_next_level);
+            self.breakthrough_readiness = (excess as f32 / self.exp_to_next_level as f32).min(2.0);
+        } else {
+            self.breakthrough_readiness = 0.0;
+        }
+    }
+
+    /// Get breakthrough success bonus from readiness (0.0 to 0.5)
+    /// At readiness 0: no bonus
+    /// At readiness 1.0 (100% over): +25% bonus
+    /// At readiness 2.0 (200% over): +50% bonus (max)
+    pub fn get_readiness_bonus(&self) -> f32 {
+        (self.breakthrough_readiness * 0.25).min(0.5)
     }
 
     pub fn promote(&mut self) {

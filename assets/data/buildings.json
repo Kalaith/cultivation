@@ -9,60 +9,6 @@
         "unique": true
     },
     {
-        "type": "Dormitory",
-        "cost": 120,
-        "name": "Dormitory",
-        "description": "Houses disciples and increases sect population capacity.",
-        "tech_required": "dormitories",
-        "element": "Earth",
-        "unique": false
-    },
-    {
-        "type": "TrainingYard",
-        "cost": 100,
-        "name": "Training Yard",
-        "description": "Where disciples cultivate.",
-        "tech_required": "basic_infrastructure",
-        "element": "Metal",
-        "unique": false
-    },
-    {
-        "type": "SpiritGarden",
-        "cost": 150,
-        "name": "Spirit Garden",
-        "description": "Grows spiritual herbs and gathers ambient Qi.",
-        "tech_required": "basic_infrastructure",
-        "element": "Wood",
-        "unique": false
-    },
-    {
-        "type": "LibraryPavilion",
-        "cost": 300,
-        "name": "Library Pavilion",
-        "description": "Store scriptures and record history.",
-        "tech_required": "advanced_facilities",
-        "element": "Water",
-        "unique": true
-    },
-    {
-        "type": "AlchemyFurnace",
-        "cost": 200,
-        "name": "Alchemy Furnace",
-        "description": "Refine pills and elixirs.",
-        "tech_required": "advanced_facilities",
-        "element": "Fire",
-        "unique": false
-    },
-    {
-        "type": "ArtifactForge",
-        "cost": 200,
-        "name": "Artifact Forge",
-        "description": "Craft magical artifacts.",
-        "tech_required": "advanced_facilities",
-        "element": "Metal",
-        "unique": false
-    },
-    {
         "type": "MissionBoard",
         "cost": 50,
         "name": "Mission Board",
@@ -72,20 +18,38 @@
         "unique": true
     },
     {
-        "type": "HerbGarden",
+        "type": "TrainingYard",
         "cost": 100,
-        "name": "Herb Garden",
-        "description": "Grows Tier 1-2 herbs when tended by Outer Disciples. Assign a disciple to harvest mature herbs.",
-        "tech_required": "basic_infrastructure",
+        "name": "Training Yard",
+        "description": "Where disciples cultivate. Increases cultivation speed.",
+        "tech_required": "basic_cultivation",
+        "element": "Metal",
+        "unique": false
+    },
+    {
+        "type": "SpiritGarden",
+        "cost": 150,
+        "name": "Spirit Garden",
+        "description": "Gathers ambient Qi for passive spirit stone income.",
+        "tech_required": "spirit_gardens",
         "element": "Wood",
         "unique": false
     },
     {
-        "type": "Greenhouse",
-        "cost": 250,
-        "name": "Greenhouse",
-        "description": "Controlled environment for Tier 2-3 herbs. Can override seasonal restrictions with elemental infusion.",
-        "tech_required": "advanced_facilities",
+        "type": "Dormitory",
+        "cost": 120,
+        "name": "Dormitory",
+        "description": "Houses disciples and increases sect population capacity.",
+        "tech_required": "dormitories",
+        "element": "Earth",
+        "unique": false
+    },
+    {
+        "type": "HerbGarden",
+        "cost": 100,
+        "name": "Herb Garden",
+        "description": "Grows Tier 1-2 herbs. Assign a disciple to tend and harvest.",
+        "tech_required": "herbalism",
         "element": "Wood",
         "unique": false
     },
@@ -93,8 +57,8 @@
         "type": "DryingPavilion",
         "cost": 150,
         "name": "Drying Pavilion",
-        "description": "Processes raw herbs into dried ingredients. Dried herbs have longer shelf life and are used in alchemy.",
-        "tech_required": "basic_infrastructure",
+        "description": "Processes raw herbs into dried ingredients for alchemy.",
+        "tech_required": "herb_processing",
         "element": "Fire",
         "unique": false
     },
@@ -102,9 +66,45 @@
         "type": "HerbStorage",
         "cost": 120,
         "name": "Herb Storage",
-        "description": "Prevents herb decay. Raw herbs decay 10% per season without storage. Higher levels reduce decay further.",
-        "tech_required": "basic_infrastructure",
+        "description": "Prevents herb decay. Higher levels reduce decay further.",
+        "tech_required": "herb_storage",
         "element": "Earth",
         "unique": false
+    },
+    {
+        "type": "Greenhouse",
+        "cost": 250,
+        "name": "Greenhouse",
+        "description": "Grows Tier 2-3 herbs year-round with elemental infusion.",
+        "tech_required": "advanced_herbalism",
+        "element": "Wood",
+        "unique": false
+    },
+    {
+        "type": "AlchemyFurnace",
+        "cost": 200,
+        "name": "Alchemy Furnace",
+        "description": "Refine pills and elixirs from herbs.",
+        "tech_required": "alchemy",
+        "element": "Fire",
+        "unique": false
+    },
+    {
+        "type": "ArtifactForge",
+        "cost": 200,
+        "name": "Artifact Forge",
+        "description": "Craft magical artifacts and weapons.",
+        "tech_required": "artifact_crafting",
+        "element": "Metal",
+        "unique": false
+    },
+    {
+        "type": "LibraryPavilion",
+        "cost": 300,
+        "name": "Library Pavilion",
+        "description": "Store scriptures and record sect history.",
+        "tech_required": "sect_archives",
+        "element": "Water",
+        "unique": true
     }
 ]
