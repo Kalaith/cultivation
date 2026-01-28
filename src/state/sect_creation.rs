@@ -42,8 +42,6 @@ impl SectCreationState {
     }
 
     pub fn draw(&self, _data: &GameData) {
-        draw_rectangle(0.0, 0.0, screen_width(), screen_height(), Color::new(0.1, 0.1, 0.1, 1.0));
-
         let title_text = "FOUND A NEW SECT";
         let title_dims = measure_text(title_text, None, FONT_TITLE_SIZE as u16, 1.0);
         draw_text(title_text, (screen_width() - title_dims.width) / 2.0, 100.0, FONT_TITLE_SIZE, TEXT_HIGHLIGHT);

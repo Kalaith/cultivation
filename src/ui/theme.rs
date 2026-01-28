@@ -5,7 +5,7 @@ pub const SECONDARY: Color = Color::new(0.2, 0.8, 0.8, 1.0); // Cyan/Jade
 pub const ACCENT: Color = Color::new(0.8, 0.3, 0.3, 1.0); // Crimson
 
 pub const BACKGROUND: Color = Color::new(0.05, 0.05, 0.08, 1.0); // Deep Dark Slate
-pub const PANEL_BG: Color = Color::new(0.1, 0.12, 0.15, 0.95); // Slightly lighter slate
+pub const PANEL_BG: Color = Color::new(0.1, 0.12, 0.15, 0.75); // Semi-transparent panel
 pub const PANEL_BORDER: Color = Color::new(0.3, 0.3, 0.35, 1.0); // Border color
 
 pub const TEXT_PRIMARY: Color = Color::new(0.95, 0.95, 0.95, 1.0); // White-ish
@@ -32,7 +32,7 @@ pub const FENG_SHUI_EXCELLENT: Color = Color::new(1.0, 0.85, 0.2, 1.0); // Gold
 
 // Panel colors (aliases and variants)
 pub const PANEL: Color = PANEL_BG;
-pub const PANEL_DARK: Color = Color::new(0.08, 0.09, 0.12, 0.95); // Darker panel
+pub const PANEL_DARK: Color = Color::new(0.08, 0.09, 0.12, 0.8); // Darker panel, semi-transparent
 pub const BORDER: Color = PANEL_BORDER;
 
 // Status colors

@@ -4007,12 +4007,14 @@
     ]
   },
   "sect_name": "Test",
-  "spirit_stones": 7,
+  "spirit_stones": 204,
   "herbs": 10,
   "influence": 0,
   "relics": 0,
   "inventory": {},
-  "unlocked_techs": [],
+  "unlocked_techs": [
+    "sect_administration"
+  ],
   "disciples": [
     {
       "id": 2829398565703287501,
@@ -4041,7 +4043,7 @@
           "survivor": true
         }
       ],
-      "exp": 48,
+      "exp": 705,
       "exp_to_next_level": 100,
       "qi": 0,
       "max_qi": 0,
@@ -4053,30 +4055,32 @@
       },
       "needs": {
         "hunger": {
-          "current": 80.08334,
+          "current": 49.685715,
           "max": 100.0,
           "decay_per_tick": 0.02,
           "urgent_threshold": 45.0
         },
         "rest": {
-          "current": 85.06061,
+          "current": 74.86102,
           "max": 100.0,
           "decay_per_tick": 0.015,
           "urgent_threshold": 40.0
         },
         "qi": {
-          "current": 99.0498,
+          "current": 99.43988,
           "max": 100.0,
           "decay_per_tick": 0.01,
           "urgent_threshold": 35.0
         },
         "morale": {
-          "current": 95.022736,
+          "current": 29.228415,
           "max": 100.0,
           "decay_per_tick": 0.005,
           "urgent_threshold": 30.0
         }
-      }
+      },
+      "injury": null,
+      "breakthrough_readiness": 2.0
     }
   ],
   "deceased_disciples": [],
@@ -4099,12 +4103,12 @@
   "ongoing_missions": [],
   "completed_missions": [],
   "completed_history": [],
-  "tick": 996,
-  "current_season": "Spring",
-  "season_ticks": 2604,
+  "tick": 14157,
+  "current_season": "Winter",
+  "season_ticks": 243,
   "tutorial": {
     "active": true,
-    "step": 1,
+    "step": 2,
     "hidden": false
   },
   "world_sim": {
@@ -4207,7 +4211,7 @@
         "aggression": 0.3,
         "alliances": [],
         "enemies": [],
-        "last_action_tick": 0
+        "last_action_tick": 12000
       },
       {
         "faction_id": "golden_merchant_guild",
@@ -4217,7 +4221,7 @@
         "aggression": 0.3,
         "alliances": [],
         "enemies": [],
-        "last_action_tick": 0
+        "last_action_tick": 12000
       },
       {
         "faction_id": "crimson_fang_sect",
@@ -4227,7 +4231,7 @@
         "aggression": 0.3,
         "alliances": [],
         "enemies": [],
-        "last_action_tick": 0
+        "last_action_tick": 12000
       },
       {
         "faction_id": "shadow_moon_cult",
@@ -4237,7 +4241,7 @@
         "aggression": 0.3,
         "alliances": [],
         "enemies": [],
-        "last_action_tick": 0
+        "last_action_tick": 12000
       },
       {
         "faction_id": "imperial_envoy",
@@ -4247,7 +4251,7 @@
         "aggression": 0.3,
         "alliances": [],
         "enemies": [],
-        "last_action_tick": 0
+        "last_action_tick": 12000
       },
       {
         "faction_id": "wild_boar_bandits",
@@ -4257,7 +4261,7 @@
         "aggression": 0.3,
         "alliances": [],
         "enemies": [],
-        "last_action_tick": 0
+        "last_action_tick": 12000
       },
       {
         "faction_id": "jade_lotus_pavilion",
@@ -4267,7 +4271,7 @@
         "aggression": 0.3,
         "alliances": [],
         "enemies": [],
-        "last_action_tick": 0
+        "last_action_tick": 12000
       }
     ],
     "relations": [
@@ -4350,32 +4354,32 @@
           "map_node_id": "serene_forest",
           "controller_faction_id": "",
           "base_prices": {
-            "beast_core": 150,
-            "cultivation_pill": 200,
             "spirit_wood": 30,
             "iron_ore": 20,
             "spirit_herb": 50,
-            "healing_pill": 100,
+            "cultivation_pill": 200,
+            "formation_flag": 80,
             "spirit_stone_fragment": 10,
-            "formation_flag": 80
+            "beast_core": 150,
+            "healing_pill": 100
           },
           "supply": {
+            "spirit_wood": 200,
+            "beast_core": 200,
+            "formation_flag": 200,
+            "cultivation_pill": 200,
             "iron_ore": 200,
-            "cultivation_pill": 36,
-            "spirit_herb": 200,
-            "healing_pill": 104,
-            "formation_flag": 82,
             "spirit_stone_fragment": 200,
-            "beast_core": 55,
-            "spirit_wood": 176
+            "healing_pill": 200,
+            "spirit_herb": 200
           },
           "demand": {
-            "beast_core": 1.3,
-            "spirit_herb": 1.0,
-            "cultivation_pill": 1.5,
-            "healing_pill": 1.2,
-            "spirit_stone_fragment": 0.8,
             "spirit_wood": 1.1,
+            "beast_core": 1.3,
+            "spirit_stone_fragment": 0.8,
+            "healing_pill": 1.2,
+            "cultivation_pill": 1.5,
+            "spirit_herb": 1.0,
             "formation_flag": 1.0,
             "iron_ore": 1.0
           }
@@ -4387,39 +4391,39 @@
           "controller_faction_id": "golden_merchant_guild",
           "base_prices": {
             "rare_scroll": 500,
-            "spirit_wood": 25,
-            "beast_core": 140,
-            "cultivation_pill": 180,
             "iron_ore": 18,
-            "healing_pill": 90,
             "formation_flag": 70,
+            "cultivation_pill": 180,
+            "healing_pill": 90,
+            "spirit_wood": 25,
             "spirit_herb": 45,
             "ancient_text": 1000,
+            "beast_core": 140,
             "spirit_stone_fragment": 8
           },
           "supply": {
-            "formation_flag": 176,
-            "spirit_stone_fragment": 200,
-            "ancient_text": 21,
             "spirit_herb": 200,
-            "rare_scroll": 26,
+            "formation_flag": 200,
+            "rare_scroll": 200,
+            "ancient_text": 200,
+            "spirit_stone_fragment": 200,
             "healing_pill": 200,
-            "beast_core": 129,
-            "cultivation_pill": 104,
+            "cultivation_pill": 200,
             "iron_ore": 200,
-            "spirit_wood": 200
+            "spirit_wood": 200,
+            "beast_core": 200
           },
           "demand": {
-            "formation_flag": 0.9,
-            "healing_pill": 1.0,
-            "beast_core": 1.1,
-            "spirit_stone_fragment": 0.7,
             "ancient_text": 2.0,
-            "spirit_herb": 0.9,
-            "iron_ore": 0.8,
+            "spirit_wood": 0.9,
+            "beast_core": 1.1,
             "rare_scroll": 1.5,
             "cultivation_pill": 1.2,
-            "spirit_wood": 0.9
+            "formation_flag": 0.9,
+            "iron_ore": 0.8,
+            "healing_pill": 1.0,
+            "spirit_herb": 0.9,
+            "spirit_stone_fragment": 0.7
           }
         },
         {
@@ -4428,28 +4432,28 @@
           "map_node_id": "haunted_ruins",
           "controller_faction_id": "crimson_fang_sect",
           "base_prices": {
+            "healing_pill": 120,
+            "armor_material": 90,
             "cultivation_pill": 250,
             "beast_core": 120,
-            "armor_material": 90,
             "weapon_material": 100,
-            "healing_pill": 120,
             "spirit_herb": 60
           },
           "supply": {
-            "weapon_material": 129,
-            "beast_core": 176,
-            "armor_material": 104,
-            "healing_pill": 55,
-            "cultivation_pill": 26,
-            "spirit_herb": 104
+            "spirit_herb": 200,
+            "cultivation_pill": 200,
+            "armor_material": 200,
+            "weapon_material": 200,
+            "beast_core": 200,
+            "healing_pill": 200
           },
           "demand": {
             "armor_material": 0.9,
-            "spirit_herb": 1.3,
-            "healing_pill": 1.5,
             "cultivation_pill": 1.8,
             "beast_core": 0.8,
-            "weapon_material": 0.9
+            "weapon_material": 0.9,
+            "spirit_herb": 1.3,
+            "healing_pill": 1.5
           }
         }
       ],
@@ -4486,33 +4490,156 @@
     },
     "active_events": [
       {
-        "event_id": "spring_awakening",
-        "name": "Spiritual Awakening",
-        "description": "The world stirs with renewed spiritual energy as spring arrives. Cultivation becomes easier for all.",
-        "event_type": "SeasonalFestival",
-        "started_tick": 60,
-        "expires_tick": 1860,
-        "effects": [
+        "event_id": "summer_beast_activity",
+        "name": "Beast Tide Warning",
+        "description": "Summer heat drives spiritual beasts from their lairs. Dangerous creatures roam the wilds.",
+        "event_type": "BeastTide",
+        "started_tick": 3600,
+        "expires_tick": null,
+        "effects": [],
+        "choices": [
           {
-            "ModifyCultivationSpeed": {
-              "modifier": 1.15,
-              "duration_ticks": 1800
-            }
+            "label": "Send hunters to cull the beasts",
+            "description": "Dispatch disciples to reduce the threat",
+            "requirements": [
+              {
+                "MinDiscipleCount": 3
+              }
+            ],
+            "effects": [
+              {
+                "ModifyResource": {
+                  "resource": "SpiritStones",
+                  "delta": 200
+                }
+              },
+              {
+                "ModifyRelation": {
+                  "faction_id": "golden_merchant_guild",
+                  "delta": 5
+                }
+              }
+            ]
+          },
+          {
+            "label": "Strengthen sect defenses",
+            "description": "Focus on protecting your own territory",
+            "requirements": [],
+            "effects": [
+              {
+                "ModifyResource": {
+                  "resource": "Influence",
+                  "delta": 10
+                }
+              }
+            ]
           }
         ],
-        "choices": [],
+        "resolved": false,
+        "choice_made": null
+      },
+      {
+        "event_id": "winter_demon_incursion",
+        "name": "Demon Incursion",
+        "description": "As winter descends, demons grow bold and attack settlements across the region.",
+        "event_type": "DemonIncursion",
+        "started_tick": 10800,
+        "expires_tick": null,
+        "effects": [],
+        "choices": [
+          {
+            "label": "Join the defense coalition",
+            "description": "Work with other sects to repel the demons",
+            "requirements": [
+              {
+                "MinDiscipleRealm": "foundation"
+              }
+            ],
+            "effects": [
+              {
+                "ModifyRelation": {
+                  "faction_id": "azure_cloud_sect",
+                  "delta": 15
+                }
+              },
+              {
+                "ModifyRelation": {
+                  "faction_id": "crimson_fang_sect",
+                  "delta": 10
+                }
+              },
+              {
+                "ModifyRelation": {
+                  "faction_id": "imperial_envoy",
+                  "delta": 5
+                }
+              },
+              {
+                "ModifyResource": {
+                  "resource": "Influence",
+                  "delta": 20
+                }
+              }
+            ]
+          },
+          {
+            "label": "Seal your borders",
+            "description": "Focus on protecting your own sect",
+            "requirements": [],
+            "effects": [
+              {
+                "ModifyRelation": {
+                  "faction_id": "azure_cloud_sect",
+                  "delta": -5
+                }
+              }
+            ]
+          },
+          {
+            "label": "Strike a deal with the Shadow Moon Cult",
+            "description": "Perhaps they know how to redirect the demons...",
+            "requirements": [
+              {
+                "MinReputation": {
+                  "faction_id": "shadow_moon_cult",
+                  "min_rep": -20
+                }
+              }
+            ],
+            "effects": [
+              {
+                "ModifyRelation": {
+                  "faction_id": "shadow_moon_cult",
+                  "delta": 20
+                }
+              },
+              {
+                "ModifyRelation": {
+                  "faction_id": "azure_cloud_sect",
+                  "delta": -15
+                }
+              },
+              {
+                "ModifyRelation": {
+                  "faction_id": "imperial_envoy",
+                  "delta": -10
+                }
+              }
+            ]
+          }
+        ],
         "resolved": false,
         "choice_made": null
       }
     ],
     "event_queue": [],
-    "world_tick": 960,
+    "world_tick": 14100,
     "price_modifiers": [],
     "seasonal_modifiers": {
       "herb_growth_mult": {},
-      "mission_difficulty_mod": 0.9,
-      "trade_activity_mod": 1.1,
-      "cultivation_speed_mod": 1.1
+      "mission_difficulty_mod": 1.2,
+      "trade_activity_mod": 0.7,
+      "cultivation_speed_mod": 0.9
     },
     "balance": {
       "relation_drift_rate": 1,
@@ -4527,28 +4654,13 @@
       "faction_action_interval": 3000,
       "war_duration_ticks": 5000
     },
-    "last_season": "Spring",
+    "last_season": "Winter",
     "triggered_event_ids": [],
-    "rng_seed": 14071998307768506793
+    "rng_seed": 1686865244352317284
   },
   "scheduler": {
-    "tick": 1399,
+    "tick": 14560,
     "assignments": [
-      {
-        "disciple_id": 2829398565703287501,
-        "scheduled": {
-          "task": {
-            "task_type": "Cultivate",
-            "target_id": null,
-            "duration_ticks": 180,
-            "priority_base": 30.0,
-            "required_rank": "Inner",
-            "cooldown_until": 1304
-          },
-          "ticks_remaining": 85,
-          "started_at": 1304
-        }
-      },
       {
         "disciple_id": 6210234857016707216,
         "scheduled": {
@@ -4562,6 +4674,21 @@
           },
           "ticks_remaining": 138,
           "started_at": 361
+        }
+      },
+      {
+        "disciple_id": 2829398565703287501,
+        "scheduled": {
+          "task": {
+            "task_type": "Idle",
+            "target_id": null,
+            "duration_ticks": 60,
+            "priority_base": 50.0,
+            "required_rank": "Outer",
+            "cooldown_until": 14504
+          },
+          "ticks_remaining": 4,
+          "started_at": 14504
         }
       }
     ],

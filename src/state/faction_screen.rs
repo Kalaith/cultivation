@@ -26,9 +26,6 @@ impl FactionScreenState {
         let screen_w = screen_width();
         let screen_h = screen_height();
 
-        // Background
-        draw_rectangle(0.0, 0.0, screen_w, screen_h, BACKGROUND);
-
         // Header
         draw_panel(Rect::new(0.0, 0.0, screen_w, 60.0), None);
         draw_text("FACTIONS & DIPLOMACY", 20.0, 40.0, FONT_TITLE_SIZE, PRIMARY);

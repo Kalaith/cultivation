@@ -17,3 +17,6 @@ dist/
 # Added by cargo
 
 /target
+nul
+savegame.json
+savegame.json

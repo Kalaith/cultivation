@@ -43,9 +43,6 @@ impl TribulationEncounterState {
          let screen_w = screen_width();
          let screen_h = screen_height();
          
-         // Background (Stormy)
-         draw_rectangle(0.0, 0.0, screen_w, screen_h, Color::new(0.1, 0.1, 0.15, 1.0));
-         
          // Title
          draw_text(&self.tribulation.config.name, 20.0, 50.0, FONT_TITLE_SIZE, Color::new(0.8, 0.2, 0.2, 1.0));
          draw_text(&self.tribulation.config.description, 20.0, 80.0, FONT_BODY_SIZE, TEXT_SECONDARY);

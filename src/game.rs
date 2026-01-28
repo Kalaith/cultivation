@@ -25,6 +25,7 @@ use rand::Rng;
 use macroquad::prelude::{is_key_pressed, KeyCode, Rect, screen_height, screen_width, draw_text};
 use crate::ui::components::{draw_panel, draw_progress_bar};
 use crate::ui::theme::*;
+use crate::ui::{FontManager, TextureManager};
 use crate::save::{SaveData, SavedTutorialState, SAVE_VERSION, storage};
 
 /// Result of a breakthrough attempt
@@ -64,6 +65,10 @@ pub struct Game {
     pub scheduler: Scheduler,
     /// Toggle for AI debug overlay
     show_ai_debug: bool,
+    /// Texture manager for all game graphics
+    pub textures: TextureManager,
+    /// Font manager for custom fonts
+    pub fonts: FontManager,
 }
 
 impl Game {
@@ -101,6 +106,17 @@ impl Game {
         // Clone ai_scheduler config before moving data
         let ai_scheduler_config = data.ai_scheduler.clone();
 
+        // Load all textures
+        let mut textures = TextureManager::new();
+        textures.load_all().await;
+        println!("Game: Loaded {} textures ({} errors)",
+            textures.texture_count(),
+            textures.error_count());
+
+        // Load fonts
+        let mut fonts = FontManager::new();
+        fonts.load_all().await;
+
         Self {
             state: GameState::MainMenu(MainMenuState::new()),
             data,
@@ -125,6 +141,8 @@ impl Game {
             world_sim,
             scheduler: Scheduler::new(ai_scheduler_config),
             show_ai_debug: false,
+            textures,
+            fonts,
         }
     }
 
@@ -145,6 +163,9 @@ impl Game {
         if is_key_pressed(KeyCode::F9) {
             self.show_ai_debug = !self.show_ai_debug;
         }
+
+        // Draw background texture FIRST (before any UI drawing in state.update())
+        self.draw_screen_background();
 
         self.tick += 1;
 
@@ -376,7 +397,40 @@ impl Game {
         }
     }
 
+    /// Draw the background texture for the current screen state
+    fn draw_screen_background(&self) {
+        use macroquad::prelude::*;
+
+        let bg_name = match &self.state {
+            GameState::MainMenu(_) => "bg_main_menu",
+            GameState::SectBase(_) => "bg_sect_base",
+            GameState::DiscipleRoster(_) => "bg_roster",
+            GameState::WorldMap(_) => "bg_world_map",
+            GameState::MissionResolution(_) => "bg_mission_result",
+            GameState::Library(_) => "bg_library",
+            GameState::MissionAssignment(_) => "bg_mission_assign",
+            GameState::SectCreation(_) => "bg_sect_creation",
+            GameState::Tribulation(_) => "bg_tribulation",
+            GameState::FactionScreen(_) => "bg_factions",
+            GameState::TradeScreen(_) => "bg_trade",
+        };
+
+        // Draw texture directly without overlay for testing
+        self.textures.draw_background(bg_name);
+
+        // Light overlay for readability
+        let overlay_alpha = match &self.state {
+            GameState::MainMenu(_) => 0.1,
+            GameState::Tribulation(_) => 0.05,
+            GameState::SectBase(_) => 0.2,
+            _ => 0.15,
+        };
+        draw_rectangle(0.0, 0.0, screen_width(), screen_height(),
+            Color::new(0.0, 0.0, 0.0, overlay_alpha));
+    }
+
     pub fn draw(&mut self) {
+        // State-specific UI drawing (most screens draw in update(), this is for any remaining)
         match &mut self.state {
             GameState::MainMenu(s) => s.draw(&self.data, self.spirit_stones),
             GameState::SectBase(s) => s.draw(&self.data, &self.grid, self.spirit_stones),
@@ -622,18 +676,24 @@ impl Game {
             } else {
                 // Survivor trait or lucky - just injured
                 let injury = Injury::from_breakthrough(&disciple.realm, is_survivor);
-                let recovery_time = injury.recovery_ticks_remaining;
+                // Recovery time in seconds (1 heal tick per cultivation tick, ~1/sec)
+                let recovery_secs = injury.recovery_ticks_remaining;
+                let time_str = if recovery_secs >= 60 {
+                    format!("~{} min", recovery_secs / 60)
+                } else {
+                    format!("~{} sec", recovery_secs)
+                };
 
                 if is_survivor {
                     self.event_log.push(format!(
-                        "{}'s indomitable will saved them! Suffered {} {} (recovery: {} ticks).",
-                        disciple.name, injury.severity_str(), injury.injury_type, recovery_time
+                        "{}'s indomitable will saved them! Suffered {} {} (recovery: {}).",
+                        disciple.name, injury.severity_str(), injury.injury_type, time_str
                     ));
                     disciple.exp = (disciple.exp as f32 * 0.25) as u32; // Lose 75% EXP - harsher penalty for cheating death
                 } else {
                     self.event_log.push(format!(
-                        "{} failed breakthrough and suffered {} {} (recovery: {} ticks).",
-                        disciple.name, injury.severity_str(), injury.injury_type, recovery_time
+                        "{} failed breakthrough and suffered {} {} (recovery: {}).",
+                        disciple.name, injury.severity_str(), injury.injury_type, time_str
                     ));
                     disciple.exp = (disciple.exp as f32 * 0.5) as u32; // Lose 50% EXP
                 }
@@ -1303,7 +1363,7 @@ impl Game {
         }
     }
 
-    fn load(&self) -> Option<Self> {
+    fn load(&mut self) -> Option<Self> {
         match storage::load() {
             Ok(save_data) => {
                 // Reconstruct world simulation (will be properly restored in Phase 6)
@@ -1326,6 +1386,10 @@ impl Game {
                 } else {
                     Scheduler::new(self.data.ai_scheduler.clone())
                 };
+
+                // Take ownership of textures and fonts from old game (they're already loaded)
+                let textures = std::mem::take(&mut self.textures);
+                let fonts = std::mem::take(&mut self.fonts);
 
                 let mut new_game = Self {
                     state: GameState::SectBase(SectBaseState::new()),
@@ -1351,6 +1415,8 @@ impl Game {
                     world_sim,
                     scheduler,
                     show_ai_debug: false,
+                    textures,
+                    fonts,
                 };
 
                 // Restore building states

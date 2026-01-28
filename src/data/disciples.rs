@@ -179,19 +179,19 @@ impl Injury {
         // Survivors get less severe injuries
         let severity = if is_survivor { 2 } else { 2 }; // Moderate by default
 
-        // Base recovery time: 300 ticks (5 seconds) per severity level
+        // Base recovery time in seconds (1 heal tick = ~1 second)
         // Mortals recover faster (not dealing with Qi deviation, just exhaustion)
         // Higher realms = longer recovery due to Qi complexity
         let realm_multiplier = match realm {
-            "Mortal" => 0.5,              // ~150 ticks per severity = 300 total for moderate
-            "QiRefinement" => 1.0,        // ~300 ticks per severity
-            "FoundationEstablishment" => 1.5,
-            "CoreFormation" => 2.0,
-            "NascentSoul" => 2.5,
-            _ => 3.0,
+            "Mortal" => 0.5,              // ~5 sec per severity = 10 sec for moderate
+            "QiRefinement" => 1.0,        // ~10 sec per severity = 20 sec for moderate
+            "FoundationEstablishment" => 1.5, // 30 sec for moderate
+            "CoreFormation" => 2.0,       // 40 sec for moderate
+            "NascentSoul" => 2.5,         // 50 sec for moderate
+            _ => 3.0,                     // 60 sec for moderate
         };
 
-        let base_recovery = 300 * severity;
+        let base_recovery = 10 * severity; // 10 seconds per severity level
         let recovery_ticks = (base_recovery as f32 * realm_multiplier) as u32;
 
         // Different description for mortals vs cultivators

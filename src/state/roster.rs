@@ -276,11 +276,15 @@ impl DiscipleRosterState {
             draw_text(&format!("INJURED: {} {}", injury.severity_str(), injury.injury_type), x, y, FONT_BODY_SIZE, FAILURE);
             y += 20.0;
 
-            let recovery_secs = injury.recovery_ticks_remaining / 60;
-            draw_text(
-                &format!("Recovery: ~{} sec remaining", recovery_secs),
-                x + 10.0, y, FONT_SMALL_SIZE, WARNING
-            );
+            // Recovery ticks = seconds (healing happens once per cultivation tick, ~1/sec)
+            let heal_rate = crate::data::disciples::Injury::get_recovery_rate(disciple.attributes.body);
+            let recovery_secs = injury.recovery_ticks_remaining / heal_rate.max(1);
+            let display = if recovery_secs >= 60 {
+                format!("~{} min remaining (heal rate: {}/sec)", recovery_secs / 60, heal_rate)
+            } else {
+                format!("~{} sec remaining (heal rate: {}/sec)", recovery_secs, heal_rate)
+            };
+            draw_text(&display, x + 10.0, y, FONT_SMALL_SIZE, WARNING);
             y += 30.0;
         }
 
