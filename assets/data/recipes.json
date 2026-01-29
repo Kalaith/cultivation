@@ -54,9 +54,10 @@
         "output_item_id": "iron_sword",
         "output_amount": 1,
         "ingredients": [
+            ["spirit_ore", 5],
             ["spirit_stones", 10]
         ],
         "craft_time": 0,
-        "required_building": "ArtifactForge"
+        "required_building": "Blacksmith"
     }
 ]

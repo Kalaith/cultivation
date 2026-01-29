@@ -8,6 +8,35 @@ pub enum ItemType {
     Artifact,
 }
 
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Hash)]
+pub enum EquipmentSlot {
+    Weapon,
+    OffHand,
+    Chest,
+    Legs,
+    Arms,
+    Head,
+    Boots,
+    Ring,
+    Amulet,
+    Belt,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct StatModifier {
+    pub stat: String,
+    pub value: i32,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct EquipmentData {
+    pub slot: EquipmentSlot,
+    #[serde(default)]
+    pub modifiers: Vec<StatModifier>,
+    #[serde(default)]
+    pub durability: u32,
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ItemEffect {
     Heal(u32),        // Reduce injury recovery time by this amount (ticks)
@@ -25,6 +54,8 @@ pub struct Item {
     pub item_type: ItemType,
     #[serde(default)]
     pub effects: Vec<ItemEffect>,
+    #[serde(default)]
+    pub equipment: Option<EquipmentData>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

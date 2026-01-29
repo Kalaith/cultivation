@@ -3,14 +3,12 @@ use macroquad::prelude::*;
 /// Manages game fonts
 pub struct FontManager {
     pub brush_font: Option<Font>,
-    pub default_font: Option<Font>,
 }
 
 impl FontManager {
     pub fn new() -> Self {
         Self {
             brush_font: None,
-            default_font: None,
         }
     }
 
@@ -28,10 +26,6 @@ impl FontManager {
         }
     }
 
-    /// Get the brush font, falling back to default if not loaded
-    pub fn get_brush_font(&self) -> Option<&Font> {
-        self.brush_font.as_ref()
-    }
 }
 
 impl Default for FontManager {

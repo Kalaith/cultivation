@@ -87,6 +87,15 @@
         "prerequisites": ["basic_cultivation"]
     },
     {
+        "id": "blacksmithing",
+        "name": "Blacksmithing",
+        "description": "Forge weapons and armor from spirit ore.",
+        "cost_spirit_stones": 120,
+        "unlocks_buildings": ["Blacksmith"],
+        "unlocks_missions": [],
+        "prerequisites": ["basic_cultivation"]
+    },
+    {
         "id": "artifact_crafting",
         "name": "Artifact Crafting",
         "description": "Forge magical artifacts and weapons.",

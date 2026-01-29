@@ -1,5 +1,5 @@
 use crate::data::buildings::BuildingType;
-use crate::data::relations::{DiplomaticAction, Treaty};
+use crate::data::relations::DiplomaticAction;
 
 #[derive(Debug)]
 pub enum Action {
@@ -11,6 +11,8 @@ pub enum Action {
     AssignLaw(usize, String), // Disciple Index, Law ID
     CraftItem(String), // Recipe ID
     UseItem(String, usize), // Item ID, Disciple Index
+    EquipItem(String, usize), // Item ID, Disciple Index
+    UnequipItem(crate::data::items::EquipmentSlot, usize), // Slot, Disciple Index
     ResearchTech(String), // Tech ID
     RepairBuilding(u64), // Building ID
     ConstructBuilding(BuildingType, i32, i32), // Type, X, Y

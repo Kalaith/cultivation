@@ -52,6 +52,7 @@ pub fn generate_disciple(game_data: &GameData) -> Disciple {
         needs: DiscipleNeeds::from_tuning(&game_data.ai_scheduler),
         injury: None,
         breakthrough_readiness: 0.0,
+        equipment: std::collections::HashMap::new(),
     }
 }
 

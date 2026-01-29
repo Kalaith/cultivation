@@ -41,9 +41,13 @@
         "name": "Iron Sword",
         "description": "A common sword forged from mortal iron.",
         "item_type": "Artifact",
-        "effects": [
-            { "BoostBody": 5 }
-        ]
+        "equipment": {
+            "slot": "Weapon",
+            "durability": 100,
+            "modifiers": [
+                { "stat": "body", "value": 2 }
+            ]
+        }
     },
     {
         "id": "spirit_ore",

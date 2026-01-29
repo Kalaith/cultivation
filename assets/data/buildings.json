@@ -2,6 +2,7 @@
     {
         "type": "SectHall",
         "cost": 0,
+        "repair_cost": 10,
         "name": "Sect Hall",
         "description": "The heart of the sect.",
         "tech_required": null,
@@ -87,6 +88,15 @@
         "description": "Refine pills and elixirs from herbs.",
         "tech_required": "alchemy",
         "element": "Fire",
+        "unique": false
+    },
+    {
+        "type": "Blacksmith",
+        "cost": 160,
+        "name": "Blacksmith",
+        "description": "Forge weapons and armor from ore.",
+        "tech_required": "blacksmithing",
+        "element": "Metal",
         "unique": false
     },
     {

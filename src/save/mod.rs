@@ -143,6 +143,7 @@ pub mod storage {
     use quad_storage::LocalStorage;
 
     const SAVE_FILE: &str = "savegame.json";
+    #[cfg(target_arch = "wasm32")]
     const SAVE_KEY: &str = "cultivation_save";
 
     /// Save game data to persistent storage
@@ -200,21 +201,5 @@ pub mod storage {
         }
     }
 
-    /// Delete save data
-    pub fn delete() -> Result<(), String> {
-        #[cfg(not(target_arch = "wasm32"))]
-        {
-            if std::path::Path::new(SAVE_FILE).exists() {
-                fs::remove_file(SAVE_FILE)
-                    .map_err(|e| format!("Delete error: {}", e))?;
-            }
-        }
-
-        #[cfg(target_arch = "wasm32")]
-        {
-            LocalStorage::remove(SAVE_KEY);
-        }
-
-        Ok(())
-    }
+    // The delete function has been removed as it was unused.
 }

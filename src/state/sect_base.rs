@@ -539,12 +539,13 @@ impl SectBaseState {
 
         if building.status == BuildingStatus::Ruined {
             draw_text("(Ruined)", rect.x + 200.0, rect.y + 60.0, FONT_HEADER_SIZE, Color::new(0.8, 0.2, 0.2, 1.0));
+            let repair_cost = building.repair_cost;
             let repair_label = if b_type == BuildingType::SectHall {
-                "Restore (50 SS)"
+                format!("Restore ({} SS)", repair_cost)
             } else {
-                "Repair (50 SS)"
+                format!("Repair ({} SS)", repair_cost)
             };
-            if draw_button(Rect::new(rect.x + 20.0, action_y, 200.0, 40.0), repair_label, false) {
+            if draw_button(Rect::new(rect.x + 20.0, action_y, 200.0, 40.0), &repair_label, false) {
                  return Some(UpdateResult::new().with_action(Action::RepairBuilding(building.id)));
             }
         } else if b_type == BuildingType::MissionBoard {
@@ -574,7 +575,7 @@ impl SectBaseState {
                   if draw_button(Rect::new(rect.x + 340.0, action_y, 150.0, 40.0), "Research / Tech", false) {
                       self.tech_tree_open = true;
                   }
-             } else if matches!(b_type, BuildingType::AlchemyFurnace | BuildingType::ArtifactForge) {
+               } else if matches!(b_type, BuildingType::AlchemyFurnace | BuildingType::ArtifactForge | BuildingType::Blacksmith) {
                   if draw_button(Rect::new(rect.x + 180.0, action_y, 150.0, 40.0), "Crafting", false) {
                        self.crafting_modal_open = true;
                   }

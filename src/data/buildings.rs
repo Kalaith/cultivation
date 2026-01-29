@@ -18,6 +18,7 @@ pub enum BuildingType {
     Decoration,
     AlchemyFurnace,
     ArtifactForge,
+    Blacksmith,
     // Herb system buildings
     HerbGarden,
     Greenhouse,
@@ -37,6 +38,7 @@ impl std::fmt::Display for BuildingType {
             BuildingType::Decoration => write!(f, "Decoration"),
             BuildingType::AlchemyFurnace => write!(f, "Alchemy Furnace"),
             BuildingType::ArtifactForge => write!(f, "Artifact Forge"),
+            BuildingType::Blacksmith => write!(f, "Blacksmith"),
             BuildingType::HerbGarden => write!(f, "Herb Garden"),
             BuildingType::Greenhouse => write!(f, "Greenhouse"),
             BuildingType::DryingPavilion => write!(f, "Drying Pavilion"),
@@ -66,6 +68,8 @@ pub struct Building {
     pub status: BuildingStatus,
     #[serde(default)]
     pub feng_shui_score: f32,
+    #[serde(default = "default_repair_cost")]
+    pub repair_cost: u32,
     /// Disciple assigned to work this building (for gardens, pavilions, etc.)
     #[serde(default)]
     pub assigned_disciple: Option<u64>,
@@ -83,6 +87,10 @@ fn default_status() -> BuildingStatus {
 
 fn default_element() -> Element {
     Element::None
+}
+
+fn default_repair_cost() -> u32 {
+    50
 }
 
 impl Building {
@@ -104,6 +112,7 @@ impl Building {
             y: 0,
             status: BuildingStatus::Active,
             feng_shui_score: 0.0,
+            repair_cost: 50,
             assigned_disciple: None,
             herb_plots,
             infused_element: None,

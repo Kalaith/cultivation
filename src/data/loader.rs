@@ -56,6 +56,8 @@ pub struct BuildingDefinition {
     #[serde(rename = "type")]
     pub building_type: crate::data::buildings::BuildingType,
     pub cost: u32,
+    #[serde(default = "default_repair_cost")]
+    pub repair_cost: u32,
     pub name: String,
     pub description: String,
     pub tech_required: Option<String>,
@@ -63,6 +65,10 @@ pub struct BuildingDefinition {
     pub element: crate::data::elements::Element,
     #[serde(default)]
     pub unique: bool,
+}
+
+fn default_repair_cost() -> u32 {
+    50
 }
 
 impl GameData {

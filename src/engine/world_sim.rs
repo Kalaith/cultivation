@@ -8,7 +8,7 @@ use crate::data::{
     relations::{DiplomaticAction, FactionRelation, Treaty, TreatyRequest},
     world_events::{
         ActiveWorldEvent, EventEffect, EventTrigger, QueuedEvent,
-        SeasonalEventWeights, WorldEvent,
+        WorldEvent,
     },
 };
 
@@ -137,8 +137,6 @@ pub struct WorldSim {
     pub price_modifiers: Vec<PriceModifier>,
     #[serde(default)]
     pub seasonal_modifiers: SeasonalModifiers,
-    #[serde(skip)]
-    pub seasonal_event_weights: SeasonalEventWeights,
     #[serde(default)]
     pub balance: WorldSimBalance,
     pub last_season: Option<Season>,
@@ -160,7 +158,6 @@ impl Default for WorldSim {
             world_tick: 0,
             price_modifiers: Vec::new(),
             seasonal_modifiers: SeasonalModifiers::default(),
-            seasonal_event_weights: SeasonalEventWeights::default(),
             balance: WorldSimBalance::default(),
             last_season: None,
             triggered_event_ids: Vec::new(),
@@ -358,10 +355,6 @@ impl WorldSim {
             .map(|f| (f.id.clone(), f.power_level))
             .collect();
 
-        let faction_names: HashMap<String, String> = self.factions
-            .iter()
-            .map(|f| (f.id.clone(), f.name.clone()))
-            .collect();
 
         let world_tick = self.world_tick;
 
@@ -411,7 +404,6 @@ impl WorldSim {
     /// Check for event triggers
     fn check_event_triggers(&mut self, results: &mut Vec<WorldSimResult>) {
         let world_tick = self.world_tick;
-        let random_chance = self.balance.random_event_chance_per_tick;
 
         // Collect events to trigger
         let mut events_to_trigger = Vec::new();
@@ -508,7 +500,7 @@ impl WorldSim {
         let world_tick = self.world_tick;
         let war_duration = self.balance.war_duration_ticks;
 
-        let faction_ids: Vec<String> = self.factions.iter().map(|f| f.id.clone()).collect();
+        //let faction_ids: Vec<String> = self.factions.iter().map(|f| f.id.clone()).collect();
 
         for relation in &mut self.relations {
             if relation.at_war {
@@ -656,13 +648,6 @@ impl WorldSim {
         results
     }
 
-    pub fn get_pending_choices(&self) -> Vec<&ActiveWorldEvent> {
-        self.active_events
-            .iter()
-            .filter(|e| e.requires_choice())
-            .collect()
-    }
-
     pub fn respond_to_event(&mut self, event_id: &str, choice_idx: usize) -> Vec<EventEffect> {
         if let Some(event) = self.active_events.iter_mut().find(|e| e.event_id == event_id) {
             event.resolve_with_choice(choice_idx);
@@ -675,23 +660,11 @@ impl WorldSim {
         self.economy.get_effective_price(node_id, item_id, self.balance.price_elasticity)
     }
 
-    pub fn get_seasonal_modifiers(&self) -> &SeasonalModifiers {
-        &self.seasonal_modifiers
-    }
-
     pub fn queue_event(&mut self, event_id: String, delay_ticks: u32) {
         self.event_queue.push(QueuedEvent {
             event_id,
             trigger_tick: self.world_tick + delay_ticks as u64,
         });
-    }
-
-    pub fn set_event_definitions(&mut self, events: Vec<WorldEvent>) {
-        self.event_definitions = events;
-    }
-
-    pub fn set_seasonal_event_weights(&mut self, weights: SeasonalEventWeights) {
-        self.seasonal_event_weights = weights;
     }
 }
 
@@ -747,7 +720,6 @@ impl WorldSim {
             world_tick: saved.world_tick,
             price_modifiers: saved.price_modifiers,
             seasonal_modifiers: saved.seasonal_modifiers,
-            seasonal_event_weights: SeasonalEventWeights::default(),
             balance: saved.balance,
             last_season: saved.last_season,
             triggered_event_ids: saved.triggered_event_ids,

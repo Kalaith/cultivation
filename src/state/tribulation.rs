@@ -19,7 +19,7 @@ impl TribulationEncounterState {
         }
     }
 
-    pub fn update(&mut self, disciples: &[Disciple]) -> UpdateResult {
+    pub fn update(&mut self) -> UpdateResult {
         // If finished, show result and allow exit
         if self.tribulation.is_finished {
              if draw_button(Rect::new(screen_width() / 2.0 - 100.0, screen_height() - 100.0, 200.0, 50.0), "Continue", true) {
@@ -30,8 +30,6 @@ impl TribulationEncounterState {
         
         // Auto-progress waves for MVP or wait for user "Next Wave"?
         // Let's make it manual "Endure Wave" button
-        
-        let disciple = &disciples[self.disciple_index];
         
         // Input handling
         // ... (Optional items usage here later)

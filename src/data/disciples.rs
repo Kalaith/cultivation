@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use crate::data::ai::AiSchedulerTuning;
 use crate::data::bloodlines::DiscipleBloodline;
+use crate::data::items::EquipmentSlot;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct NeedState {
@@ -287,6 +288,9 @@ pub struct Disciple {
     /// Higher readiness improves breakthrough success chance
     #[serde(default)]
     pub breakthrough_readiness: f32,
+    /// Equipped item IDs by slot
+    #[serde(default)]
+    pub equipment: std::collections::HashMap<EquipmentSlot, String>,
 }
 
 impl Disciple {

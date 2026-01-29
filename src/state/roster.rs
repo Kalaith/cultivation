@@ -41,6 +41,7 @@ pub struct DiscipleRosterState {
     selected_filtered_index: Option<usize>,
     law_modal_open: bool,
     item_modal_open: bool,
+    equip_modal_open: bool,
     scroll_offset: f32,
     filter: RosterFilter,
 }
@@ -51,6 +52,7 @@ impl DiscipleRosterState {
             selected_filtered_index: None,
             law_modal_open: false,
             item_modal_open: false,
+            equip_modal_open: false,
             scroll_offset: 0.0,
             filter: RosterFilter::All,
         }
@@ -234,6 +236,16 @@ impl DiscipleRosterState {
             }
         }
 
+        if self.equip_modal_open {
+            if let Some(idx) = selected_actual_index {
+                if let Some(result) = self.draw_equip_modal(data, idx, inventory, disciples) {
+                    return result;
+                }
+            } else {
+                self.equip_modal_open = false;
+            }
+        }
+
         // Back Button
         if draw_button(Rect::new(screen_w - 120.0, screen_h - 50.0, 100.0, 40.0), "Back", false) {
             return UpdateResult::new().with_transition(StateTransition::ToSectBase);
@@ -295,6 +307,49 @@ impl DiscipleRosterState {
             x, y, FONT_BODY_SIZE, TEXT_PRIMARY
         );
         y += 30.0;
+
+        // Equipment (compact)
+        draw_text("Equipment:", x, y, FONT_SMALL_SIZE, TEXT_SECONDARY);
+        y += 20.0;
+
+        let slots = [
+            crate::data::items::EquipmentSlot::Weapon,
+            crate::data::items::EquipmentSlot::OffHand,
+            crate::data::items::EquipmentSlot::Chest,
+            crate::data::items::EquipmentSlot::Legs,
+            crate::data::items::EquipmentSlot::Arms,
+            crate::data::items::EquipmentSlot::Head,
+            crate::data::items::EquipmentSlot::Boots,
+            crate::data::items::EquipmentSlot::Ring,
+            crate::data::items::EquipmentSlot::Amulet,
+            crate::data::items::EquipmentSlot::Belt,
+        ];
+
+        for slot in slots.iter() {
+            let slot_name = match slot {
+                crate::data::items::EquipmentSlot::Weapon => "Weapon",
+                crate::data::items::EquipmentSlot::OffHand => "Off-hand",
+                crate::data::items::EquipmentSlot::Chest => "Chest",
+                crate::data::items::EquipmentSlot::Legs => "Legs",
+                crate::data::items::EquipmentSlot::Arms => "Arms",
+                crate::data::items::EquipmentSlot::Head => "Head",
+                crate::data::items::EquipmentSlot::Boots => "Boots",
+                crate::data::items::EquipmentSlot::Ring => "Ring",
+                crate::data::items::EquipmentSlot::Amulet => "Amulet",
+                crate::data::items::EquipmentSlot::Belt => "Belt",
+            };
+
+            let item_label = disciple
+                .equipment
+                .get(slot)
+                .and_then(|id| data.items.get(id))
+                .map(|item| item.name.clone())
+                .unwrap_or_else(|| "Empty".to_string());
+
+            draw_text(&format!("{}: {}", slot_name, item_label), x + 10.0, y, FONT_SMALL_SIZE, TEXT_SECONDARY);
+            y += 18.0;
+        }
+        y += 10.0;
 
         // Qi (for non-mortals)
         if disciple.rank != DiscipleRank::Outer && disciple.realm != "Mortal" {
@@ -374,28 +429,35 @@ impl DiscipleRosterState {
             }
         }
 
-        // Row 2: Use Item, Change Law
+        // Row 2: Use Item, Equip Gear
         let row2_y = btn_y + btn_h + spacing;
 
         if draw_button(Rect::new(right_x, row2_y, btn_w, btn_h), "Use Item", false) {
             self.item_modal_open = true;
         }
 
+        if draw_button(Rect::new(right_x + btn_w + spacing, row2_y, btn_w, btn_h), "Equip Gear", false) {
+            self.equip_modal_open = true;
+        }
+
+        // Row 3: Change Law (if applicable)
+        let row3_y = row2_y + btn_h + spacing;
+
         if disciple.rank != DiscipleRank::Outer && disciple.realm != "Mortal" {
-            if draw_button(Rect::new(right_x + btn_w + spacing, row2_y, btn_w, btn_h), "Change Law", false) {
+            if draw_button(Rect::new(right_x, row3_y, btn_w * 2.0 + spacing, btn_h), "Change Law", false) {
                 self.law_modal_open = true;
             }
         }
 
-        // Row 3: Promote (if applicable)
-        let row3_y = row2_y + btn_h + spacing;
+        // Row 4: Promote (if applicable)
+        let row4_y = row3_y + btn_h + spacing;
 
         if disciple.rank == DiscipleRank::Outer && disciple.realm != "Mortal" {
-            if draw_button(Rect::new(right_x, row3_y, btn_w * 2.0 + spacing, btn_h), "Promote to Inner (100 SS)", false) {
+            if draw_button(Rect::new(right_x, row4_y, btn_w * 2.0 + spacing, btn_h), "Promote to Inner (100 SS)", false) {
                 return Some(UpdateResult::new().with_action(crate::engine::actions::Action::PromoteDisciple(idx)));
             }
         } else if disciple.rank == DiscipleRank::Outer && disciple.realm == "Mortal" {
-            draw_text("Reach Qi Refinement to promote", right_x, row3_y + 20.0, FONT_SMALL_SIZE, TEXT_SECONDARY);
+            draw_text("Reach Qi Refinement to promote", right_x, row4_y + 20.0, FONT_SMALL_SIZE, TEXT_SECONDARY);
         }
 
         None
@@ -454,6 +516,9 @@ impl DiscipleRosterState {
         for (item_id, count) in inventory {
             if *count > 0 {
                 if let Some(item) = data.items.get(item_id) {
+                    if item.equipment.is_some() {
+                        continue;
+                    }
                     found_any = true;
                     if draw_button(Rect::new(modal_x + 20.0, i_y, modal_w - 40.0, 35.0), &format!("{} (x{})", item.name, count), false) {
                         self.item_modal_open = false;
@@ -471,6 +536,134 @@ impl DiscipleRosterState {
 
         if !found_any {
             draw_text("Inventory Empty", modal_x + 20.0, i_y, FONT_BODY_SIZE, TEXT_SECONDARY);
+        }
+
+        None
+    }
+
+    fn draw_equip_modal(
+        &mut self,
+        data: &GameData,
+        idx: usize,
+        inventory: &std::collections::HashMap<String, u32>,
+        disciples: &[Disciple],
+    ) -> Option<UpdateResult> {
+        let screen_w = screen_width();
+        let screen_h = screen_height();
+
+        draw_rectangle(0.0, 0.0, screen_w, screen_h, Color::new(0.0, 0.0, 0.0, 0.8));
+        let modal_w = 520.0;
+        let modal_h = 520.0;
+        let modal_x = (screen_w - modal_w) / 2.0;
+        let modal_y = (screen_h - modal_h) / 2.0;
+
+        draw_panel(Rect::new(modal_x, modal_y, modal_w, modal_h), Some("Equip Gear"));
+
+        if draw_button(Rect::new(modal_x + modal_w - 60.0, modal_y + 10.0, 50.0, 30.0), "X", false) {
+            self.equip_modal_open = false;
+        }
+
+        let Some(disciple) = disciples.get(idx) else {
+            return None;
+        };
+
+        // Current equipment list
+        let mut y = modal_y + 50.0;
+        draw_text("Equipped", modal_x + 20.0, y, FONT_BODY_SIZE, TEXT_HIGHLIGHT);
+        y += 20.0;
+
+        let slots = [
+            crate::data::items::EquipmentSlot::Weapon,
+            crate::data::items::EquipmentSlot::OffHand,
+            crate::data::items::EquipmentSlot::Chest,
+            crate::data::items::EquipmentSlot::Legs,
+            crate::data::items::EquipmentSlot::Arms,
+            crate::data::items::EquipmentSlot::Head,
+            crate::data::items::EquipmentSlot::Boots,
+            crate::data::items::EquipmentSlot::Ring,
+            crate::data::items::EquipmentSlot::Amulet,
+            crate::data::items::EquipmentSlot::Belt,
+        ];
+
+        for slot in slots.iter() {
+            let slot_name = match slot {
+                crate::data::items::EquipmentSlot::Weapon => "Weapon",
+                crate::data::items::EquipmentSlot::OffHand => "Off-hand",
+                crate::data::items::EquipmentSlot::Chest => "Chest",
+                crate::data::items::EquipmentSlot::Legs => "Legs",
+                crate::data::items::EquipmentSlot::Arms => "Arms",
+                crate::data::items::EquipmentSlot::Head => "Head",
+                crate::data::items::EquipmentSlot::Boots => "Boots",
+                crate::data::items::EquipmentSlot::Ring => "Ring",
+                crate::data::items::EquipmentSlot::Amulet => "Amulet",
+                crate::data::items::EquipmentSlot::Belt => "Belt",
+            };
+
+            if let Some(item_id) = disciple.equipment.get(slot) {
+                let item_name = data.items.get(item_id).map(|i| i.name.as_str()).unwrap_or("Unknown");
+                draw_text(&format!("{}: {}", slot_name, item_name), modal_x + 20.0, y, FONT_SMALL_SIZE, TEXT_SECONDARY);
+
+                if draw_button(Rect::new(modal_x + modal_w - 110.0, y - 14.0, 80.0, 24.0), "Unequip", false) {
+                    self.equip_modal_open = false;
+                    return Some(UpdateResult::new().with_action(crate::engine::actions::Action::UnequipItem(slot.clone(), idx)));
+                }
+            } else {
+                draw_text(&format!("{}: Empty", slot_name), modal_x + 20.0, y, FONT_SMALL_SIZE, TEXT_SECONDARY);
+            }
+
+            y += 22.0;
+            if y > modal_y + 220.0 {
+                break;
+            }
+        }
+
+        y = modal_y + 240.0;
+        draw_text("Inventory", modal_x + 20.0, y, FONT_BODY_SIZE, TEXT_HIGHLIGHT);
+        y += 20.0;
+
+        let mut found_any = false;
+        for (item_id, count) in inventory {
+            if *count == 0 {
+                continue;
+            }
+            let Some(item) = data.items.get(item_id) else { continue; };
+            let Some(eq) = item.equipment.as_ref() else { continue; };
+
+            found_any = true;
+            let slot_name = match eq.slot {
+                crate::data::items::EquipmentSlot::Weapon => "Weapon",
+                crate::data::items::EquipmentSlot::OffHand => "Off-hand",
+                crate::data::items::EquipmentSlot::Chest => "Chest",
+                crate::data::items::EquipmentSlot::Legs => "Legs",
+                crate::data::items::EquipmentSlot::Arms => "Arms",
+                crate::data::items::EquipmentSlot::Head => "Head",
+                crate::data::items::EquipmentSlot::Boots => "Boots",
+                crate::data::items::EquipmentSlot::Ring => "Ring",
+                crate::data::items::EquipmentSlot::Amulet => "Amulet",
+                crate::data::items::EquipmentSlot::Belt => "Belt",
+            };
+
+            if draw_button(
+                Rect::new(modal_x + 20.0, y, modal_w - 40.0, 30.0),
+                &format!("{} ({} slot) x{}", item.name, slot_name, count),
+                false,
+            ) {
+                self.equip_modal_open = false;
+                return Some(UpdateResult::new().with_action(crate::engine::actions::Action::EquipItem(item_id.clone(), idx)));
+            }
+
+            if Rect::new(modal_x + 20.0, y, modal_w - 40.0, 30.0).contains(mouse_position().into()) {
+                draw_tooltip(mouse_position().into(), &item.description);
+            }
+
+            y += 35.0;
+            if y > modal_y + modal_h - 30.0 {
+                break;
+            }
+        }
+
+        if !found_any {
+            draw_text("No equippable items in inventory", modal_x + 20.0, y, FONT_BODY_SIZE, TEXT_SECONDARY);
         }
 
         None
