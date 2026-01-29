@@ -28,12 +28,15 @@ use crate::ui::theme::*;
 use crate::ui::{FontManager, TextureManager};
 use crate::save::{SaveData, SavedTutorialState, SAVE_VERSION, storage};
 
+const FOUNDATION_TRIAL_MISSION: &str = "Foundation Trial (Solo)";
+
 /// Result of a breakthrough attempt
 pub enum BreakthroughResult {
     Success,
     Failure,           // Died
     Injured,           // Survived but didn't advance
     Tribulation(TribulationType), // Needs tribulation
+    Blocked,           // Blocked by requirements
 }
 
 pub struct Game {
@@ -551,9 +554,33 @@ impl Game {
         };
     }
 
+    fn has_completed_foundation_trial(&self, disciple_idx: usize) -> bool {
+        self.completed_missions.iter().any(|m| {
+            m.success
+                && m.mission_name == FOUNDATION_TRIAL_MISSION
+                && m.disciple_indices.len() == 1
+                && m.disciple_indices[0] == disciple_idx
+        })
+    }
+
     /// Attempts a breakthrough. Returns result logic.
-    fn attempt_breakthrough(&mut self, disciple: &mut Disciple) -> BreakthroughResult {
+    fn attempt_breakthrough(&mut self, disciple: &mut Disciple, disciple_idx: usize) -> BreakthroughResult {
         let mut rng = rand::thread_rng();
+        // MVP cap gate: prevent major breakthrough beyond Foundation Establishment without solo trial
+        if disciple.realm == "FoundationEstablishment" {
+            if let Some(stage) = self.data.stages.get(&disciple.realm) {
+                let at_peak = disciple.sub_stage >= stage.sub_stages.len().saturating_sub(1);
+                if at_peak && !self.has_completed_foundation_trial(disciple_idx) {
+                    self.event_log.push(format!(
+                        "{} cannot advance beyond Foundation Establishment without completing the solo mission '{}'.",
+                        disciple.name,
+                        FOUNDATION_TRIAL_MISSION
+                    ));
+                    return BreakthroughResult::Blocked;
+                }
+            }
+        }
+
         let base_chance = match disciple.talent {
              Talent::Low => 0.3,
              Talent::Medium => 0.5,
@@ -893,7 +920,7 @@ impl Game {
                         }
                     } else {
                         let mut disciple = disciple;
-                        let result = self.attempt_breakthrough(&mut disciple);
+                        let result = self.attempt_breakthrough(&mut disciple, idx);
 
                         match result {
                             BreakthroughResult::Failure => {
@@ -911,6 +938,9 @@ impl Game {
                                 self.disciples[idx] = disciple.clone();
                                 let trib_state = TribulationState::new(t_type, &disciple);
                                 self.transition(StateTransition::ToTribulation(trib_state, idx));
+                            }
+                            BreakthroughResult::Blocked => {
+                                // Blocked by progression requirements (no state changes)
                             }
                             _ => {
                                 // Success or Injured - update disciple and reset readiness

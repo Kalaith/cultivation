@@ -150,6 +150,8 @@ class InkWashGenerator:
         "none": {"brightness": 1.0, "contrast": 1.0, "warmth": 0.0, "vignette": 1.0},
     }
 
+    TERRAIN_TYPES = ["mountains", "river_valley", "lakeside", "cliffs", "plains", "cascades", "world_map"]
+
     def __init__(
         self,
         width: int = 1024,
@@ -161,6 +163,7 @@ class InkWashGenerator:
         structure_density: float = 1.0,
         celestial_glow: float = 0.0,
         show_seal: bool = True,
+        terrain: str = "mountains",
     ):
         self.width = width
         self.height = height
@@ -171,6 +174,7 @@ class InkWashGenerator:
         self.structure_density = clamp(structure_density, 0.0, 2.0)
         self.celestial_glow = clamp(celestial_glow, 0.0, 1.0)
         self.show_seal = show_seal
+        self.terrain = (terrain or "mountains").lower()
 
         random.seed(self.seed)
         np.random.seed(self.seed)
@@ -182,46 +186,228 @@ class InkWashGenerator:
         self.palette_override = self.ELEMENT_PALETTES.get(self.element_palette, [])
 
     def generate_height_map(self) -> np.ndarray:
-        """Generate layered mountain height map using multi-octave noise."""
+        """Generate terrain height map. Shape varies by self.terrain type."""
+        if self.terrain == "river_valley":
+            return self._height_map_river_valley()
+        elif self.terrain == "lakeside":
+            return self._height_map_lakeside()
+        elif self.terrain == "cliffs":
+            return self._height_map_cliffs()
+        elif self.terrain == "plains":
+            return self._height_map_plains()
+        elif self.terrain == "cascades":
+            return self._height_map_cascades()
+        elif self.terrain == "world_map":
+            return self._height_map_world_map()
+        else:
+            return self._height_map_mountains()
+
+    def _height_map_mountains(self) -> np.ndarray:
+        """Classic layered mountain height map."""
         height_map = np.zeros((self.height, self.width), dtype=np.float32)
 
-        # Multiple mountain layers at different depths - more distinct layers
         layers = [
-            {"scale": 0.003, "octaves": 5, "weight": 0.8, "y_offset": 0.05, "peak_boost": 1.5},   # Far background
-            {"scale": 0.005, "octaves": 4, "weight": 0.9, "y_offset": 0.2, "peak_boost": 1.3},    # Mid background
-            {"scale": 0.007, "octaves": 4, "weight": 1.0, "y_offset": 0.4, "peak_boost": 1.2},    # Mid-ground
-            {"scale": 0.01, "octaves": 3, "weight": 0.6, "y_offset": 0.6, "peak_boost": 1.0},     # Foreground
+            {"scale": 0.003, "octaves": 5, "weight": 0.8, "y_offset": 0.05, "peak_boost": 1.5},
+            {"scale": 0.005, "octaves": 4, "weight": 0.9, "y_offset": 0.2, "peak_boost": 1.3},
+            {"scale": 0.007, "octaves": 4, "weight": 1.0, "y_offset": 0.4, "peak_boost": 1.2},
+            {"scale": 0.01, "octaves": 3, "weight": 0.6, "y_offset": 0.6, "peak_boost": 1.0},
         ]
 
         for layer in layers:
             layer_noise = PerlinNoise(self.seed + hash(str(layer["scale"])) % 10000)
 
             for y in range(self.height):
-                # Create natural horizon line with smooth falloff
                 y_norm = y / self.height
-                # Mountains fade out below their horizon line
                 horizon_factor = max(0.0, 1.0 - (y_norm - layer["y_offset"]) * 1.8)
                 horizon_factor = smoothstep(horizon_factor)
-                horizon_factor = math.pow(max(0.0, horizon_factor), 0.7)  # Softer falloff
+                horizon_factor = math.pow(max(0.0, horizon_factor), 0.7)
 
                 for x in range(self.width):
                     noise_val = layer_noise.octave_noise(
                         x * layer["scale"],
-                        y * layer["scale"] * 0.6,  # Stretch vertically for mountain shapes
+                        y * layer["scale"] * 0.6,
                         octaves=layer["octaves"],
                         persistence=0.45
                     )
-                    # Normalize to 0-1 and clamp
                     noise_val = max(0.0, min(1.0, (noise_val + 1.0) / 2.0))
-
-                    # Boost peaks to create more dramatic mountain shapes
                     noise_val = math.pow(noise_val, 1.0 / layer["peak_boost"])
-
                     height_map[y, x] += noise_val * horizon_factor * layer["weight"]
 
-        # Normalize
         height_map = (height_map - height_map.min()) / (height_map.max() - height_map.min() + 0.001)
+        return height_map
 
+    def _height_map_river_valley(self) -> np.ndarray:
+        """Mountains on sides with a river channel winding through the center."""
+        height_map = np.zeros((self.height, self.width), dtype=np.float32)
+        terrain_noise = PerlinNoise(self.seed)
+        river_noise = PerlinNoise(self.seed + 777)
+
+        for y in range(self.height):
+            y_norm = y / self.height
+            # River center meanders using noise
+            river_center = 0.5 + river_noise.octave_noise(y * 0.005, 0.0, octaves=3) * 0.2
+            for x in range(self.width):
+                x_norm = x / self.width
+                # Distance from river center
+                dist = abs(x_norm - river_center)
+                # Valley shape: low in center, high on sides
+                valley = smoothstep(clamp(dist * 3.0, 0.0, 1.0))
+                # Mountain noise on the sides
+                noise_val = terrain_noise.octave_noise(x * 0.005, y * 0.004, octaves=4, persistence=0.45)
+                noise_val = max(0.0, (noise_val + 1.0) / 2.0)
+                # Horizon fade for upper portion
+                horizon = smoothstep(clamp(1.0 - y_norm * 1.2, 0.0, 1.0))
+                height_map[y, x] = valley * noise_val * (0.4 + horizon * 0.6)
+
+        height_map = (height_map - height_map.min()) / (height_map.max() - height_map.min() + 0.001)
+        # Store river path for later rendering
+        self._river_center_func = lambda yy: 0.5 + river_noise.octave_noise(yy * 0.005, 0.0, octaves=3) * 0.2
+        return height_map
+
+    def _height_map_lakeside(self) -> np.ndarray:
+        """Mountains in the background with a flat lake in the lower portion."""
+        height_map = np.zeros((self.height, self.width), dtype=np.float32)
+        terrain_noise = PerlinNoise(self.seed)
+
+        for y in range(self.height):
+            y_norm = y / self.height
+            for x in range(self.width):
+                noise_val = terrain_noise.octave_noise(x * 0.004, y * 0.003, octaves=5, persistence=0.5)
+                noise_val = max(0.0, (noise_val + 1.0) / 2.0)
+                # Mountains only in upper third, lake below
+                mountain_mask = smoothstep(clamp(1.0 - y_norm * 1.8, 0.0, 1.0))
+                # Shore line with gentle slope
+                shore = smoothstep(clamp((0.55 - y_norm) * 4.0, 0.0, 1.0))
+                height_map[y, x] = noise_val * mountain_mask * 0.8 + shore * 0.2
+
+        height_map = (height_map - height_map.min()) / (height_map.max() - height_map.min() + 0.001)
+        return height_map
+
+    def _height_map_cliffs(self) -> np.ndarray:
+        """Dramatic steep cliff faces with sharp vertical drops."""
+        height_map = np.zeros((self.height, self.width), dtype=np.float32)
+        terrain_noise = PerlinNoise(self.seed)
+        cliff_noise = PerlinNoise(self.seed + 333)
+
+        for y in range(self.height):
+            y_norm = y / self.height
+            for x in range(self.width):
+                x_norm = x / self.width
+                noise_val = terrain_noise.octave_noise(x * 0.006, y * 0.003, octaves=4, persistence=0.55)
+                noise_val = max(0.0, (noise_val + 1.0) / 2.0)
+                # Create sharp cliff edges by quantizing height
+                cliff_edge = cliff_noise.octave_noise(x * 0.004, y * 0.002, octaves=3)
+                cliff_edge = (cliff_edge + 1.0) / 2.0
+                # Step function for cliff faces
+                if cliff_edge > 0.55:
+                    noise_val = min(1.0, noise_val * 1.8)
+                elif cliff_edge < 0.45:
+                    noise_val = noise_val * 0.3
+                # Horizon fade
+                horizon = smoothstep(clamp(1.0 - y_norm * 1.3, 0.0, 1.0))
+                height_map[y, x] = noise_val * (0.3 + horizon * 0.7)
+
+        height_map = (height_map - height_map.min()) / (height_map.max() - height_map.min() + 0.001)
+        return height_map
+
+    def _height_map_plains(self) -> np.ndarray:
+        """Gentle rolling hills with distant mountains on the horizon."""
+        height_map = np.zeros((self.height, self.width), dtype=np.float32)
+        terrain_noise = PerlinNoise(self.seed)
+        hill_noise = PerlinNoise(self.seed + 555)
+
+        for y in range(self.height):
+            y_norm = y / self.height
+            for x in range(self.width):
+                # Distant mountains (top 25%)
+                mountain = terrain_noise.octave_noise(x * 0.004, y * 0.003, octaves=5, persistence=0.5)
+                mountain = max(0.0, (mountain + 1.0) / 2.0)
+                mountain_mask = smoothstep(clamp(1.0 - y_norm * 3.5, 0.0, 1.0))
+                # Gentle rolling hills (lower portion)
+                hills = hill_noise.octave_noise(x * 0.008, y * 0.006, octaves=2, persistence=0.3)
+                hills = max(0.0, (hills + 1.0) / 2.0) * 0.25
+                hill_mask = smoothstep(clamp(y_norm * 1.5 - 0.3, 0.0, 1.0))
+                height_map[y, x] = mountain * mountain_mask * 0.8 + hills * hill_mask
+
+        height_map = (height_map - height_map.min()) / (height_map.max() - height_map.min() + 0.001)
+        return height_map
+
+    def _height_map_cascades(self) -> np.ndarray:
+        """Terraced mountain with multiple waterfall levels."""
+        height_map = np.zeros((self.height, self.width), dtype=np.float32)
+        terrain_noise = PerlinNoise(self.seed)
+
+        for y in range(self.height):
+            y_norm = y / self.height
+            for x in range(self.width):
+                noise_val = terrain_noise.octave_noise(x * 0.005, y * 0.004, octaves=4, persistence=0.5)
+                noise_val = max(0.0, (noise_val + 1.0) / 2.0)
+                # Create terrace steps by quantizing
+                terraced = math.floor(noise_val * 5.0) / 5.0
+                # Blend partial terrace with smooth for natural look
+                noise_val = noise_val * 0.3 + terraced * 0.7
+                # Horizon fade
+                horizon = smoothstep(clamp(1.0 - y_norm * 1.4, 0.0, 1.0))
+                height_map[y, x] = noise_val * (0.3 + horizon * 0.7)
+
+        height_map = (height_map - height_map.min()) / (height_map.max() - height_map.min() + 0.001)
+        return height_map
+
+    def _height_map_world_map(self) -> np.ndarray:
+        """Complex world map with varied terrain: mountains, plains, rivers, and lakes."""
+        height_map = np.zeros((self.height, self.width), dtype=np.float32)
+        
+        # 1. Base terrain macro structure (continents/landmasses)
+        macro_noise = PerlinNoise(self.seed)
+        for y in range(self.height):
+            y_norm = y / self.height
+            for x in range(self.width):
+                # Variety of biomes
+                base = macro_noise.octave_noise(x * 0.002, y * 0.002, octaves=4, persistence=0.5)
+                base = (base + 1.0) / 2.0
+                
+                # Push values to extremes for clear mountain/plain separation
+                base = smoothstep(base)
+                height_map[y, x] = base
+
+        # 2. Add mountain ranges (ridges)
+        mountain_noise = PerlinNoise(self.seed + 123)
+        for y in range(self.height):
+            for x in range(self.width):
+                # Only add detail where base is high enough
+                if height_map[y, x] > 0.4:
+                    mtn = mountain_noise.octave_noise(x * 0.006, y * 0.006, octaves=5, persistence=0.55)
+                    mtn = max(0.0, (mtn + 1.0) / 2.0)
+                    
+                    # Sharpen peaks
+                    mtn = math.pow(mtn, 1.5)
+                    
+                    blend = smoothstep(clamp((height_map[y, x] - 0.4) * 3.0, 0.0, 1.0))
+                    height_map[y, x] += mtn * 0.8 * blend
+
+        # 3. Carve river valleys
+        river_noise = PerlinNoise(self.seed + 456)
+        # We will use this noise for the river path later too
+        self._river_center_func_1 = lambda yy: 0.3 + river_noise.octave_noise(yy * 0.004, 0.0, octaves=3) * 0.15
+        self._river_center_func_2 = lambda yy: 0.7 + river_noise.octave_noise(yy * 0.004 + 100, 0.0, octaves=3) * 0.15
+
+        for y in range(self.height):
+            # Two main river systems
+            r1 = self._river_center_func_1(y) * self.width
+            r2 = self._river_center_func_2(y) * self.width
+            
+            for x in range(self.width):
+                # Carve river 1
+                dist1 = abs(x - r1) / self.width
+                valley1 = smoothstep(clamp(dist1 * 15.0, 0.0, 1.0))
+                
+                # Carve river 2
+                dist2 = abs(x - r2) / self.width
+                valley2 = smoothstep(clamp(dist2 * 15.0, 0.0, 1.0))
+                
+                height_map[y, x] *= valley1 * valley2
+
+        height_map = (height_map - height_map.min()) / (height_map.max() - height_map.min() + 0.001)
         return height_map
 
     def create_paper_texture(self) -> Image.Image:
@@ -802,6 +988,138 @@ class InkWashGenerator:
 
         return Image.alpha_composite(img.convert('RGBA'), mist_layer)
 
+    def render_river(self, height_map: np.ndarray) -> Image.Image:
+        """Render a winding river/stream through the landscape."""
+        img = Image.new('RGBA', (self.width, self.height), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(img)
+
+        river_noise = PerlinNoise(self.seed + 888)
+
+        if hasattr(self, '_river_center_func'):
+            center_func = self._river_center_func
+        else:
+            # Default river path based on noise
+            center_func = lambda yy: 0.5 + river_noise.octave_noise(yy * 0.005, 0.0, octaves=3) * 0.2
+
+        # Draw river from top to bottom
+        prev_x = None
+        prev_y = None
+        for y in range(0, self.height, 2):
+            y_norm = y / self.height
+            center_x = center_func(y) * self.width
+
+            # River width varies
+            width_variation = river_noise.noise(y * 0.01, 100.0)
+            river_width = int(12 + y_norm * 25 + width_variation * 8)
+
+            # Water color - semi-transparent blue-grey ink wash
+            depth_alpha = int(40 + y_norm * 60)
+            water_color = (70, 85, 105, depth_alpha)
+
+            x1 = int(center_x - river_width / 2)
+            x2 = int(center_x + river_width / 2)
+            draw.rectangle([(x1, y), (x2, y + 2)], fill=water_color)
+
+            # Ripple lines
+            if random.random() > 0.7:
+                ripple_alpha = int(depth_alpha * 0.6)
+                ripple_ink = (*self.ink_color, ripple_alpha)
+                ripple_x = int(center_x + random.randint(-river_width // 3, river_width // 3))
+                ripple_len = random.randint(5, river_width // 2)
+                draw.line([(ripple_x, y), (ripple_x + ripple_len, y)],
+                         fill=ripple_ink, width=1)
+
+            prev_x = int(center_x)
+            prev_y = y
+
+        img = img.filter(ImageFilter.GaussianBlur(3))
+        return img
+
+    def render_lake(self, height_map: np.ndarray) -> Image.Image:
+        """Render a calm lake surface in lower portions of the image."""
+        img = Image.new('RGBA', (self.width, self.height), (0, 0, 0, 0))
+        pixels = np.array(img)
+
+        ripple_noise = PerlinNoise(self.seed + 999)
+
+        for y in range(self.height):
+            y_norm = y / self.height
+            for x in range(self.width):
+                # Lake appears where terrain is low (below shoreline)
+                if height_map[y, x] < 0.2 and y_norm > 0.45:
+                    # Distance from shore affects water appearance
+                    shore_dist = 0.2 - height_map[y, x]
+                    water_strength = smoothstep(clamp(shore_dist * 8.0, 0.0, 1.0))
+
+                    # Ripple pattern
+                    ripple = ripple_noise.noise(x * 0.02, y * 0.008)
+                    ripple = (ripple + 1.0) / 2.0
+
+                    alpha = int(water_strength * (50 + ripple * 30))
+                    # Reflection gets darker further from shore
+                    r = int(60 + ripple * 20)
+                    g = int(75 + ripple * 15)
+                    b = int(100 + ripple * 20)
+
+                    pixels[y, x] = (r, g, b, alpha)
+
+        lake_layer = Image.fromarray(pixels)
+        lake_layer = lake_layer.filter(ImageFilter.GaussianBlur(4))
+
+        # Add horizontal ripple lines
+        draw = ImageDraw.Draw(lake_layer)
+        for y in range(int(self.height * 0.5), self.height, random.randint(6, 12)):
+            for x_start in range(0, self.width, random.randint(30, 80)):
+                if height_map[min(y, self.height - 1), min(x_start, self.width - 1)] < 0.18:
+                    ripple_len = random.randint(15, 50)
+                    alpha = random.randint(30, 70)
+                    draw.line(
+                        [(x_start, y), (x_start + ripple_len, y)],
+                        fill=(*self.ink_color, alpha), width=1
+                    )
+
+        return lake_layer
+
+    def render_waterfall(self, height_map: np.ndarray) -> Image.Image:
+        """Render waterfall streaks at terrace edges (for cascades terrain)."""
+        img = Image.new('RGBA', (self.width, self.height), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(img)
+
+        # Find steep vertical drops in the height map
+        for x in range(10, self.width - 10, 8):
+            for y in range(10, self.height - 10, 4):
+                if y + 5 < self.height:
+                    drop = height_map[y, x] - height_map[y + 5, x]
+                    if drop > 0.08:
+                        # Steep drop - draw waterfall streak
+                        streak_height = int(drop * 200) + random.randint(10, 30)
+                        alpha = int(60 + drop * 300)
+                        alpha = min(180, alpha)
+
+                        # White-blue water streak
+                        water_color = (180, 195, 210, alpha)
+                        streak_width = random.randint(1, 3)
+
+                        x_wobble = random.randint(-3, 3)
+                        draw.line(
+                            [(x + x_wobble, y), (x + x_wobble + random.randint(-2, 2), y + streak_height)],
+                            fill=water_color, width=streak_width
+                        )
+
+                        # Spray at base
+                        if random.random() > 0.5:
+                            spray_y = y + streak_height
+                            for _ in range(3):
+                                sx = x + random.randint(-8, 8)
+                                sy = spray_y + random.randint(-3, 5)
+                                draw.ellipse(
+                                    [(sx, sy), (sx + 3, sy + 2)],
+                                    fill=(200, 210, 220, alpha // 2)
+                                )
+
+        img = img.filter(ImageFilter.GaussianBlur(2))
+        return img
+
     def draw_calligraphy_mark(self, img: Image.Image) -> Image.Image:
         """Add a simple seal/stamp mark in the corner."""
         draw = ImageDraw.Draw(img)
@@ -864,6 +1182,39 @@ class InkWashGenerator:
         result = Image.alpha_composite(result, contours)
         result = Image.alpha_composite(result, structures)
         result = Image.alpha_composite(result, trees)
+
+        # Water features based on terrain type
+        if self.terrain == "river_valley":
+            print("  Rendering river...")
+            river = self.render_river(height_map)
+            result = Image.alpha_composite(result, river)
+        elif self.terrain == "lakeside":
+            print("  Rendering lake...")
+            lake = self.render_lake(height_map)
+            result = Image.alpha_composite(result, lake)
+            print("  Rendering waterfalls...")
+            waterfalls = self.render_waterfall(height_map)
+            result = Image.alpha_composite(result, waterfalls)
+        elif self.terrain == "world_map":
+            print("  Rendering world map features...")
+            # Render multiple rivers
+            self._river_center_func = self._river_center_func_1
+            river1 = self.render_river(height_map)
+            result = Image.alpha_composite(result, river1)
+            
+            self._river_center_func = self._river_center_func_2
+            river2 = self.render_river(height_map)
+            result = Image.alpha_composite(result, river2)
+            
+            # Render lakes in low areas
+            print("  Rendering lakes...")
+            lake = self.render_lake(height_map)
+            result = Image.alpha_composite(result, lake)
+            
+            # Render waterfalls on steep slopes
+            print("  Rendering waterfalls...")
+            waterfalls = self.render_waterfall(height_map)
+            result = Image.alpha_composite(result, waterfalls)
 
         # Add atmospheric effects
         print("  Adding mist...")
@@ -974,6 +1325,12 @@ def main():
         action="store_true",
         help="Disable the red seal/stamp mark"
     )
+    parser.add_argument(
+        "--terrain",
+        type=str,
+        default="mountains",
+        help="Terrain type: mountains|river_valley|lakeside|cliffs|plains|cascades"
+    )
 
     args = parser.parse_args()
 
@@ -992,6 +1349,7 @@ def main():
             structure_density=args.structure_density,
             celestial_glow=args.celestial_glow,
             show_seal=not args.no_seal,
+            terrain=args.terrain,
         )
 
         img = generator.generate()

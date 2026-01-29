@@ -8,10 +8,14 @@ import sys
 from pathlib import Path
 
 # Base command
-GENERATOR = "python tools/ink_wash_generator.py"
+SCRIPT_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SCRIPT_DIR.parent
+
+GENERATOR_PATH = SCRIPT_DIR / "ink_wash_generator.py"
+GENERATOR = f"python \"{GENERATOR_PATH}\""
 
 # Output directories
-ASSETS_DIR = Path("assets/generated")
+ASSETS_DIR = PROJECT_ROOT / "assets" / "generated"
 BG_DIR = ASSETS_DIR / "backgrounds"
 BUILDINGS_DIR = ASSETS_DIR / "buildings"
 REGIONS_DIR = ASSETS_DIR / "regions"
@@ -29,73 +33,73 @@ LOADING_DIR = ASSETS_DIR / "loading"
 IMAGES = [
     # ========== 1. SCREEN BACKGROUNDS (11) ==========
     {"name": "bg_main_menu", "dir": BG_DIR, "w": 1280, "h": 720, "seed": 1042,
-     "args": "--time-of-day dawn --structure-density 0.5"},
+     "args": "--terrain world_map --time-of-day dawn --structure-density 1.2"},
     {"name": "bg_sect_base", "dir": BG_DIR, "w": 1280, "h": 720, "seed": 1105,
-     "args": "--time-of-day day --structure-density 1.5"},
+     "args": "--terrain river_valley --time-of-day day --structure-density 1.5"},
     {"name": "bg_roster", "dir": BG_DIR, "w": 1280, "h": 720, "seed": 1210,
-     "args": "--time-of-day dawn --element wood"},
+     "args": "--terrain plains --time-of-day dawn --element wood"},
     {"name": "bg_world_map", "dir": BG_DIR, "w": 1280, "h": 720, "seed": 1320,
-     "args": "--structure-density 0.3"},
+     "args": "--terrain world_map --structure-density 1.2"},
     {"name": "bg_mission_assign", "dir": BG_DIR, "w": 1280, "h": 720, "seed": 1425,
-     "args": "--time-of-day dusk"},
+     "args": "--terrain cliffs --time-of-day dusk"},
     {"name": "bg_mission_result", "dir": BG_DIR, "w": 1280, "h": 720, "seed": 1530,
-     "args": "--time-of-day dawn"},
+     "args": "--terrain river_valley --time-of-day dawn"},
     {"name": "bg_library", "dir": BG_DIR, "w": 1280, "h": 720, "seed": 1650,
-     "args": "--element wood --structure-density 1.2"},
+     "args": "--terrain plains --element wood --structure-density 1.2"},
     {"name": "bg_factions", "dir": BG_DIR, "w": 1280, "h": 720, "seed": 1755,
-     "args": "--structure-density 1.8"},
+     "args": "--terrain mountains --structure-density 1.8"},
     {"name": "bg_trade", "dir": BG_DIR, "w": 1280, "h": 720, "seed": 1860,
-     "args": "--element water --time-of-day day"},
+     "args": "--terrain river_valley --element water --time-of-day day"},
     {"name": "bg_tribulation", "dir": BG_DIR, "w": 1280, "h": 720, "seed": 1970,
-     "args": "--weather storm --time-of-day night --celestial-glow 0.5"},
+     "args": "--terrain cliffs --weather storm --time-of-day night --celestial-glow 0.5"},
     {"name": "bg_sect_creation", "dir": BG_DIR, "w": 1280, "h": 720, "seed": 2050,
-     "args": "--time-of-day dawn --structure-density 0.2"},
+     "args": "--terrain lakeside --time-of-day dawn --structure-density 0.2"},
 
     # ========== 2. BUILDING ILLUSTRATIONS (13) ==========
     {"name": "bld_sect_hall", "dir": BUILDINGS_DIR, "w": 512, "h": 384, "seed": 2100,
-     "args": "--structure-density 2.0 --no-seal"},
+     "args": "--terrain mountains --structure-density 2.0 --no-seal"},
     {"name": "bld_dormitory", "dir": BUILDINGS_DIR, "w": 512, "h": 384, "seed": 2110,
-     "args": "--structure-density 1.5 --no-seal"},
+     "args": "--terrain plains --structure-density 1.5 --no-seal"},
     {"name": "bld_training_yard", "dir": BUILDINGS_DIR, "w": 512, "h": 384, "seed": 2120,
-     "args": "--element metal --no-seal"},
+     "args": "--terrain plains --element metal --no-seal"},
     {"name": "bld_spirit_garden", "dir": BUILDINGS_DIR, "w": 512, "h": 384, "seed": 2130,
-     "args": "--element wood --celestial-glow 0.2 --no-seal"},
+     "args": "--terrain lakeside --element wood --celestial-glow 0.2 --no-seal"},
     {"name": "bld_mission_board", "dir": BUILDINGS_DIR, "w": 512, "h": 384, "seed": 2140,
-     "args": "--structure-density 1.0 --no-seal"},
+     "args": "--terrain river_valley --structure-density 1.0 --no-seal"},
     {"name": "bld_library", "dir": BUILDINGS_DIR, "w": 512, "h": 384, "seed": 2150,
-     "args": "--element wood --structure-density 1.5 --no-seal"},
+     "args": "--terrain mountains --element wood --structure-density 1.5 --no-seal"},
     {"name": "bld_alchemy", "dir": BUILDINGS_DIR, "w": 512, "h": 384, "seed": 2160,
-     "args": "--element fire --time-of-day dusk --no-seal"},
+     "args": "--terrain cliffs --element fire --time-of-day dusk --no-seal"},
     {"name": "bld_forge", "dir": BUILDINGS_DIR, "w": 512, "h": 384, "seed": 2170,
-     "args": "--element fire --element metal --no-seal"},
+     "args": "--terrain cliffs --element fire --element metal --no-seal"},
     {"name": "bld_drying", "dir": BUILDINGS_DIR, "w": 512, "h": 384, "seed": 2180,
-     "args": "--element wood --time-of-day day --no-seal"},
+     "args": "--terrain plains --element wood --time-of-day day --no-seal"},
     {"name": "bld_storage", "dir": BUILDINGS_DIR, "w": 512, "h": 384, "seed": 2190,
-     "args": "--element earth --no-seal"},
+     "args": "--terrain mountains --element earth --no-seal"},
     {"name": "bld_herb_garden", "dir": BUILDINGS_DIR, "w": 512, "h": 384, "seed": 2200,
-     "args": "--element wood --no-seal"},
+     "args": "--terrain river_valley --element wood --no-seal"},
     {"name": "bld_greenhouse", "dir": BUILDINGS_DIR, "w": 512, "h": 384, "seed": 2210,
-     "args": "--element water --celestial-glow 0.15 --no-seal"},
+     "args": "--terrain lakeside --element water --celestial-glow 0.15 --no-seal"},
     {"name": "bld_mine", "dir": BUILDINGS_DIR, "w": 512, "h": 384, "seed": 2220,
-     "args": "--element earth --time-of-day dusk --no-seal"},
+     "args": "--terrain cliffs --element earth --time-of-day dusk --no-seal"},
 
     # ========== 3. WORLD MAP REGIONS (8) ==========
     {"name": "region_central", "dir": REGIONS_DIR, "w": 512, "h": 384, "seed": 3000,
-     "args": "--time-of-day day --no-seal"},
+     "args": "--terrain plains --time-of-day day --no-seal"},
     {"name": "region_northern", "dir": REGIONS_DIR, "w": 512, "h": 384, "seed": 3010,
-     "args": "--element metal --weather snow --no-seal"},
+     "args": "--terrain mountains --element metal --weather snow --no-seal"},
     {"name": "region_southern", "dir": REGIONS_DIR, "w": 512, "h": 384, "seed": 3020,
-     "args": "--element wood --no-seal"},
+     "args": "--terrain river_valley --element wood --no-seal"},
     {"name": "region_eastern", "dir": REGIONS_DIR, "w": 512, "h": 384, "seed": 3030,
-     "args": "--element water --no-seal"},
+     "args": "--terrain lakeside --element water --no-seal"},
     {"name": "region_western", "dir": REGIONS_DIR, "w": 512, "h": 384, "seed": 3040,
-     "args": "--element earth --structure-density 0.3 --no-seal"},
+     "args": "--terrain cliffs --element earth --structure-density 0.3 --no-seal"},
     {"name": "region_spirit_vein", "dir": REGIONS_DIR, "w": 512, "h": 384, "seed": 3050,
-     "args": "--celestial-glow 0.6 --no-seal"},
+     "args": "--terrain cascades --celestial-glow 0.6 --no-seal"},
     {"name": "region_demon_lands", "dir": REGIONS_DIR, "w": 512, "h": 384, "seed": 3060,
-     "args": "--time-of-day night --weather storm --no-seal"},
+     "args": "--terrain cliffs --time-of-day night --weather storm --no-seal"},
     {"name": "region_celestial", "dir": REGIONS_DIR, "w": 512, "h": 384, "seed": 3070,
-     "args": "--celestial-glow 0.8 --time-of-day dawn --no-seal"},
+     "args": "--terrain cascades --celestial-glow 0.8 --time-of-day dawn --no-seal"},
 
     # ========== 4. MISSION SCENES (5) ==========
     {"name": "mission_exploration", "dir": MISSIONS_DIR, "w": 512, "h": 384, "seed": 4000,
