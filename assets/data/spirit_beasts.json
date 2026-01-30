@@ -1,0 +1,20 @@
+[
+  {
+    "id": "beast_azure_fox",
+    "name": "Azure Fox",
+    "species": "Fox",
+    "element": "Water",
+    "base_stats": { "health": 40, "attack": 8, "defense": 6, "speed": 12, "qi": 10 },
+    "growth_rate": 1.0,
+    "traits": ["agile", "keen_sense"]
+  },
+  {
+    "id": "beast_mountain_boar",
+    "name": "Mountain Boar",
+    "species": "Boar",
+    "element": "Earth",
+    "base_stats": { "health": 70, "attack": 10, "defense": 12, "speed": 6, "qi": 6 },
+    "growth_rate": 0.9,
+    "traits": ["stubborn", "thick_hide"]
+  }
+]

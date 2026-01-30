@@ -3,7 +3,8 @@ use crate::ui::theme::*;
 
 /// Draws a styled panel with a border and optional title.
 pub fn draw_panel(rect: Rect, title: Option<&str>) {
-    // Fully transparent panel - just border, no background fill
+    // Semi-transparent panel background for visibility
+    draw_rectangle(rect.x, rect.y, rect.w, rect.h, PANEL_BG);
     draw_rectangle_lines(rect.x, rect.y, rect.w, rect.h, 2.0, PANEL_BORDER);
 
     if let Some(t) = title {
@@ -14,7 +15,7 @@ pub fn draw_panel(rect: Rect, title: Option<&str>) {
 }
 
 /// Draw a brush stroke effect - simulates ink brush painting
-fn draw_brush_stroke(x: f32, y: f32, width: f32, height: f32, color: Color, intensity: f32) {
+pub fn draw_brush_stroke(x: f32, y: f32, width: f32, height: f32, color: Color, intensity: f32) {
     // Use deterministic "randomness" based on position for consistent look
     let seed = (x * 100.0 + y * 50.0) as i32;
 

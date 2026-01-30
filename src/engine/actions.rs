@@ -13,6 +13,7 @@ pub enum Action {
     UseItem(String, usize), // Item ID, Disciple Index
     EquipItem(String, usize), // Item ID, Disciple Index
     UnequipItem(crate::data::items::EquipmentSlot, usize), // Slot, Disciple Index
+    RepairItem(String, usize), // Item ID, Disciple Index — repairs equipped item durability
     ResearchTech(String), // Tech ID
     RepairBuilding(u64), // Building ID
     ConstructBuilding(BuildingType, i32, i32), // Type, X, Y
@@ -29,4 +30,7 @@ pub enum Action {
     RespondToEvent { event_id: String, choice_idx: usize },
     // Breakthrough action (player-controlled)
     AttemptBreakthrough(usize), // Disciple Index
+    // Spirit beast actions
+    RecruitSpiritBeast(String), // Definition ID
+    EquipBeastItem(u64, String), // Beast ID, Item ID
 }

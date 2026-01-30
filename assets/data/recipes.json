@@ -9,7 +9,10 @@
             ["ember_root", 1]
         ],
         "craft_time": 0,
-        "required_building": "AlchemyFurnace"
+        "required_building": "AlchemyFurnace",
+        "recipe_type": "Alchemy",
+        "difficulty": 20,
+        "element_affinity": "Fire"
     },
     {
         "id": "recipe_qi_gathering_pill",
@@ -21,7 +24,10 @@
             ["moonwell_lotus", 1]
         ],
         "craft_time": 0,
-        "required_building": "AlchemyFurnace"
+        "required_building": "AlchemyFurnace",
+        "recipe_type": "Alchemy",
+        "difficulty": 35,
+        "element_affinity": "Wood"
     },
     {
         "id": "recipe_body_tempering_pill",
@@ -33,7 +39,10 @@
             ["ember_root", 2]
         ],
         "craft_time": 0,
-        "required_building": "AlchemyFurnace"
+        "required_building": "AlchemyFurnace",
+        "recipe_type": "Alchemy",
+        "difficulty": 40,
+        "element_affinity": "Fire"
     },
     {
         "id": "recipe_foundation_pill",
@@ -46,7 +55,10 @@
             ["moonwell_lotus", 2]
         ],
         "craft_time": 0,
-        "required_building": "AlchemyFurnace"
+        "required_building": "AlchemyFurnace",
+        "recipe_type": "Alchemy",
+        "difficulty": 60,
+        "element_affinity": "Earth"
     },
     {
         "id": "recipe_iron_sword",
@@ -58,6 +70,206 @@
             ["spirit_stones", 10]
         ],
         "craft_time": 0,
-        "required_building": "Blacksmith"
+        "required_building": "Blacksmith",
+        "recipe_type": "Blacksmith",
+        "difficulty": 25,
+        "element_affinity": "Metal"
+    },
+    {
+        "id": "recipe_spirit_steel_sword",
+        "name": "Forge Spirit Steel Sword",
+        "output_item_id": "spirit_steel_sword",
+        "output_amount": 1,
+        "ingredients": [
+            ["spirit_iron_ore", 3],
+            ["spirit_stones", 20]
+        ],
+        "craft_time": 0,
+        "required_building": "Blacksmith",
+        "recipe_type": "Blacksmith",
+        "difficulty": 55,
+        "element_affinity": "Metal"
+    },
+    {
+        "id": "recipe_iron_chest_plate",
+        "name": "Forge Iron Chest Plate",
+        "output_item_id": "iron_chest_plate",
+        "output_amount": 1,
+        "ingredients": [
+            ["iron_ore", 8],
+            ["leather_scraps", 3]
+        ],
+        "craft_time": 0,
+        "required_building": "Blacksmith",
+        "recipe_type": "Blacksmith",
+        "difficulty": 45,
+        "element_affinity": "Metal"
+    },
+    {
+        "id": "recipe_leather_bracers",
+        "name": "Craft Leather Bracers",
+        "output_item_id": "leather_bracers",
+        "output_amount": 1,
+        "ingredients": [
+            ["leather_scraps", 5]
+        ],
+        "craft_time": 0,
+        "required_building": "Blacksmith",
+        "recipe_type": "Blacksmith",
+        "difficulty": 20,
+        "element_affinity": null
+    },
+    {
+        "id": "recipe_iron_helm",
+        "name": "Forge Iron Helm",
+        "output_item_id": "iron_helm",
+        "output_amount": 1,
+        "ingredients": [
+            ["iron_ore", 4],
+            ["leather_scraps", 1]
+        ],
+        "craft_time": 0,
+        "required_building": "Blacksmith",
+        "recipe_type": "Blacksmith",
+        "difficulty": 30,
+        "element_affinity": "Metal"
+    },
+    {
+        "id": "recipe_iron_greaves",
+        "name": "Forge Iron Greaves",
+        "output_item_id": "iron_greaves",
+        "output_amount": 1,
+        "ingredients": [
+            ["iron_ore", 6],
+            ["leather_scraps", 2]
+        ],
+        "craft_time": 0,
+        "required_building": "Blacksmith",
+        "recipe_type": "Blacksmith",
+        "difficulty": 35,
+        "element_affinity": "Metal"
+    },
+    {
+        "id": "recipe_minor_healing_potion",
+        "name": "Brew Minor Healing Potion",
+        "output_item_id": "minor_healing_potion",
+        "output_amount": 1,
+        "ingredients": [
+            ["spirit_grass", 2],
+            ["moonwell_lotus", 1]
+        ],
+        "craft_time": 0,
+        "required_building": "AlchemyFurnace",
+        "recipe_type": "Alchemy",
+        "difficulty": 30,
+        "element_affinity": "Water"
+    },
+    {
+        "id": "recipe_qi_surge_potion",
+        "name": "Brew Qi Surge Potion",
+        "output_item_id": "qi_surge_potion",
+        "output_amount": 1,
+        "ingredients": [
+            ["spirit_grass", 4],
+            ["yellow_earth_ginseng", 1]
+        ],
+        "craft_time": 0,
+        "required_building": "AlchemyFurnace",
+        "recipe_type": "Alchemy",
+        "difficulty": 45,
+        "element_affinity": "Wood"
+    },
+    {
+        "id": "recipe_body_fortification_potion",
+        "name": "Brew Body Fortification Potion",
+        "output_item_id": "body_fortification_potion",
+        "output_amount": 1,
+        "ingredients": [
+            ["iron_bark_fungus", 2],
+            ["ember_root", 3]
+        ],
+        "craft_time": 0,
+        "required_building": "AlchemyFurnace",
+        "recipe_type": "Alchemy",
+        "difficulty": 50,
+        "element_affinity": "Earth"
+    },
+    {
+        "id": "recipe_mind_clarity_elixir",
+        "name": "Brew Mind Clarity Elixir",
+        "output_item_id": "mind_clarity_elixir",
+        "output_amount": 1,
+        "ingredients": [
+            ["moonwell_lotus", 2],
+            ["dried_spirit_grass", 3]
+        ],
+        "craft_time": 0,
+        "required_building": "AlchemyFurnace",
+        "recipe_type": "Alchemy",
+        "difficulty": 50,
+        "element_affinity": "Water"
+    },
+    {
+        "id": "recipe_fire_strike_talisman",
+        "name": "Inscribe Fire Strike Talisman",
+        "output_item_id": "fire_strike_talisman",
+        "output_amount": 1,
+        "ingredients": [
+            ["talisman_paper", 1],
+            ["spirit_ink", 1],
+            ["ember_root", 1]
+        ],
+        "craft_time": 0,
+        "required_building": "TalismanScriptorium",
+        "recipe_type": "Talisman",
+        "difficulty": 35,
+        "element_affinity": "Fire"
+    },
+    {
+        "id": "recipe_earth_shield_talisman",
+        "name": "Inscribe Earth Shield Talisman",
+        "output_item_id": "earth_shield_talisman",
+        "output_amount": 1,
+        "ingredients": [
+            ["talisman_paper", 1],
+            ["spirit_ink", 1],
+            ["yellow_earth_ginseng", 1]
+        ],
+        "craft_time": 0,
+        "required_building": "TalismanScriptorium",
+        "recipe_type": "Talisman",
+        "difficulty": 40,
+        "element_affinity": "Earth"
+    },
+    {
+        "id": "recipe_wind_step_scroll",
+        "name": "Inscribe Wind Step Scroll",
+        "output_item_id": "wind_step_scroll",
+        "output_amount": 1,
+        "ingredients": [
+            ["talisman_paper", 2],
+            ["spirit_ink", 2]
+        ],
+        "craft_time": 0,
+        "required_building": "TalismanScriptorium",
+        "recipe_type": "Talisman",
+        "difficulty": 30,
+        "element_affinity": null
+    },
+    {
+        "id": "recipe_qi_gathering_scroll",
+        "name": "Inscribe Qi Gathering Scroll",
+        "output_item_id": "qi_gathering_scroll",
+        "output_amount": 1,
+        "ingredients": [
+            ["talisman_paper", 1],
+            ["spirit_ink", 1],
+            ["spirit_grass", 3]
+        ],
+        "craft_time": 0,
+        "required_building": "TalismanScriptorium",
+        "recipe_type": "Talisman",
+        "difficulty": 25,
+        "element_affinity": "Wood"
     }
 ]

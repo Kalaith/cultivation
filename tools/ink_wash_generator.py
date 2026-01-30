@@ -22,6 +22,7 @@ from PIL import Image, ImageDraw, ImageFilter
 import random
 import math
 import argparse
+import json
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
@@ -43,6 +44,45 @@ def fade(t: float) -> float:
 
 def clamp(value: float, min_value: float, max_value: float) -> float:
     return max(min_value, min(max_value, value))
+
+
+DEFAULTS = {
+    "element": "default",
+    "time_of_day": "none",
+    "weather": "none",
+    "structure_density": 1.0,
+    "landmark_density": 1.0,
+    "wash_contrast": 1.0,
+    "mist_intensity": 1.0,
+    "stroke_density": 1.0,
+    "tree_density": 1.0,
+    "parchment_age": 1.0,
+    "vignette_strength": 1.0,
+    "celestial_glow": 0.0,
+}
+
+
+def load_presets(preset_file: Path) -> Dict[str, Dict[str, float]]:
+    if not preset_file.exists():
+        return {}
+    with preset_file.open("r", encoding="utf-8") as handle:
+        data = json.load(handle)
+    if not isinstance(data, dict):
+        return {}
+    return data
+
+
+def apply_preset(args: argparse.Namespace, preset: Dict[str, float]) -> None:
+    """Apply preset values where args are still at default settings."""
+    for key, value in preset.items():
+        if not hasattr(args, key):
+            continue
+        current = getattr(args, key)
+        default = DEFAULTS.get(key, None)
+        if default is None:
+            continue
+        if current == default:
+            setattr(args, key, value)
 
 
 class PerlinNoise:
@@ -161,6 +201,13 @@ class InkWashGenerator:
         time_of_day: str = "none",
         weather: str = "none",
         structure_density: float = 1.0,
+        landmark_density: float = 1.0,
+        wash_contrast: float = 1.0,
+        mist_intensity: float = 1.0,
+        stroke_density: float = 1.0,
+        tree_density: float = 1.0,
+        parchment_age: float = 1.0,
+        vignette_strength: float = 1.0,
         celestial_glow: float = 0.0,
         show_seal: bool = True,
         terrain: str = "mountains",
@@ -172,6 +219,13 @@ class InkWashGenerator:
         self.time_of_day = (time_of_day or "none").lower()
         self.weather = (weather or "none").lower()
         self.structure_density = clamp(structure_density, 0.0, 2.0)
+        self.landmark_density = clamp(landmark_density, 0.0, 2.5)
+        self.wash_contrast = clamp(wash_contrast, 0.3, 2.0)
+        self.mist_intensity = clamp(mist_intensity, 0.0, 2.0)
+        self.stroke_density = clamp(stroke_density, 0.0, 2.5)
+        self.tree_density = clamp(tree_density, 0.0, 2.5)
+        self.parchment_age = clamp(parchment_age, 0.3, 2.0)
+        self.vignette_strength = clamp(vignette_strength, 0.3, 2.0)
         self.celestial_glow = clamp(celestial_glow, 0.0, 1.0)
         self.show_seal = show_seal
         self.terrain = (terrain or "mountains").lower()
@@ -414,12 +468,13 @@ class InkWashGenerator:
         """Create aged paper/scroll background texture."""
         img = Image.new('RGB', (self.width, self.height), self.paper_color)
         pixels = np.array(img, dtype=np.float32)
+        age_factor = self.parchment_age
 
         # Add subtle paper grain
         grain_noise = PerlinNoise(self.seed + 1000)
         for y in range(self.height):
             for x in range(self.width):
-                grain = grain_noise.noise(x * 0.05, y * 0.05) * 8
+                grain = grain_noise.noise(x * 0.05, y * 0.05) * 8 * (0.6 + 0.4 * age_factor)
                 pixels[y, x] += grain
 
         # Add age spots and stains
@@ -428,7 +483,7 @@ class InkWashGenerator:
             for x in range(self.width):
                 stain = stain_noise.octave_noise(x * 0.003, y * 0.003, octaves=3)
                 if stain > 0.3:
-                    darkness = (stain - 0.3) * 30
+                    darkness = (stain - 0.3) * 30 * age_factor
                     pixels[y, x] -= darkness
 
         # Darken edges (vignette)
@@ -437,7 +492,7 @@ class InkWashGenerator:
         for y in range(self.height):
             for x in range(self.width):
                 dist = math.sqrt((x - center_x)**2 + (y - center_y)**2)
-                vignette = (dist / max_dist) ** 2 * 25
+                vignette = (dist / max_dist) ** 2 * 25 * self.vignette_strength
                 pixels[y, x] -= vignette
 
         pixels = np.clip(pixels, 0, 255).astype(np.uint8)
@@ -462,7 +517,8 @@ class InkWashGenerator:
             pixels = np.array(layer)
 
             threshold = config["threshold"]
-            base_alpha = config["base_alpha"]
+            base_alpha = int(config["base_alpha"] * self.wash_contrast)
+            base_alpha = int(clamp(base_alpha, 10, 255))
             lightness = config["lightness"]
 
             for y in range(self.height):
@@ -503,6 +559,8 @@ class InkWashGenerator:
     def render_contour_strokes(self, height_map: np.ndarray) -> Image.Image:
         """Render ink contour strokes - the 'cun' texturing strokes of Chinese painting."""
         img = Image.new('RGBA', (self.width, self.height), (0, 0, 0, 0))
+        if self.stroke_density <= 0.0:
+            return img
         draw = ImageDraw.Draw(img)
 
         # Compute gradients
@@ -515,13 +573,14 @@ class InkWashGenerator:
         gradient_mag = np.sqrt(gradient_x**2 + gradient_y**2)
 
         # Draw strokes where gradient is strong (edges/ridges)
-        stroke_threshold = 0.015
+        stroke_threshold = 0.015 / max(0.2, self.stroke_density)
+        skip_chance = clamp(0.6 / max(0.2, self.stroke_density), 0.1, 0.9)
 
         for y in range(2, self.height - 2, 2):
             for x in range(2, self.width - 2, 2):
                 if gradient_mag[y, x] > stroke_threshold and height_map[y, x] > 0.15:
                     # Skip randomly for organic feel
-                    if random.random() > 0.4:
+                    if random.random() < skip_chance:
                         continue
 
                     # Stroke length varies with gradient
@@ -659,10 +718,13 @@ class InkWashGenerator:
     def render_trees(self, height_map: np.ndarray) -> Image.Image:
         """Render sparse tree silhouettes."""
         img = Image.new('RGBA', (self.width, self.height), (0, 0, 0, 0))
+        if self.tree_density <= 0.0:
+            return img
         draw = ImageDraw.Draw(img)
 
         # Place trees on ridge lines and slopes
-        num_trees = random.randint(8, 20)
+        num_trees = int(random.randint(8, 20) * self.tree_density)
+        num_trees = max(1, num_trees)
 
         for _ in range(num_trees):
             # Find suitable location
@@ -748,6 +810,127 @@ class InkWashGenerator:
 
         return img
 
+    def render_birds_layer(self) -> Image.Image:
+        """Render distant flying birds onto a transparent layer."""
+        layer = Image.new('RGBA', (self.width, self.height), (0, 0, 0, 0))
+        return self.draw_flying_birds(layer)
+
+    def _jitter_point(self, x: int, y: int, amount: int) -> Tuple[int, int]:
+        return (x + random.randint(-amount, amount), y + random.randint(-amount, amount))
+
+    def draw_mountain_stamp(self, draw: ImageDraw.Draw, x: int, y: int, scale: float):
+        """Draw a symbolic mountain stamp."""
+        base_w = int(90 * scale)
+        height = int(70 * scale)
+        alpha = int(140 + 60 * scale)
+        ink = (*self.ink_color, min(220, alpha))
+
+        peak = self._jitter_point(x, y - height, 3)
+        left = self._jitter_point(x - base_w // 2, y, 4)
+        right = self._jitter_point(x + base_w // 2, y, 4)
+
+        draw.polygon([left, peak, right], fill=(*self.ink_color, 70))
+        draw.line([left, peak, right], fill=ink, width=2)
+
+        # Secondary ridge
+        ridge_left = self._jitter_point(x - base_w // 4, y - height // 3, 3)
+        ridge_right = self._jitter_point(x + base_w // 5, y - height // 4, 3)
+        draw.line([ridge_left, ridge_right], fill=ink, width=1)
+
+    def draw_forest_stamp(self, draw: ImageDraw.Draw, x: int, y: int, scale: float):
+        """Draw a clustered forest stamp."""
+        count = random.randint(3, 6)
+        for i in range(count):
+            ox = random.randint(-18, 18)
+            oy = random.randint(-8, 8)
+            height = int(random.randint(18, 32) * scale)
+            alpha = int(120 + random.randint(20, 80))
+            self.draw_pine_tree(draw, x + ox, y + oy, height, alpha)
+
+    def draw_cave_stamp(self, draw: ImageDraw.Draw, x: int, y: int, scale: float):
+        """Draw a cave/entrance stamp."""
+        w = int(32 * scale)
+        h = int(20 * scale)
+        fill = (*self.ink_color, 200)
+        outline = (*self.ink_color, 230)
+        draw.ellipse([(x - w // 2, y - h // 2), (x + w // 2, y + h // 2)], fill=fill)
+        draw.arc([(x - w // 2, y - h // 2), (x + w // 2, y + h // 2)], 0, 180, fill=outline, width=2)
+
+    def draw_ruin_stamp(self, draw: ImageDraw.Draw, x: int, y: int, scale: float):
+        """Draw a small ruined pagoda stamp."""
+        height = int(36 * scale)
+        alpha = int(120 + 60 * scale)
+        self.draw_distant_pagoda(draw, x, y, height, alpha)
+        # Broken line hint
+        draw.line([(x - 10, y - 5), (x + 6, y - 2)], fill=(*self.ink_color, 160), width=1)
+
+    def draw_waterfall_stamp(self, draw: ImageDraw.Draw, x: int, y: int, scale: float):
+        """Draw a waterfall stamp."""
+        streaks = random.randint(2, 4)
+        for _ in range(streaks):
+            ox = random.randint(-6, 6)
+            length = int(24 * scale + random.randint(0, 12))
+            water = (180, 195, 210, 140)
+            draw.line([(x + ox, y), (x + ox, y + length)], fill=water, width=2)
+
+    def render_landmarks(self, height_map: np.ndarray) -> Image.Image:
+        """Render symbolic landmark stamps."""
+        img = Image.new('RGBA', (self.width, self.height), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(img)
+
+        gradient_x = np.zeros_like(height_map)
+        gradient_y = np.zeros_like(height_map)
+        gradient_x[:, 1:] = height_map[:, 1:] - height_map[:, :-1]
+        gradient_y[1:, :] = height_map[1:, :] - height_map[:-1, :]
+        gradient_mag = np.sqrt(gradient_x**2 + gradient_y**2)
+
+        placed: List[Tuple[int, int, int]] = []
+
+        def is_far(px: int, py: int, min_dist: int) -> bool:
+            for ox, oy, dist in placed:
+                if (px - ox) ** 2 + (py - oy) ** 2 < dist ** 2:
+                    return False
+            return True
+
+        base_dist = int(min(self.width, self.height) * 0.12)
+
+        def place(kind: str, count: int, attempts: int = 80):
+            for _ in range(count):
+                for _ in range(attempts):
+                    x = random.randint(80, self.width - 80)
+                    y = random.randint(int(self.height * 0.18), int(self.height * 0.82))
+                    h = height_map[y, x]
+                    if not is_far(x, y, base_dist):
+                        continue
+
+                    if kind == "mountain" and h > 0.55:
+                        self.draw_mountain_stamp(draw, x, y, random.uniform(0.8, 1.2))
+                    elif kind == "forest" and 0.3 < h < 0.7:
+                        self.draw_forest_stamp(draw, x, y, random.uniform(0.8, 1.1))
+                    elif kind == "cave" and h > 0.5 and gradient_mag[y, x] > 0.03:
+                        self.draw_cave_stamp(draw, x, y, random.uniform(0.8, 1.1))
+                    elif kind == "ruin" and 0.25 < h < 0.6:
+                        self.draw_ruin_stamp(draw, x, y, random.uniform(0.8, 1.1))
+                    elif kind == "waterfall":
+                        if y + 6 < self.height and (height_map[y, x] - height_map[y + 6, x]) > 0.08:
+                            self.draw_waterfall_stamp(draw, x, y, random.uniform(0.8, 1.1))
+                        else:
+                            continue
+                    else:
+                        continue
+
+                    placed.append((x, y, base_dist))
+                    break
+
+        density = max(0.2, self.landmark_density)
+        place("mountain", int(2 * density) + 1)
+        place("forest", int(3 * density) + 1)
+        place("ruin", int(1 * density))
+        place("cave", int(1 * density))
+        place("waterfall", int(1 * density))
+
+        return img
+
     def draw_distant_pagoda(self, draw: ImageDraw.Draw, x: int, y: int,
                             height: int, ink_alpha: int):
         """Draw a simple distant pagoda/pavilion silhouette."""
@@ -813,6 +996,112 @@ class InkWashGenerator:
                         break
 
         return img
+
+    def build_base_layers(self, height_map: np.ndarray) -> Dict[str, Image.Image]:
+        """Build static base layers for the scene."""
+        paper = self.create_paper_texture()
+        ink_wash = self.render_ink_wash(height_map)
+        contours = self.render_contour_strokes(height_map)
+        landmarks = self.render_landmarks(height_map)
+        trees = self.render_trees(height_map)
+        structures = self.render_structures(height_map)
+        return {
+            "paper": paper,
+            "ink_wash": ink_wash,
+            "contours": contours,
+            "landmarks": landmarks,
+            "structures": structures,
+            "trees": trees,
+        }
+
+    def build_water_layers(self, height_map: np.ndarray) -> Dict[str, Image.Image]:
+        """Build water-related layers based on terrain type."""
+        layers: Dict[str, Image.Image] = {}
+        if self.terrain == "river_valley":
+            layers["river"] = self.render_river(height_map)
+        elif self.terrain == "lakeside":
+            layers["lake"] = self.render_lake(height_map)
+            layers["waterfalls"] = self.render_waterfall(height_map)
+        elif self.terrain == "world_map":
+            self._river_center_func = self._river_center_func_1
+            layers["river_1"] = self.render_river(height_map)
+            self._river_center_func = self._river_center_func_2
+            layers["river_2"] = self.render_river(height_map)
+            layers["lake"] = self.render_lake(height_map)
+            layers["waterfalls"] = self.render_waterfall(height_map)
+        return layers
+
+    def build_fx_layers(self, height_map: np.ndarray) -> Dict[str, Image.Image]:
+        """Build effect layers like mist and birds."""
+        return {
+            "mist": self.add_mist(Image.new('RGBA', (self.width, self.height), (0, 0, 0, 0)), height_map),
+            "birds": self.render_birds_layer(),
+        }
+
+    def compose_layers(
+        self,
+        base_layers: Dict[str, Image.Image],
+        water_layers: Dict[str, Image.Image],
+        fx_layers: Dict[str, Image.Image],
+    ) -> Image.Image:
+        """Composite the base, water, and FX layers into a single image."""
+        result = base_layers["paper"].convert('RGBA')
+        result = Image.alpha_composite(result, base_layers["ink_wash"])
+        result = Image.alpha_composite(result, base_layers["contours"])
+        result = Image.alpha_composite(result, base_layers["landmarks"])
+        result = Image.alpha_composite(result, base_layers["structures"])
+        result = Image.alpha_composite(result, base_layers["trees"])
+
+        for layer in water_layers.values():
+            result = Image.alpha_composite(result, layer)
+
+        result = Image.alpha_composite(result, fx_layers["mist"])
+        result = Image.alpha_composite(result, fx_layers["birds"])
+
+        return result
+
+    def generate_with_layers(self) -> Tuple[Image.Image, Dict[str, Image.Image]]:
+        """Generate the image and return the full set of layers."""
+        print(f"Generating with seed: {self.seed}")
+
+        print("  Creating paper texture...")
+        print("  Generating height map...")
+        height_map = self.generate_height_map()
+        base_layers = self.build_base_layers(height_map)
+        water_layers = self.build_water_layers(height_map)
+        fx_layers = self.build_fx_layers(height_map)
+
+        print("  Compositing layers...")
+        result = self.compose_layers(base_layers, water_layers, fx_layers)
+
+        print("  Applying color wash...")
+        result = self.add_color_wash(result)
+
+        if self.time_of_day != "none":
+            print("  Applying time-of-day grading...")
+            result = self.apply_time_of_day(result)
+
+        if self.celestial_glow > 0.0:
+            print("  Applying celestial glow...")
+            result = self.apply_celestial_glow(result, height_map)
+
+        if self.weather != "none":
+            print("  Applying weather effects...")
+            result = self.apply_weather(result)
+
+        if self.show_seal:
+            result = self.draw_calligraphy_mark(result)
+
+        result = result.convert('RGB')
+        result = result.filter(ImageFilter.GaussianBlur(0.5))
+
+        layers: Dict[str, Image.Image] = {}
+        layers.update(base_layers)
+        layers.update(water_layers)
+        layers.update(fx_layers)
+        layers["composite_raw"] = self.compose_layers(base_layers, water_layers, fx_layers)
+
+        return result, layers
 
     def add_color_wash(self, img: Image.Image) -> Image.Image:
         """Add subtle color tints in the style of colored ink wash."""
@@ -943,7 +1232,7 @@ class InkWashGenerator:
         for band in mist_bands:
             mist_h = band["height"]
             thickness = band["thickness"]
-            intensity = band["intensity"]
+            intensity = band["intensity"] * self.mist_intensity
 
             for y in range(self.height):
                 # Mist tends to settle in horizontal bands
@@ -1158,71 +1447,15 @@ class InkWashGenerator:
 
         # Generate base layers
         print("  Creating paper texture...")
-        paper = self.create_paper_texture()
-
         print("  Generating height map...")
         height_map = self.generate_height_map()
-
-        print("  Rendering ink wash layers...")
-        ink_wash = self.render_ink_wash(height_map)
-
-        print("  Drawing contour strokes...")
-        contours = self.render_contour_strokes(height_map)
-
-        print("  Placing trees...")
-        trees = self.render_trees(height_map)
-
-        print("  Adding structures...")
-        structures = self.render_structures(height_map)
+        base_layers = self.build_base_layers(height_map)
 
         # Composite layers
         print("  Compositing layers...")
-        result = paper.convert('RGBA')
-        result = Image.alpha_composite(result, ink_wash)
-        result = Image.alpha_composite(result, contours)
-        result = Image.alpha_composite(result, structures)
-        result = Image.alpha_composite(result, trees)
-
-        # Water features based on terrain type
-        if self.terrain == "river_valley":
-            print("  Rendering river...")
-            river = self.render_river(height_map)
-            result = Image.alpha_composite(result, river)
-        elif self.terrain == "lakeside":
-            print("  Rendering lake...")
-            lake = self.render_lake(height_map)
-            result = Image.alpha_composite(result, lake)
-            print("  Rendering waterfalls...")
-            waterfalls = self.render_waterfall(height_map)
-            result = Image.alpha_composite(result, waterfalls)
-        elif self.terrain == "world_map":
-            print("  Rendering world map features...")
-            # Render multiple rivers
-            self._river_center_func = self._river_center_func_1
-            river1 = self.render_river(height_map)
-            result = Image.alpha_composite(result, river1)
-            
-            self._river_center_func = self._river_center_func_2
-            river2 = self.render_river(height_map)
-            result = Image.alpha_composite(result, river2)
-            
-            # Render lakes in low areas
-            print("  Rendering lakes...")
-            lake = self.render_lake(height_map)
-            result = Image.alpha_composite(result, lake)
-            
-            # Render waterfalls on steep slopes
-            print("  Rendering waterfalls...")
-            waterfalls = self.render_waterfall(height_map)
-            result = Image.alpha_composite(result, waterfalls)
-
-        # Add atmospheric effects
-        print("  Adding mist...")
-        result = self.add_mist(result, height_map)
-
-        # Add flying birds
-        print("  Adding birds...")
-        result = self.draw_flying_birds(result)
+        water_layers = self.build_water_layers(height_map)
+        fx_layers = self.build_fx_layers(height_map)
+        result = self.compose_layers(base_layers, water_layers, fx_layers)
 
         # Add color wash
         print("  Applying color wash...")
@@ -1315,6 +1548,71 @@ def main():
         help="Structure density multiplier (0.0-2.0)"
     )
     parser.add_argument(
+        "--landmark-density",
+        type=float,
+        default=1.0,
+        help="Landmark stamp density (0.0-2.5)"
+    )
+    parser.add_argument(
+        "--wash-contrast",
+        type=float,
+        default=1.0,
+        help="Ink wash contrast/intensity (0.3-2.0)"
+    )
+    parser.add_argument(
+        "--mist-intensity",
+        type=float,
+        default=1.0,
+        help="Mist intensity multiplier (0.0-2.0)"
+    )
+    parser.add_argument(
+        "--stroke-density",
+        type=float,
+        default=1.0,
+        help="Contour stroke density (0.2-2.5)"
+    )
+    parser.add_argument(
+        "--tree-density",
+        type=float,
+        default=1.0,
+        help="Tree density multiplier (0.2-2.5)"
+    )
+    parser.add_argument(
+        "--parchment-age",
+        type=float,
+        default=1.0,
+        help="Parchment aging intensity (0.3-2.0)"
+    )
+    parser.add_argument(
+        "--vignette-strength",
+        type=float,
+        default=1.0,
+        help="Vignette strength (0.3-2.0)"
+    )
+    parser.add_argument(
+        "--preset",
+        type=str,
+        default=None,
+        help="Optional preset name for style overrides"
+    )
+    parser.add_argument(
+        "--preset-file",
+        type=str,
+        default="tools/ink_wash_presets.json",
+        help="Preset JSON file path"
+    )
+    parser.add_argument(
+        "--export-layers",
+        action="store_true",
+        help="Export named layers to a sidecar folder"
+    )
+    parser.add_argument(
+        "--export-dir",
+        type=str,
+        default=None,
+        help="Optional directory for exported layers"
+    )
+    parser.add_argument(
         "--celestial-glow",
         type=float,
         default=0.0,
@@ -1334,6 +1632,15 @@ def main():
 
     args = parser.parse_args()
 
+    preset_file = Path(args.preset_file)
+    presets = load_presets(preset_file)
+    if args.preset:
+        preset = presets.get(args.preset)
+        if preset is None:
+            available = ", ".join(sorted(presets.keys())) or "none"
+            raise SystemExit(f"Preset '{args.preset}' not found. Available: {available}")
+        apply_preset(args, preset)
+
     output_path = Path(args.output)
 
     for i in range(args.count):
@@ -1347,12 +1654,22 @@ def main():
             time_of_day=args.time_of_day,
             weather=args.weather,
             structure_density=args.structure_density,
+            landmark_density=args.landmark_density,
+            wash_contrast=args.wash_contrast,
+            mist_intensity=args.mist_intensity,
+            stroke_density=args.stroke_density,
+            tree_density=args.tree_density,
+            parchment_age=args.parchment_age,
+            vignette_strength=args.vignette_strength,
             celestial_glow=args.celestial_glow,
             show_seal=not args.no_seal,
             terrain=args.terrain,
         )
 
-        img = generator.generate()
+        if args.export_layers:
+            img, layers = generator.generate_with_layers()
+        else:
+            img = generator.generate()
 
         if args.count > 1:
             out_file = output_path.parent / f"{output_path.stem}_{i+1}{output_path.suffix}"
@@ -1361,6 +1678,24 @@ def main():
 
         img.save(out_file, quality=95)
         print(f"Saved: {out_file}")
+
+        if args.export_layers:
+            if args.export_dir:
+                base_dir = Path(args.export_dir)
+                if args.count > 1:
+                    layer_dir = base_dir / out_file.stem
+                else:
+                    layer_dir = base_dir
+            else:
+                layer_dir = out_file.parent / f"{out_file.stem}_layers"
+            layer_dir.mkdir(parents=True, exist_ok=True)
+
+            for layer_name, layer_img in layers.items():
+                layer_path = layer_dir / f"{layer_name}.png"
+                if layer_img.mode != "RGBA":
+                    layer_img = layer_img.convert("RGBA")
+                layer_img.save(layer_path)
+            print(f"  Exported layers: {layer_dir}")
 
 
 if __name__ == "__main__":

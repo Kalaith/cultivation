@@ -13,11 +13,13 @@ PROJECT_ROOT = SCRIPT_DIR.parent
 
 GENERATOR_PATH = SCRIPT_DIR / "ink_wash_generator.py"
 GENERATOR = f"python \"{GENERATOR_PATH}\""
+PRESET_FILE = SCRIPT_DIR / "ink_wash_presets.json"
 
 # Output directories
 ASSETS_DIR = PROJECT_ROOT / "assets" / "generated"
 BG_DIR = ASSETS_DIR / "backgrounds"
 BUILDINGS_DIR = ASSETS_DIR / "buildings"
+MAPS_DIR = ASSETS_DIR / "maps"
 REGIONS_DIR = ASSETS_DIR / "regions"
 MISSIONS_DIR = ASSETS_DIR / "missions"
 REALMS_DIR = ASSETS_DIR / "realms"
@@ -33,13 +35,13 @@ LOADING_DIR = ASSETS_DIR / "loading"
 IMAGES = [
     # ========== 1. SCREEN BACKGROUNDS (11) ==========
     {"name": "bg_main_menu", "dir": BG_DIR, "w": 1280, "h": 720, "seed": 1042,
-     "args": "--terrain world_map --time-of-day dawn --structure-density 1.2"},
+     "preset": "world_map_bold", "args": "--terrain world_map --time-of-day dawn --structure-density 1.2"},
     {"name": "bg_sect_base", "dir": BG_DIR, "w": 1280, "h": 720, "seed": 1105,
-     "args": "--terrain river_valley --time-of-day day --structure-density 1.5"},
+     "preset": "parchment_soft", "args": "--terrain river_valley --time-of-day day --structure-density 1.5"},
     {"name": "bg_roster", "dir": BG_DIR, "w": 1280, "h": 720, "seed": 1210,
      "args": "--terrain plains --time-of-day dawn --element wood"},
     {"name": "bg_world_map", "dir": BG_DIR, "w": 1280, "h": 720, "seed": 1320,
-     "args": "--terrain world_map --structure-density 1.2"},
+     "preset": "world_map_bold", "args": "--terrain world_map --structure-density 1.2"},
     {"name": "bg_mission_assign", "dir": BG_DIR, "w": 1280, "h": 720, "seed": 1425,
      "args": "--terrain cliffs --time-of-day dusk"},
     {"name": "bg_mission_result", "dir": BG_DIR, "w": 1280, "h": 720, "seed": 1530,
@@ -47,13 +49,17 @@ IMAGES = [
     {"name": "bg_library", "dir": BG_DIR, "w": 1280, "h": 720, "seed": 1650,
      "args": "--terrain plains --element wood --structure-density 1.2"},
     {"name": "bg_factions", "dir": BG_DIR, "w": 1280, "h": 720, "seed": 1755,
-     "args": "--terrain mountains --structure-density 1.8"},
+     "preset": "parchment_contrast", "args": "--terrain mountains --structure-density 1.8"},
     {"name": "bg_trade", "dir": BG_DIR, "w": 1280, "h": 720, "seed": 1860,
      "args": "--terrain river_valley --element water --time-of-day day"},
     {"name": "bg_tribulation", "dir": BG_DIR, "w": 1280, "h": 720, "seed": 1970,
      "args": "--terrain cliffs --weather storm --time-of-day night --celestial-glow 0.5"},
     {"name": "bg_sect_creation", "dir": BG_DIR, "w": 1280, "h": 720, "seed": 2050,
      "args": "--terrain lakeside --time-of-day dawn --structure-density 0.2"},
+
+    # ========== 1.5 SECT MAP BASE (1) ==========
+    {"name": "sect_map_base", "dir": MAPS_DIR, "w": 4096, "h": 4096, "seed": 2250,
+     "preset": "sect_map_large", "args": "--terrain river_valley --time-of-day day --no-seal"},
 
     # ========== 2. BUILDING ILLUSTRATIONS (13) ==========
     {"name": "bld_sect_hall", "dir": BUILDINGS_DIR, "w": 512, "h": 384, "seed": 2100,
@@ -250,7 +256,7 @@ IMAGES = [
 def create_directories():
     """Create all output directories."""
     dirs = [
-        ASSETS_DIR, BG_DIR, BUILDINGS_DIR, REGIONS_DIR, MISSIONS_DIR,
+        ASSETS_DIR, BG_DIR, BUILDINGS_DIR, MAPS_DIR, REGIONS_DIR, MISSIONS_DIR,
         REALMS_DIR, ELEMENTS_DIR, SEASONS_DIR, FACTIONS_DIR, EVENTS_DIR,
         UI_DIR, ITEMS_DIR, LOADING_DIR
     ]
@@ -267,13 +273,18 @@ def generate_image(img_def: dict, index: int, total: int) -> bool:
     height = img_def["h"]
     seed = img_def["seed"]
     extra_args = img_def.get("args", "")
+    preset = img_def.get("preset")
 
     output_path = out_dir / f"{name}.png"
 
-    cmd = f"{GENERATOR} -o \"{output_path}\" -W {width} -H {height} -s {seed} {extra_args}"
+    preset_arg = f"--preset {preset}" if preset else ""
+    preset_file_arg = f"--preset-file \"{PRESET_FILE}\""
+    cmd = f"{GENERATOR} -o \"{output_path}\" -W {width} -H {height} -s {seed} {preset_arg} {preset_file_arg} {extra_args}"
 
     print(f"\n[{index}/{total}] Generating: {name}")
     print(f"  Size: {width}x{height}, Seed: {seed}")
+    if preset:
+        print(f"  Preset: {preset}")
     print(f"  Args: {extra_args}")
 
     try:

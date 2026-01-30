@@ -20,6 +20,7 @@ impl Game {
             unlocked_techs: self.unlocked_techs.clone(),
             disciples: self.disciples.clone(),
             deceased_disciples: self.deceased_disciples.clone(),
+            spirit_beasts: self.spirit_beasts.clone(),
             buildings: self.data.buildings.clone(),
             ongoing_missions: self.ongoing_missions.clone(),
             completed_missions: self.completed_missions.clone(),
@@ -30,6 +31,7 @@ impl Game {
             tutorial: SavedTutorialState::from_tutorial(&self.tutorial),
             world_sim: Some(SavedWorldSim::from(&self.world_sim)),
             scheduler: Some(self.scheduler.to_saved()),
+            discovered_recipes: self.discovered_recipes.clone(),
         };
 
         if let Err(e) = storage::save(&save_data) {
@@ -74,10 +76,12 @@ impl Game {
                     unlocked_techs: save_data.unlocked_techs,
                     disciples: save_data.disciples,
                     deceased_disciples: save_data.deceased_disciples,
+                    spirit_beasts: save_data.spirit_beasts,
                     ongoing_missions: save_data.ongoing_missions,
                     completed_missions: save_data.completed_missions,
                     completed_history: save_data.completed_history,
                     event_log: vec!["Game loaded successfully.".to_string()],
+                    discovered_recipes: save_data.discovered_recipes,
                     tutorial: save_data.tutorial.to_tutorial(),
                     tick: save_data.tick,
                     current_season: save_data.current_season,

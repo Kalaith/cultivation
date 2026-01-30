@@ -116,5 +116,14 @@
         "tech_required": "sect_archives",
         "element": "Water",
         "unique": true
+    },
+    {
+        "type": "TalismanScriptorium",
+        "cost": 180,
+        "name": "Talisman Scriptorium",
+        "description": "Inscribe talismans and scrolls with spiritual energy.",
+        "tech_required": "inscription",
+        "element": "Water",
+        "unique": false
     }
 ]

@@ -73,17 +73,38 @@ impl Game {
                     influence: 0,
                     relics: 0,
                     items: vec![],
+                    recipe_discoveries: vec![],
                 },
                 crate::data::missions::MissionType::ResourceGathering => {
-                    let ore_amount = ongoing.mission.danger_level * 5;
-                    logs.push(format!("Gathered {} Spirit Ore.", ore_amount));
+                    let base_amount = ongoing.mission.danger_level * 3;
+                    let mut items = vec![("spirit_ore".to_string(), base_amount)];
+
+                    // Give gathering-specific items based on mission description
+                    let desc = &ongoing.mission.description;
+                    if desc.contains("Iron Ore") {
+                        items = vec![("iron_ore".to_string(), base_amount + 3)];
+                        logs.push(format!("Gathered {} Iron Ore.", base_amount + 3));
+                    } else if desc.contains("Spirit Iron") {
+                        items = vec![("spirit_iron_ore".to_string(), base_amount)];
+                        logs.push(format!("Gathered {} Spirit Iron Ore.", base_amount));
+                    } else if desc.contains("Spirit Ink") {
+                        items = vec![("spirit_ink".to_string(), base_amount + 2)];
+                        logs.push(format!("Gathered {} Spirit Ink.", base_amount + 2));
+                    } else if desc.contains("Talisman Paper") {
+                        items = vec![("talisman_paper".to_string(), base_amount + 2)];
+                        logs.push(format!("Gathered {} Talisman Paper.", base_amount + 2));
+                    } else {
+                        logs.push(format!("Gathered {} Spirit Ore.", base_amount));
+                    }
+
                     MissionRewards {
                         spirit_stones: ongoing.mission.danger_level * 30,
                         disciple_exp: ongoing.mission.danger_level * 60,
                         herbs: ongoing.mission.danger_level * 2,
                         influence: 0,
                         relics: 0,
-                        items: vec![("spirit_ore".to_string(), ore_amount)],
+                        items,
+                        recipe_discoveries: vec![],
                     }
                 }
                 crate::data::missions::MissionType::MonsterSuppression => {
@@ -91,13 +112,22 @@ impl Game {
                     if found_relic {
                         logs.push("Found a Monster Core (Relic)!".to_string());
                     }
+                    // Leather scraps from hunting missions
+                    let mut items = vec![];
+                    let desc = &ongoing.mission.description;
+                    if desc.contains("Leather") || desc.contains("Beast") || desc.contains("Hunt") {
+                        let scraps = ongoing.mission.danger_level * 2 + 1;
+                        items.push(("leather_scraps".to_string(), scraps));
+                        logs.push(format!("Collected {} Leather Scraps.", scraps));
+                    }
                     MissionRewards {
                         spirit_stones: ongoing.mission.danger_level * 80,
                         disciple_exp: ongoing.mission.danger_level * 120,
                         herbs: 0,
                         influence: 0,
                         relics: if found_relic { 1 } else { 0 },
-                        items: vec![],
+                        items,
+                        recipe_discoveries: vec![],
                     }
                 }
                 crate::data::missions::MissionType::Diplomacy => MissionRewards {
@@ -107,6 +137,7 @@ impl Game {
                     influence: ongoing.mission.danger_level * 5,
                     relics: 0,
                     items: vec![],
+                    recipe_discoveries: vec![],
                 },
                 crate::data::missions::MissionType::RuinDelve => {
                     let found_relic = game_rng::chance(0.7);
@@ -120,6 +151,7 @@ impl Game {
                         influence: 0,
                         relics: if found_relic { 1 } else { 0 },
                         items: vec![],
+                        recipe_discoveries: vec![],
                     }
                 }
             }

@@ -54,10 +54,26 @@ impl Game {
 
                     // Notify player when disciple first reaches breakthrough threshold
                     if old_readiness == 0.0 && disciple.breakthrough_readiness > 0.0 {
-                        self.event_log.push(format!(
-                            "{} is ready for breakthrough! Visit Roster to attempt.",
-                            disciple.name
-                        ));
+                        // Roll for hidden bottleneck
+                        let realm_index = self.data.stages_order.iter()
+                            .position(|id| id == &disciple.realm)
+                            .unwrap_or(0);
+                        let bottleneck = crate::engine::bottleneck::generate_bottleneck(
+                            disciple, &self.data, realm_index,
+                        );
+                        if let Some(ref bn) = bottleneck {
+                            let desc = bn.description(&self.data);
+                            self.event_log.push(format!(
+                                "{} is ready for breakthrough but faces a bottleneck: {}",
+                                disciple.name, desc
+                            ));
+                            disciple.breakthrough_bottleneck = Some(bn.clone());
+                        } else {
+                            self.event_log.push(format!(
+                                "{} is ready for breakthrough! Visit Roster to attempt.",
+                                disciple.name
+                            ));
+                        }
                     }
                 }
             }
@@ -263,6 +279,7 @@ impl Game {
             GameState::SectBase(s) => s.update(
                 &mut self.data,
                 &mut self.grid,
+                &self.textures,
                 self.spirit_stones,
                 self.herbs,
                 self.influence,
@@ -274,9 +291,11 @@ impl Game {
                 &self.completed_missions,
                 &self.completed_history,
                 &self.disciples,
+                &self.spirit_beasts,
                 &self.current_season,
                 self.season_ticks,
                 &mut self.tutorial,
+                &self.discovered_recipes,
             ),
             GameState::DiscipleRoster(s) => s.update(&self.data, &self.disciples, &self.inventory),
             GameState::WorldMap(s) => s.update(&self.data),

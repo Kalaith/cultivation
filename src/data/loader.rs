@@ -7,6 +7,7 @@ use crate::data::{
     factions::Faction,
     herbs::Herb,
     missions::{MapNode, Mission},
+    spirit_beasts::{BeastEquipmentItem, SpiritBeastDefinition},
     stages::StageDefinition,
     world_events::WorldEvent,
 };
@@ -42,6 +43,10 @@ pub struct GameData {
     pub balance: WorldSimBalance,
     /// AI scheduler tuning configuration
     pub ai_scheduler: AiSchedulerTuning,
+    /// Spirit beast species definitions
+    pub spirit_beast_definitions: std::collections::HashMap<String, SpiritBeastDefinition>,
+    /// Spirit beast equipment definitions
+    pub beast_equipment_definitions: std::collections::HashMap<String, BeastEquipmentItem>,
 }
 
 /// Economy data loaded from JSON
@@ -137,6 +142,20 @@ impl GameData {
         let ai_json = std::fs::read_to_string("assets/data/ai_scheduler.json").unwrap_or_else(|_| "{}".to_string());
         let ai_scheduler: AiSchedulerTuning = serde_json::from_str(&ai_json).unwrap_or_default();
 
+        let beasts_json = std::fs::read_to_string("assets/data/spirit_beasts.json").unwrap_or_else(|_| "[]".to_string());
+        let beasts_list: Vec<SpiritBeastDefinition> = serde_json::from_str(&beasts_json)?;
+        let spirit_beast_definitions = beasts_list
+            .into_iter()
+            .map(|b| (b.id.clone(), b))
+            .collect();
+
+        let beast_equipment_json = std::fs::read_to_string("assets/data/beast_equipment.json").unwrap_or_else(|_| "[]".to_string());
+        let beast_equipment_list: Vec<BeastEquipmentItem> = serde_json::from_str(&beast_equipment_json)?;
+        let beast_equipment_definitions = beast_equipment_list
+            .into_iter()
+            .map(|b| (b.id.clone(), b))
+            .collect();
+
         Ok(GameData {
             buildings,
             building_definitions,
@@ -157,6 +176,8 @@ impl GameData {
             world_events,
             balance,
             ai_scheduler,
+            spirit_beast_definitions,
+            beast_equipment_definitions,
         })
     }
 }

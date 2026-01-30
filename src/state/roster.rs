@@ -404,6 +404,14 @@ impl DiscipleRosterState {
             let overflow_pct = ((disciple.exp as f32 / disciple.exp_to_next_level as f32 - 1.0) * 100.0) as u32;
             draw_text(&format!("+{}% overflow", overflow_pct), x + 360.0, y + 12.0, FONT_SMALL_SIZE, SUCCESS);
         }
+
+        // Show bottleneck if present
+        if let Some(ref bottleneck) = disciple.breakthrough_bottleneck {
+            y += 25.0;
+            let desc = bottleneck.description(data);
+            draw_rectangle(x - 5.0, y - 5.0, 400.0, 25.0, Color::new(0.5, 0.4, 0.1, 0.3));
+            draw_text(&format!("Bottleneck: {}", desc), x, y + 12.0, FONT_SMALL_SIZE, WARNING);
+        }
     }
 
     fn handle_detail_actions(&mut self, data: &GameData, disciples: &[Disciple], idx: usize, _inventory: &std::collections::HashMap<String, u32>) -> Option<UpdateResult> {
@@ -419,13 +427,22 @@ impl DiscipleRosterState {
 
         // Row 1: Breakthrough (if ready)
         if disciple.can_attempt_breakthrough() {
-            let readiness_bonus = (disciple.get_readiness_bonus() * 100.0) as u32;
-            if draw_button(
-                Rect::new(right_x, btn_y, btn_w * 2.0 + spacing, btn_h),
-                &format!("Attempt Breakthrough (+{}%)", readiness_bonus),
-                false
-            ) {
-                return Some(UpdateResult::new().with_action(crate::engine::actions::Action::AttemptBreakthrough(idx)));
+            if disciple.breakthrough_bottleneck.is_some() {
+                // Bottleneck present — show amber text instead of button
+                let desc = disciple.breakthrough_bottleneck.as_ref().unwrap().description(data);
+                draw_text(
+                    &format!("Blocked: {}", desc),
+                    right_x, btn_y + 22.0, FONT_SMALL_SIZE, WARNING,
+                );
+            } else {
+                let readiness_bonus = (disciple.get_readiness_bonus() * 100.0) as u32;
+                if draw_button(
+                    Rect::new(right_x, btn_y, btn_w * 2.0 + spacing, btn_h),
+                    &format!("Attempt Breakthrough (+{}%)", readiness_bonus),
+                    false
+                ) {
+                    return Some(UpdateResult::new().with_action(crate::engine::actions::Action::AttemptBreakthrough(idx)));
+                }
             }
         }
 

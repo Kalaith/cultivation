@@ -89,4 +89,6 @@ pub struct MissionRewards {
     pub relics: u32,
     #[serde(default)]
     pub items: Vec<(String, u32)>, // Item ID, Amount
+    #[serde(default)]
+    pub recipe_discoveries: Vec<String>, // Recipe IDs discovered
 }

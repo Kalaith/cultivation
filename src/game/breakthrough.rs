@@ -15,6 +15,32 @@ impl Game {
 
     /// Attempts a breakthrough. Returns result logic.
     pub(super) fn attempt_breakthrough(&mut self, disciple: &mut Disciple, disciple_idx: usize) -> BreakthroughResult {
+        // Check hidden bottleneck
+        if let Some(ref bottleneck) = disciple.breakthrough_bottleneck {
+            let resolved = crate::engine::bottleneck::is_bottleneck_resolved(
+                bottleneck,
+                disciple,
+                &self.completed_history,
+                &self.inventory,
+                &self.data,
+            );
+            if resolved {
+                let desc = bottleneck.description(&self.data);
+                self.event_log.push(format!(
+                    "{} overcame their bottleneck: {}!",
+                    disciple.name, desc
+                ));
+                disciple.breakthrough_bottleneck = None;
+            } else {
+                let desc = bottleneck.description(&self.data);
+                self.event_log.push(format!(
+                    "{} cannot break through yet — bottleneck: {}",
+                    disciple.name, desc
+                ));
+                return BreakthroughResult::Blocked;
+            }
+        }
+
         // MVP cap gate: prevent major breakthrough beyond Foundation Establishment without solo trial
         if disciple.realm == "FoundationEstablishment" {
             if let Some(stage) = self.data.stages.get(&disciple.realm) {

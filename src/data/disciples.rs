@@ -2,6 +2,8 @@ use serde::{Deserialize, Serialize};
 use crate::data::ai::AiSchedulerTuning;
 use crate::data::bloodlines::DiscipleBloodline;
 use crate::data::items::EquipmentSlot;
+use crate::data::loader::GameData;
+use crate::data::missions::MissionType;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct NeedState {
@@ -249,6 +251,58 @@ impl Injury {
     }
 }
 
+/// A hidden bottleneck that blocks breakthrough until fulfilled
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub enum Bottleneck {
+    /// Must complete a mission of the given type
+    CompleteMission(String),
+    /// Must craft the given recipe
+    CraftItem(String),
+    /// Must reach a stat threshold
+    ReachStat { stat: String, value: u32 },
+    /// Must use a specific item
+    UseItem(String),
+    /// Must equip an item in the given slot
+    EquipSlot(EquipmentSlot),
+}
+
+impl Bottleneck {
+    pub fn description(&self, data: &GameData) -> String {
+        match self {
+            Bottleneck::CompleteMission(mt) => format!("Complete a {} mission", mt),
+            Bottleneck::CraftItem(recipe_id) => {
+                let name = data.recipes.iter()
+                    .find(|r| r.id == *recipe_id)
+                    .map(|r| r.name.as_str())
+                    .unwrap_or(recipe_id.as_str());
+                format!("Craft {}", name)
+            }
+            Bottleneck::ReachStat { stat, value } => format!("Reach {} {}", value, stat),
+            Bottleneck::UseItem(item_id) => {
+                let name = data.items.get(item_id)
+                    .map(|i| i.name.as_str())
+                    .unwrap_or(item_id.as_str());
+                format!("Use {}", name)
+            }
+            Bottleneck::EquipSlot(slot) => {
+                let slot_name = match slot {
+                    EquipmentSlot::Weapon => "Weapon",
+                    EquipmentSlot::OffHand => "Off-Hand",
+                    EquipmentSlot::Chest => "Chest",
+                    EquipmentSlot::Legs => "Legs",
+                    EquipmentSlot::Arms => "Arms",
+                    EquipmentSlot::Head => "Head",
+                    EquipmentSlot::Boots => "Boots",
+                    EquipmentSlot::Ring => "Ring",
+                    EquipmentSlot::Amulet => "Amulet",
+                    EquipmentSlot::Belt => "Belt",
+                };
+                format!("Equip a {}", slot_name)
+            }
+        }
+    }
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Disciple {
     /// Unique identifier for the disciple
@@ -291,6 +345,9 @@ pub struct Disciple {
     /// Equipped item IDs by slot
     #[serde(default)]
     pub equipment: std::collections::HashMap<EquipmentSlot, String>,
+    /// Hidden bottleneck blocking breakthrough (if any)
+    #[serde(default)]
+    pub breakthrough_bottleneck: Option<Bottleneck>,
 }
 
 impl Disciple {

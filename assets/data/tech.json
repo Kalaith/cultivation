@@ -112,5 +112,14 @@
         "unlocks_buildings": ["LibraryPavilion"],
         "unlocks_missions": ["Exploration"],
         "prerequisites": ["basic_cultivation"]
+    },
+    {
+        "id": "inscription",
+        "name": "Spirit Inscription",
+        "description": "The art of inscribing spiritual talismans and scrolls.",
+        "cost_spirit_stones": 130,
+        "unlocks_buildings": ["TalismanScriptorium"],
+        "unlocks_missions": [],
+        "prerequisites": ["basic_cultivation"]
     }
 ]

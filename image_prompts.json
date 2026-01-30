@@ -1,0 +1,2348 @@
+{
+  "image_prompts": [
+    {
+      "id": "martial_arts_dojo",
+      "Prompt": "isolated ink illustration of an ancient Chinese Martial Arts Dojo, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single red glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Large open hall for group training, punching bags, dummies"
+    },
+    {
+      "id": "sword_training_ground",
+      "Prompt": "isolated ink illustration of an ancient Chinese Sword Training Ground, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Open field with weapon racks, target dummies"
+    },
+    {
+      "id": "combat_arena",
+      "Prompt": "isolated ink illustration of an ancient Chinese Combat Arena, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single red glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Enclosed fighting ring with spectator seating for tournaments"
+    },
+    {
+      "id": "sparring_hall",
+      "Prompt": "isolated ink illustration of an ancient Chinese Sparring Hall, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single red glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Indoor gym-like structure for one-on-one practice matches"
+    },
+    {
+      "id": "waterfall_training_ground",
+      "Prompt": "isolated ink illustration of an ancient Chinese Waterfall Training Ground, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Natural waterfall location for meditative martial arts practice"
+    },
+    {
+      "id": "heavy_equipment_training_room",
+      "Prompt": "isolated ink illustration of an ancient Chinese Heavy Equipment Training Room, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Weighted weapons and conditioning equipment"
+    },
+    {
+      "id": "speed_training_course",
+      "Prompt": "isolated ink illustration of an ancient Chinese Speed Training Course, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Obstacle course for agility and reflexes"
+    },
+    {
+      "id": "aerial_combat_platform",
+      "Prompt": "isolated ink illustration of an ancient Chinese Aerial Combat Platform, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single red glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Elevated platforms for testing flight/levitation abilities"
+    },
+    {
+      "id": "beam_walking_corridor",
+      "Prompt": "isolated ink illustration of an ancient Chinese Beam Walking Corridor, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single red glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Narrow beams suspended high for balance training"
+    },
+    {
+      "id": "gravity_chamber",
+      "Prompt": "isolated ink illustration of an ancient Chinese Gravity Chamber, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single red glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Magical room with adjustable gravity for enhanced training"
+    },
+    {
+      "id": "beast_combat_arena",
+      "Prompt": "isolated ink illustration of an ancient Chinese Beast Combat Arena, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single red glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Combat ring for spirit beast battles"
+    },
+    {
+      "id": "dual_wielding_practice_hall",
+      "Prompt": "isolated ink illustration of an ancient Chinese Dual Wielding Practice Hall, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Specialized room for two-weapon training"
+    },
+    {
+      "id": "archery_range",
+      "Prompt": "isolated ink illustration of an ancient Chinese Archery Range, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single red glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Target range for ranged weapon practitioners"
+    },
+    {
+      "id": "whip_mastery_hall",
+      "Prompt": "isolated ink illustration of an ancient Chinese Whip Mastery Hall, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single red glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Open space for long-range flexible weapon training"
+    },
+    {
+      "id": "fist_art_pavilion",
+      "Prompt": "isolated ink illustration of an ancient Chinese Fist Art Pavilion, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single red glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Specialized space for bare-handed combat forms"
+    },
+    {
+      "id": "spear_techniques_hall",
+      "Prompt": "isolated ink illustration of an ancient Chinese Spear Techniques Hall, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single red glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Large space for polearm training"
+    },
+    {
+      "id": "chain_weapon_chamber",
+      "Prompt": "isolated ink illustration of an ancient Chinese Chain Weapon Chamber, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single red glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Space for practicing chain whips and chain techniques"
+    },
+    {
+      "id": "flying_technique_platform",
+      "Prompt": "isolated ink illustration of an ancient Chinese Flying Technique Platform, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Open platforms for aerial movement practice"
+    },
+    {
+      "id": "pressure_training_chamber",
+      "Prompt": "isolated ink illustration of an ancient Chinese Pressure Training Chamber, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "High-qi environment for intensive power training"
+    },
+    {
+      "id": "poison_resistance_chamber",
+      "Prompt": "isolated ink illustration of an ancient Chinese Poison Resistance Chamber, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Room with controlled toxic atmosphere for resistance training"
+    },
+    {
+      "id": "meditation_hall",
+      "Prompt": "isolated ink illustration of an ancient Chinese Meditation Hall, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Basic meditation room with silk cushions, low lighting"
+    },
+    {
+      "id": "private_cultivation_rooms",
+      "Prompt": "isolated ink illustration of an ancient Chinese Private Cultivation Rooms, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Individual meditation chambers (multiple units)"
+    },
+    {
+      "id": "group_cultivation_chamber",
+      "Prompt": "isolated ink illustration of an ancient Chinese Group Cultivation Chamber, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Large room for synchronized group cultivation"
+    },
+    {
+      "id": "soundproof_cultivation_cells",
+      "Prompt": "isolated ink illustration of an ancient Chinese Soundproof Cultivation Cells, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Isolated pods to prevent interruption"
+    },
+    {
+      "id": "spiritual_vein_meditation_room",
+      "Prompt": "isolated ink illustration of an ancient Chinese Spiritual Vein Meditation Room, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single purple glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Built directly on underground spiritual ley lines"
+    },
+    {
+      "id": "ancient_shrine_meditation_hall",
+      "Prompt": "isolated ink illustration of an ancient Chinese Ancient Shrine Meditation Hall, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Sacred meditation space with historical significance"
+    },
+    {
+      "id": "heavenly_insight_pavilion",
+      "Prompt": "isolated ink illustration of an ancient Chinese Heavenly Insight Pavilion, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single gold glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Open-air meditation structure under stars"
+    },
+    {
+      "id": "inner_sanctum",
+      "Prompt": "isolated ink illustration of an ancient Chinese Inner Sanctum, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Most powerful cultivation chamber (restricted access)"
+    },
+    {
+      "id": "breakthrough_chamber",
+      "Prompt": "isolated ink illustration of an ancient Chinese Breakthrough Chamber, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Reinforced room designed for realm advancements (may need repairs)"
+    },
+    {
+      "id": "yin_yang_meditation_pool",
+      "Prompt": "isolated ink illustration of an ancient Chinese Yin-Yang Meditation Pool, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single red glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Water-based meditation area balancing opposing energies"
+    },
+    {
+      "id": "qi_absorption_tower",
+      "Prompt": "isolated ink illustration of an ancient Chinese Qi Absorption Tower, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Tall structure designed to accumulate and channel qi"
+    },
+    {
+      "id": "heavenly_tribulation_platform",
+      "Prompt": "isolated ink illustration of an ancient Chinese Heavenly Tribulation Platform, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single gold glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Elevated stage for safely channeling lightning tribulations"
+    },
+    {
+      "id": "dual_cultivation_chamber",
+      "Prompt": "isolated ink illustration of an ancient Chinese Dual Cultivation Chamber, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Private room for partner cultivation pairs"
+    },
+    {
+      "id": "transcendence_pavilion",
+      "Prompt": "isolated ink illustration of an ancient Chinese Transcendence Pavilion, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Special chamber for ascension/immortality attempts"
+    },
+    {
+      "id": "enlightenment_temple",
+      "Prompt": "isolated ink illustration of an ancient Chinese Enlightenment Temple, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single gold glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Sacred building for achieving sudden breakthroughs"
+    },
+    {
+      "id": "bottleneck_breakthrough_hall",
+      "Prompt": "isolated ink illustration of an ancient Chinese Bottleneck Breakthrough Hall, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Specialized room for overcoming cultivation plateaus"
+    },
+    {
+      "id": "beast_soul_communion_room",
+      "Prompt": "isolated ink illustration of an ancient Chinese Beast Soul Communion Room, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single purple glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Chamber where beast bonds strengthen"
+    },
+    {
+      "id": "elemental_attunement_chambers",
+      "Prompt": "isolated ink illustration of an ancient Chinese Elemental Attunement Chambers, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "5 separate rooms (Fire/Water/Wood/Metal/Earth)"
+    },
+    {
+      "id": "alchemy_meditation_vault",
+      "Prompt": "isolated ink illustration of an ancient Chinese Alchemy Meditation Vault, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Sealed chamber for pill-based cultivation"
+    },
+    {
+      "id": "forbidden_breakthrough_hall",
+      "Prompt": "isolated ink illustration of an ancient Chinese Forbidden Breakthrough Hall, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Dangerous room for demonic/unconventional cultivation methods"
+    },
+    {
+      "id": "alchemy_laboratory",
+      "Prompt": "isolated ink illustration of an ancient Chinese Alchemy Laboratory, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Main workspace with cauldrons, distillation equipment"
+    },
+    {
+      "id": "pill_refinement_room",
+      "Prompt": "isolated ink illustration of an ancient Chinese Pill Refinement Room, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Specialized area for processing pills"
+    },
+    {
+      "id": "herb_drying_shed",
+      "Prompt": "isolated ink illustration of an ancient Chinese Herb Drying Shed, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Climate-controlled storage for drying herbs"
+    },
+    {
+      "id": "ingredient_preparation_station",
+      "Prompt": "isolated ink illustration of an ancient Chinese Ingredient Preparation Station, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single crimson glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Workbenches for grinding, cutting, processing"
+    },
+    {
+      "id": "volatile_pill_testing_chamber",
+      "Prompt": "isolated ink illustration of an ancient Chinese Volatile Pill Testing Chamber, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Sealed room with reinforced walls (explosions likely)"
+    },
+    {
+      "id": "master_alchemist_s_studio",
+      "Prompt": "isolated ink illustration of an ancient Chinese Master Alchemist's Studio, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "High-end workspace for legendary pill creation"
+    },
+    {
+      "id": "elixir_fermentation_vault",
+      "Prompt": "isolated ink illustration of an ancient Chinese Elixir Fermentation Vault, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Underground storage with temperature control"
+    },
+    {
+      "id": "poison_brewing_cellar",
+      "Prompt": "isolated ink illustration of an ancient Chinese Poison Brewing Cellar, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Hidden dark chamber for toxin creation"
+    },
+    {
+      "id": "transmutation_lab",
+      "Prompt": "isolated ink illustration of an ancient Chinese Transmutation Lab, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Advanced workspace for elemental transformation"
+    },
+    {
+      "id": "legendary_pill_furnace_hall",
+      "Prompt": "isolated ink illustration of an ancient Chinese Legendary Pill Furnace Hall, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Special chamber with ancient alchemy furnaces"
+    },
+    {
+      "id": "blacksmith_forge",
+      "Prompt": "isolated ink illustration of an ancient Chinese Blacksmith Forge, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Main smithy with anvils, furnaces, cooling tanks"
+    },
+    {
+      "id": "weapon_refinement_station",
+      "Prompt": "isolated ink illustration of an ancient Chinese Weapon Refinement Station, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Specialized workspace for upgrading weapons"
+    },
+    {
+      "id": "legendary_weapon_forge",
+      "Prompt": "isolated ink illustration of an ancient Chinese Legendary Weapon Forge, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "High-temperature furnace for artifact creation"
+    },
+    {
+      "id": "armor_crafting_workshop",
+      "Prompt": "isolated ink illustration of an ancient Chinese Armor Crafting Workshop, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Dedicated space for crafting protective gear"
+    },
+    {
+      "id": "gem_cutting_hall",
+      "Prompt": "isolated ink illustration of an ancient Chinese Gem Cutting Hall, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Jewelry crafting and gem preparation"
+    },
+    {
+      "id": "enchantment_engraving_room",
+      "Prompt": "isolated ink illustration of an ancient Chinese Enchantment Engraving Room, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Workspace for inscribing magical runes"
+    },
+    {
+      "id": "spiritual_ore_smeltery",
+      "Prompt": "isolated ink illustration of an ancient Chinese Spiritual Ore Smeltery, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single purple glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Special furnace for rare/mystical materials"
+    },
+    {
+      "id": "weapon_repair_station",
+      "Prompt": "isolated ink illustration of an ancient Chinese Weapon Repair Station, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Quick repair and maintenance shop"
+    },
+    {
+      "id": "tool_manufacturing_workshop",
+      "Prompt": "isolated ink illustration of an ancient Chinese Tool Manufacturing Workshop, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Crafts various tools and implements"
+    },
+    {
+      "id": "artifact_assembly_chamber",
+      "Prompt": "isolated ink illustration of an ancient Chinese Artifact Assembly Chamber, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Secure room for combining rare item components"
+    },
+    {
+      "id": "talisman_inscription_hall",
+      "Prompt": "isolated ink illustration of an ancient Chinese Talisman Inscription Hall, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Large workspace with ink, brushes, special paper"
+    },
+    {
+      "id": "rune_carving_studio",
+      "Prompt": "isolated ink illustration of an ancient Chinese Rune Carving Studio, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Specialized area for engraving runes on equipment"
+    },
+    {
+      "id": "seal_master_s_chamber",
+      "Prompt": "isolated ink illustration of an ancient Chinese Seal Master's Chamber, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "High-security room for creating powerful seals"
+    },
+    {
+      "id": "array_formation_registry",
+      "Prompt": "isolated ink illustration of an ancient Chinese Array Formation Registry, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Workshop for designing and testing formation arrays"
+    },
+    {
+      "id": "scroll_transcription_room",
+      "Prompt": "isolated ink illustration of an ancient Chinese Scroll Transcription Room, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Scribes create spell scrolls and technique records"
+    },
+    {
+      "id": "divine_mark_inscription_hall",
+      "Prompt": "isolated ink illustration of an ancient Chinese Divine Mark Inscription Hall, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single gold glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Sacred space for marking equipment with divine protection"
+    },
+    {
+      "id": "main_library",
+      "Prompt": "isolated ink illustration of an ancient Chinese Main Library, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Central repository of martial techniques and knowledge"
+    },
+    {
+      "id": "restricted_knowledge_archive",
+      "Prompt": "isolated ink illustration of an ancient Chinese Restricted Knowledge Archive, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "High-security vault for powerful/forbidden techniques"
+    },
+    {
+      "id": "technique_scrolls_library",
+      "Prompt": "isolated ink illustration of an ancient Chinese Technique Scrolls Library, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Organized collection of teachable skills"
+    },
+    {
+      "id": "history_archives",
+      "Prompt": "isolated ink illustration of an ancient Chinese History Archives, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Records of sect history and member achievements"
+    },
+    {
+      "id": "ancient_tome_vault",
+      "Prompt": "isolated ink illustration of an ancient Chinese Ancient Tome Vault, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Sealed chamber containing rare historical documents"
+    },
+    {
+      "id": "study_hall",
+      "Prompt": "isolated ink illustration of an ancient Chinese Study Hall, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Individual study carrels and reading areas"
+    },
+    {
+      "id": "manuscript_copying_studio",
+      "Prompt": "isolated ink illustration of an ancient Chinese Manuscript Copying Studio, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Scribes duplicate important texts"
+    },
+    {
+      "id": "martial_technique_encyclopedia",
+      "Prompt": "isolated ink illustration of an ancient Chinese Martial Technique Encyclopedia, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Reference library for all combat styles"
+    },
+    {
+      "id": "cultivation_theory_archive",
+      "Prompt": "isolated ink illustration of an ancient Chinese Cultivation Theory Archive, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Philosophical and theoretical cultivation texts"
+    },
+    {
+      "id": "monster_compendium_library",
+      "Prompt": "isolated ink illustration of an ancient Chinese Monster Compendium Library, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Detailed information on beasts and creatures"
+    },
+    {
+      "id": "basic_martial_arts_classroom",
+      "Prompt": "isolated ink illustration of an ancient Chinese Basic Martial Arts Classroom, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Group instruction room for beginners"
+    },
+    {
+      "id": "technique_teaching_hall",
+      "Prompt": "isolated ink illustration of an ancient Chinese Technique Teaching Hall, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Classroom for specialized skill instruction"
+    },
+    {
+      "id": "theory_lecture_hall",
+      "Prompt": "isolated ink illustration of an ancient Chinese Theory Lecture Hall, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Amphitheater-style teaching space"
+    },
+    {
+      "id": "one_on_one_training_room",
+      "Prompt": "isolated ink illustration of an ancient Chinese One-on-One Training Room, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Private instruction chamber"
+    },
+    {
+      "id": "sect_doctrine_teaching_chamber",
+      "Prompt": "isolated ink illustration of an ancient Chinese Sect Doctrine Teaching Chamber, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Religious/philosophical instruction space"
+    },
+    {
+      "id": "elemental_theory_classroom",
+      "Prompt": "isolated ink illustration of an ancient Chinese Elemental Theory Classroom, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Focus on element-specific teachings"
+    },
+    {
+      "id": "beast_master_academy",
+      "Prompt": "isolated ink illustration of an ancient Chinese Beast Master Academy, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Classroom dedicated to beast training"
+    },
+    {
+      "id": "leadership_training_hall",
+      "Prompt": "isolated ink illustration of an ancient Chinese Leadership Training Hall, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Education for sect officers and commanders"
+    },
+    {
+      "id": "alchemy_theory_classroom",
+      "Prompt": "isolated ink illustration of an ancient Chinese Alchemy Theory Classroom, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Theoretical knowledge of pill-making"
+    },
+    {
+      "id": "array_formation_teaching_studio",
+      "Prompt": "isolated ink illustration of an ancient Chinese Array Formation Teaching Studio, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Classroom for learning formation design"
+    },
+    {
+      "id": "outer_disciple_dormitory",
+      "Prompt": "isolated ink illustration of an ancient Chinese Outer Disciple Dormitory, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single warm yellow glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Large barracks for many low-rank disciples"
+    },
+    {
+      "id": "inner_disciple_dormitory",
+      "Prompt": "isolated ink illustration of an ancient Chinese Inner Disciple Dormitory, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single warm yellow glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Smaller dormitory for advanced disciples"
+    },
+    {
+      "id": "core_member_housing",
+      "Prompt": "isolated ink illustration of an ancient Chinese Core Member Housing, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single warm yellow glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Private rooms for elite sect members"
+    },
+    {
+      "id": "master_s_residence",
+      "Prompt": "isolated ink illustration of an ancient Chinese Master's Residence, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single warm yellow glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Spacious home for sect leadership"
+    },
+    {
+      "id": "elder_s_pavilion",
+      "Prompt": "isolated ink illustration of an ancient Chinese Elder's Pavilion, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single warm yellow glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Luxury quarters for senior masters"
+    },
+    {
+      "id": "visiting_scholar_quarters",
+      "Prompt": "isolated ink illustration of an ancient Chinese Visiting Scholar Quarters, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single warm yellow glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Guest housing for temporary visitors"
+    },
+    {
+      "id": "couples_housing",
+      "Prompt": "isolated ink illustration of an ancient Chinese Couples' Housing, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single warm yellow glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Private chambers for married disciples"
+    },
+    {
+      "id": "sect_leader_s_palace",
+      "Prompt": "isolated ink illustration of an ancient Chinese Sect Leader's Palace, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single warm yellow glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Grand residence for the sect's supreme leader"
+    },
+    {
+      "id": "founder_s_mausoleum_and_residence",
+      "Prompt": "isolated ink illustration of an ancient Chinese Founder's Mausoleum & Residence, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single warm yellow glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Historic dwelling of sect founder"
+    },
+    {
+      "id": "disciplinary_officer_s_residence",
+      "Prompt": "isolated ink illustration of an ancient Chinese Disciplinary Officer's Residence, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Housing for rule enforcers"
+    },
+    {
+      "id": "dining_hall",
+      "Prompt": "isolated ink illustration of an ancient Chinese Dining Hall, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single warm yellow glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Central cafeteria serving all sect members"
+    },
+    {
+      "id": "kitchen_complex",
+      "Prompt": "isolated ink illustration of an ancient Chinese Kitchen Complex, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single warm yellow glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Large-scale food preparation facilities"
+    },
+    {
+      "id": "tea_house",
+      "Prompt": "isolated ink illustration of an ancient Chinese Tea House, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single warm yellow glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Casual social gathering space"
+    },
+    {
+      "id": "recreation_hall",
+      "Prompt": "isolated ink illustration of an ancient Chinese Recreation Hall, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single warm yellow glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Games, music, social entertainment"
+    },
+    {
+      "id": "bathhouse",
+      "Prompt": "isolated ink illustration of an ancient Chinese Bathhouse, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single warm yellow glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Large communal bathing facility"
+    },
+    {
+      "id": "hot_spring_resort",
+      "Prompt": "isolated ink illustration of an ancient Chinese Hot Spring Resort, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single warm yellow glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Natural hot springs for relaxation"
+    },
+    {
+      "id": "tavern",
+      "Prompt": "isolated ink illustration of an ancient Chinese Tavern, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single warm yellow glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Alcoholic beverages and food service"
+    },
+    {
+      "id": "music_performance_hall",
+      "Prompt": "isolated ink illustration of an ancient Chinese Music Performance Hall, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single warm yellow glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Concert venue for performers"
+    },
+    {
+      "id": "game_hall",
+      "Prompt": "isolated ink illustration of an ancient Chinese Game Hall, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single warm yellow glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Board games, chess, gambling area"
+    },
+    {
+      "id": "library_reading_lounge",
+      "Prompt": "isolated ink illustration of an ancient Chinese Library Reading Lounge, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single warm yellow glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Comfortable area for casual reading"
+    },
+    {
+      "id": "medical_hall",
+      "Prompt": "isolated ink illustration of an ancient Chinese Medical Hall, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Primary medical clinic and treatment center"
+    },
+    {
+      "id": "emergency_treatment_chamber",
+      "Prompt": "isolated ink illustration of an ancient Chinese Emergency Treatment Chamber, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Intensive care for critical injuries"
+    },
+    {
+      "id": "surgery_theater",
+      "Prompt": "isolated ink illustration of an ancient Chinese Surgery Theater, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single red glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Sterile room for surgical procedures"
+    },
+    {
+      "id": "poison_antidote_workshop",
+      "Prompt": "isolated ink illustration of an ancient Chinese Poison Antidote Workshop, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Specializes in toxin treatments"
+    },
+    {
+      "id": "herb_medicine_pharmacy",
+      "Prompt": "isolated ink illustration of an ancient Chinese Herb Medicine Pharmacy, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Dispenses prepared herbal remedies"
+    },
+    {
+      "id": "triage_station",
+      "Prompt": "isolated ink illustration of an ancient Chinese Triage Station, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Intake and assessment area"
+    },
+    {
+      "id": "recovery_ward",
+      "Prompt": "isolated ink illustration of an ancient Chinese Recovery Ward, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Patient bedding and monitoring"
+    },
+    {
+      "id": "acupuncture_treatment_room",
+      "Prompt": "isolated ink illustration of an ancient Chinese Acupuncture Treatment Room, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Energy meridian therapy"
+    },
+    {
+      "id": "healer_s_private_study",
+      "Prompt": "isolated ink illustration of an ancient Chinese Healer's Private Study, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Master healer's workspace"
+    },
+    {
+      "id": "quarantine_chamber",
+      "Prompt": "isolated ink illustration of an ancient Chinese Quarantine Chamber, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Isolation room for contagious conditions"
+    },
+    {
+      "id": "laundry_house",
+      "Prompt": "isolated ink illustration of an ancient Chinese Laundry House, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Clothing cleaning and maintenance"
+    },
+    {
+      "id": "armory_storage",
+      "Prompt": "isolated ink illustration of an ancient Chinese Armory Storage, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Secure weapon and armor storage"
+    },
+    {
+      "id": "supply_depot",
+      "Prompt": "isolated ink illustration of an ancient Chinese Supply Depot, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "General provisions and equipment storage"
+    },
+    {
+      "id": "maintenance_workshop",
+      "Prompt": "isolated ink illustration of an ancient Chinese Maintenance Workshop, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Repairs building damage and tools"
+    },
+    {
+      "id": "carpentry_studio",
+      "Prompt": "isolated ink illustration of an ancient Chinese Carpentry Studio, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Furniture and woodwork creation"
+    },
+    {
+      "id": "tailoring_workshop",
+      "Prompt": "isolated ink illustration of an ancient Chinese Tailoring Workshop, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Clothing creation and repairs"
+    },
+    {
+      "id": "shoe_making_shop",
+      "Prompt": "isolated ink illustration of an ancient Chinese Shoe Making Shop, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Footwear crafting"
+    },
+    {
+      "id": "waste_management_facility",
+      "Prompt": "isolated ink illustration of an ancient Chinese Waste Management Facility, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Garbage and waste processing"
+    },
+    {
+      "id": "water_management_system",
+      "Prompt": "isolated ink illustration of an ancient Chinese Water Management System, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Wells, pumps, irrigation control"
+    },
+    {
+      "id": "grain_storage_silo",
+      "Prompt": "isolated ink illustration of an ancient Chinese Grain Storage Silo, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Long-term food storage"
+    },
+    {
+      "id": "spirit_herb_garden",
+      "Prompt": "isolated ink illustration of an ancient Chinese Spirit Herb Garden, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Cultivation of magical herbs and plants"
+    },
+    {
+      "id": "vegetable_patch",
+      "Prompt": "isolated ink illustration of an ancient Chinese Vegetable Patch, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Standard food crop farming"
+    },
+    {
+      "id": "fruit_orchard",
+      "Prompt": "isolated ink illustration of an ancient Chinese Fruit Orchard, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Fruit tree cultivation"
+    },
+    {
+      "id": "rare_plant_greenhouse",
+      "Prompt": "isolated ink illustration of an ancient Chinese Rare Plant Greenhouse, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Climate-controlled exotic plant growth"
+    },
+    {
+      "id": "medicinal_root_farm",
+      "Prompt": "isolated ink illustration of an ancient Chinese Medicinal Root Farm, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Specialized growth of healing ingredients"
+    },
+    {
+      "id": "alchemical_ingredient_field",
+      "Prompt": "isolated ink illustration of an ancient Chinese Alchemical Ingredient Field, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single crimson glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Crops for pill-making"
+    },
+    {
+      "id": "beast_feed_pasture",
+      "Prompt": "isolated ink illustration of an ancient Chinese Beast Feed Pasture, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Grazing area for spirit beasts"
+    },
+    {
+      "id": "poisonous_plant_garden",
+      "Prompt": "isolated ink illustration of an ancient Chinese Poisonous Plant Garden, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Cultivation of toxic plants"
+    },
+    {
+      "id": "rice_paddies",
+      "Prompt": "isolated ink illustration of an ancient Chinese Rice Paddies, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Water-based grain cultivation"
+    },
+    {
+      "id": "mulberry_silk_farm",
+      "Prompt": "isolated ink illustration of an ancient Chinese Mulberry Silk Farm, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Silk production"
+    },
+    {
+      "id": "quarry",
+      "Prompt": "isolated ink illustration of an ancient Chinese Quarry, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Stone and rock extraction"
+    },
+    {
+      "id": "logging_camp",
+      "Prompt": "isolated ink illustration of an ancient Chinese Logging Camp, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Timber harvesting"
+    },
+    {
+      "id": "mine_entrance",
+      "Prompt": "isolated ink illustration of an ancient Chinese Mine Entrance, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Ore and mineral extraction"
+    },
+    {
+      "id": "spiritual_stone_pit",
+      "Prompt": "isolated ink illustration of an ancient Chinese Spiritual Stone Pit, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single terracotta glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "High-value ore mining"
+    },
+    {
+      "id": "clay_pit",
+      "Prompt": "isolated ink illustration of an ancient Chinese Clay Pit, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Clay for pottery and building"
+    },
+    {
+      "id": "salt_extraction_pond",
+      "Prompt": "isolated ink illustration of an ancient Chinese Salt Extraction Pond, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Salt production from brines"
+    },
+    {
+      "id": "coal_storage_yard",
+      "Prompt": "isolated ink illustration of an ancient Chinese Coal Storage Yard, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Fuel resource stockpile"
+    },
+    {
+      "id": "fishing_dock",
+      "Prompt": "isolated ink illustration of an ancient Chinese Fishing Dock, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Water-based food harvesting (if near water)"
+    },
+    {
+      "id": "hunting_lodge",
+      "Prompt": "isolated ink illustration of an ancient Chinese Hunting Lodge, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Base for beast hunting expeditions"
+    },
+    {
+      "id": "beehive_farm",
+      "Prompt": "isolated ink illustration of an ancient Chinese Beehive Farm, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Honey and wax production"
+    },
+    {
+      "id": "beast_stable",
+      "Prompt": "isolated ink illustration of an ancient Chinese Beast Stable, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Housing for spirit beasts"
+    },
+    {
+      "id": "beast_feeding_station",
+      "Prompt": "isolated ink illustration of an ancient Chinese Beast Feeding Station, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Meal preparation for creatures"
+    },
+    {
+      "id": "beast_medical_center",
+      "Prompt": "isolated ink illustration of an ancient Chinese Beast Medical Center, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Veterinary care for beasts"
+    },
+    {
+      "id": "beast_training_ground",
+      "Prompt": "isolated ink illustration of an ancient Chinese Beast Training Ground, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Dedicated space for beast skill practice"
+    },
+    {
+      "id": "beast_breeding_chamber",
+      "Prompt": "isolated ink illustration of an ancient Chinese Beast Breeding Chamber, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Controlled mating environment"
+    },
+    {
+      "id": "egg_incubation_room",
+      "Prompt": "isolated ink illustration of an ancient Chinese Egg Incubation Room, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Climate-controlled egg hatching"
+    },
+    {
+      "id": "young_beast_nursery",
+      "Prompt": "isolated ink illustration of an ancient Chinese Young Beast Nursery, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Care for juvenile beasts"
+    },
+    {
+      "id": "beast_bonding_pavilion",
+      "Prompt": "isolated ink illustration of an ancient Chinese Beast Bonding Pavilion, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Space for human-beast relationship building"
+    },
+    {
+      "id": "beast_combat_arena",
+      "Prompt": "isolated ink illustration of an ancient Chinese Beast Combat Arena, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Staged battles for beasts"
+    },
+    {
+      "id": "beast_resurrection_chamber",
+      "Prompt": "isolated ink illustration of an ancient Chinese Beast Resurrection Chamber, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Revival magic for defeated beasts"
+    },
+    {
+      "id": "horse_stables",
+      "Prompt": "isolated ink illustration of an ancient Chinese Horse Stables, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Regular horse housing"
+    },
+    {
+      "id": "flying_mount_roost",
+      "Prompt": "isolated ink illustration of an ancient Chinese Flying Mount Roost, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Housing for aerial mounts"
+    },
+    {
+      "id": "livestock_pen",
+      "Prompt": "isolated ink illustration of an ancient Chinese Livestock Pen, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Cattle, pigs, chickens"
+    },
+    {
+      "id": "waterfowl_pond",
+      "Prompt": "isolated ink illustration of an ancient Chinese Waterfowl Pond, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Ducks and geese"
+    },
+    {
+      "id": "exotic_pet_menagerie",
+      "Prompt": "isolated ink illustration of an ancient Chinese Exotic Pet Menagerie, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Decorative/companion animals"
+    },
+    {
+      "id": "animal_slaughterhouse",
+      "Prompt": "isolated ink illustration of an ancient Chinese Animal Slaughterhouse, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Food processing (away from main areas)"
+    },
+    {
+      "id": "veterinary_clinic",
+      "Prompt": "isolated ink illustration of an ancient Chinese Veterinary Clinic, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "General animal care"
+    },
+    {
+      "id": "mount_equipment_storage",
+      "Prompt": "isolated ink illustration of an ancient Chinese Mount Equipment Storage, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Saddles, harnesses, tack"
+    },
+    {
+      "id": "sect_hall",
+      "Prompt": "isolated ink illustration of an ancient Chinese Sect Hall, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Central meeting place for leadership"
+    },
+    {
+      "id": "sect_leader_s_throne_room",
+      "Prompt": "isolated ink illustration of an ancient Chinese Sect Leader's Throne Room, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Formal audience chamber"
+    },
+    {
+      "id": "council_chamber",
+      "Prompt": "isolated ink illustration of an ancient Chinese Council Chamber, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Meeting room for governing body"
+    },
+    {
+      "id": "elder_s_parliament_hall",
+      "Prompt": "isolated ink illustration of an ancient Chinese Elder's Parliament Hall, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Assembly for senior members"
+    },
+    {
+      "id": "judicial_court",
+      "Prompt": "isolated ink illustration of an ancient Chinese Judicial Court, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Disciplinary hearings and disputes"
+    },
+    {
+      "id": "record_keeping_office",
+      "Prompt": "isolated ink illustration of an ancient Chinese Record Keeping Office, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Administrative documentation"
+    },
+    {
+      "id": "tax_and_tribute_hall",
+      "Prompt": "isolated ink illustration of an ancient Chinese Tax & Tribute Hall, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Financial accounting"
+    },
+    {
+      "id": "inspection_office",
+      "Prompt": "isolated ink illustration of an ancient Chinese Inspection Office, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Quality control and standards"
+    },
+    {
+      "id": "recruitment_station",
+      "Prompt": "isolated ink illustration of an ancient Chinese Recruitment Station, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "New member processing"
+    },
+    {
+      "id": "disciplinary_detention",
+      "Prompt": "isolated ink illustration of an ancient Chinese Disciplinary Detention, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Punishment cells/jails"
+    },
+    {
+      "id": "intelligence_bureau",
+      "Prompt": "isolated ink illustration of an ancient Chinese Intelligence Bureau, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Spy network headquarters"
+    },
+    {
+      "id": "message_station",
+      "Prompt": "isolated ink illustration of an ancient Chinese Message Station, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Messenger dispatch and receipt"
+    },
+    {
+      "id": "map_archives",
+      "Prompt": "isolated ink illustration of an ancient Chinese Map Archives, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Geographic and territory information"
+    },
+    {
+      "id": "census_office",
+      "Prompt": "isolated ink illustration of an ancient Chinese Census Office, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Population and member tracking"
+    },
+    {
+      "id": "ledger_house",
+      "Prompt": "isolated ink illustration of an ancient Chinese Ledger House, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Financial record keeping"
+    },
+    {
+      "id": "decree_broadcasting_hall",
+      "Prompt": "isolated ink illustration of an ancient Chinese Decree Broadcasting Hall, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Official announcements"
+    },
+    {
+      "id": "complaints_office",
+      "Prompt": "isolated ink illustration of an ancient Chinese Complaints Office, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Member grievance handling"
+    },
+    {
+      "id": "archive_vault",
+      "Prompt": "isolated ink illustration of an ancient Chinese Archive Vault, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Secure document storage"
+    },
+    {
+      "id": "auction_house",
+      "Prompt": "isolated ink illustration of an ancient Chinese Auction House, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Item buying/selling coordination"
+    },
+    {
+      "id": "bounty_board_station",
+      "Prompt": "isolated ink illustration of an ancient Chinese Bounty Board Station, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Job postings and contracts"
+    },
+    {
+      "id": "main_temple",
+      "Prompt": "isolated ink illustration of an ancient Chinese Main Temple, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Central religious/spiritual building"
+    },
+    {
+      "id": "ancestral_shrine",
+      "Prompt": "isolated ink illustration of an ancient Chinese Ancestral Shrine, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Honors sect founders and legendary members"
+    },
+    {
+      "id": "meditation_temple",
+      "Prompt": "isolated ink illustration of an ancient Chinese Meditation Temple, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Religious contemplative space"
+    },
+    {
+      "id": "prayer_hall",
+      "Prompt": "isolated ink illustration of an ancient Chinese Prayer Hall, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Dedicated space for ritual prayers"
+    },
+    {
+      "id": "heavenly_altar",
+      "Prompt": "isolated ink illustration of an ancient Chinese Heavenly Altar, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single gold glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Platform for heavenly tribulation prayers"
+    },
+    {
+      "id": "immortal_ascension_chapel",
+      "Prompt": "isolated ink illustration of an ancient Chinese Immortal Ascension Chapel, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Space for ascension ceremonies"
+    },
+    {
+      "id": "divine_blessing_pavilion",
+      "Prompt": "isolated ink illustration of an ancient Chinese Divine Blessing Pavilion, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single gold glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Receives divine blessings"
+    },
+    {
+      "id": "holy_relic_chamber",
+      "Prompt": "isolated ink illustration of an ancient Chinese Holy Relic Chamber, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single gold glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Stores sacred artifacts"
+    },
+    {
+      "id": "demon_binding_chamber",
+      "Prompt": "isolated ink illustration of an ancient Chinese Demon Binding Chamber, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single purple glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Contains sealed demonic entities"
+    },
+    {
+      "id": "reincarnation_memorial",
+      "Prompt": "isolated ink illustration of an ancient Chinese Reincarnation Memorial, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Honors fallen members"
+    },
+    {
+      "id": "karma_accumulation_hall",
+      "Prompt": "isolated ink illustration of an ancient Chinese Karma Accumulation Hall, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Tracks and celebrates good deeds"
+    },
+    {
+      "id": "heavenly_mandate_chamber",
+      "Prompt": "isolated ink illustration of an ancient Chinese Heavenly Mandate Chamber, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single gold glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Receives divine authority"
+    },
+    {
+      "id": "sacred_seal_sanctuary",
+      "Prompt": "isolated ink illustration of an ancient Chinese Sacred Seal Sanctuary, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Magical sealing ceremonies"
+    },
+    {
+      "id": "demon_suppression_tower",
+      "Prompt": "isolated ink illustration of an ancient Chinese Demon Suppression Tower, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single purple glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Contains/controls demonic forces"
+    },
+    {
+      "id": "enlightenment_shrine",
+      "Prompt": "isolated ink illustration of an ancient Chinese Enlightenment Shrine, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single gold glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Focus for achieving satori/sudden insight"
+    },
+    {
+      "id": "qi_blessing_pavilion",
+      "Prompt": "isolated ink illustration of an ancient Chinese Qi Blessing Pavilion, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Receives celestial qi blessings"
+    },
+    {
+      "id": "heavenly_tribulation_shelter",
+      "Prompt": "isolated ink illustration of an ancient Chinese Heavenly Tribulation Shelter, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single gold glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Safe space during lightning strikes"
+    },
+    {
+      "id": "spirit_possession_chamber",
+      "Prompt": "isolated ink illustration of an ancient Chinese Spirit Possession Chamber, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single purple glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Controlled possession rituals"
+    },
+    {
+      "id": "exorcism_hall",
+      "Prompt": "isolated ink illustration of an ancient Chinese Exorcism Hall, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Removes unwanted spiritual possession"
+    },
+    {
+      "id": "divine_inheritance_room",
+      "Prompt": "isolated ink illustration of an ancient Chinese Divine Inheritance Room, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single gold glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Passes down celestial techniques"
+    },
+    {
+      "id": "outer_walls",
+      "Prompt": "isolated ink illustration of an ancient Chinese Outer Walls, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single terracotta glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Perimeter defense"
+    },
+    {
+      "id": "guard_towers",
+      "Prompt": "isolated ink illustration of an ancient Chinese Guard Towers, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Elevated defensive positions"
+    },
+    {
+      "id": "gate_house",
+      "Prompt": "isolated ink illustration of an ancient Chinese Gate House, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Main entrance control"
+    },
+    {
+      "id": "barrier_formation_array",
+      "Prompt": "isolated ink illustration of an ancient Chinese Barrier Formation Array, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Magical protective perimeter"
+    },
+    {
+      "id": "underground_bunker",
+      "Prompt": "isolated ink illustration of an ancient Chinese Underground Bunker, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Emergency shelter"
+    },
+    {
+      "id": "watchtower",
+      "Prompt": "isolated ink illustration of an ancient Chinese Watchtower, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Early warning system"
+    },
+    {
+      "id": "garrison_barracks",
+      "Prompt": "isolated ink illustration of an ancient Chinese Garrison Barracks, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Military force housing"
+    },
+    {
+      "id": "armory_arsenal",
+      "Prompt": "isolated ink illustration of an ancient Chinese Armory Arsenal, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Weapon and armor stockpile"
+    },
+    {
+      "id": "trap_chamber",
+      "Prompt": "isolated ink illustration of an ancient Chinese Trap Chamber, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Automated security measures"
+    },
+    {
+      "id": "secret_escape_tunnel",
+      "Prompt": "isolated ink illustration of an ancient Chinese Secret Escape Tunnel, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Hidden evacuation route"
+    },
+    {
+      "id": "anti_flying_formation",
+      "Prompt": "isolated ink illustration of an ancient Chinese Anti-Flying Formation, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Prevents aerial entry"
+    },
+    {
+      "id": "teleportation_ward",
+      "Prompt": "isolated ink illustration of an ancient Chinese Teleportation Ward, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Blocks unwanted teleportation"
+    },
+    {
+      "id": "boundary_breaking_pillar",
+      "Prompt": "isolated ink illustration of an ancient Chinese Boundary Breaking Pillar, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Tests intruder strength"
+    },
+    {
+      "id": "detection_array",
+      "Prompt": "isolated ink illustration of an ancient Chinese Detection Array, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Senses approaching threats"
+    },
+    {
+      "id": "magical_alarm_system",
+      "Prompt": "isolated ink illustration of an ancient Chinese Magical Alarm System, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Alerts on intrusion"
+    },
+    {
+      "id": "seal_activation_chamber",
+      "Prompt": "isolated ink illustration of an ancient Chinese Seal Activation Chamber, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Locks down buildings"
+    },
+    {
+      "id": "trap_activation_hall",
+      "Prompt": "isolated ink illustration of an ancient Chinese Trap Activation Hall, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Controls environmental hazards"
+    },
+    {
+      "id": "spiritual_barrier_generator",
+      "Prompt": "isolated ink illustration of an ancient Chinese Spiritual Barrier Generator, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single purple glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Maintains protective shields"
+    },
+    {
+      "id": "defense_coordination_center",
+      "Prompt": "isolated ink illustration of an ancient Chinese Defense Coordination Center, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single terracotta glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Command center for security"
+    },
+    {
+      "id": "backup_power_generator",
+      "Prompt": "isolated ink illustration of an ancient Chinese Backup Power Generator, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Maintains defenses without external qi"
+    },
+    {
+      "id": "flying_ship_dock",
+      "Prompt": "isolated ink illustration of an ancient Chinese Flying Ship Dock, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Mooring for airborne vessels"
+    },
+    {
+      "id": "teleportation_portal_hall",
+      "Prompt": "isolated ink illustration of an ancient Chinese Teleportation Portal Hall, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Fast travel destination hubs"
+    },
+    {
+      "id": "dimensional_gate_chamber",
+      "Prompt": "isolated ink illustration of an ancient Chinese Dimensional Gate Chamber, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Access to pocket dimensions"
+    },
+    {
+      "id": "carriage_house",
+      "Prompt": "isolated ink illustration of an ancient Chinese Carriage House, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Ground transport vehicle storage"
+    },
+    {
+      "id": "flying_carpet_storage",
+      "Prompt": "isolated ink illustration of an ancient Chinese Flying Carpet Storage, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Personal flight item storage"
+    },
+    {
+      "id": "sky_bridge",
+      "Prompt": "isolated ink illustration of an ancient Chinese Sky Bridge, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single gold glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Elevated walkways between buildings"
+    },
+    {
+      "id": "fast_travel_network_room",
+      "Prompt": "isolated ink illustration of an ancient Chinese Fast Travel Network Room, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Coordinates magical travel"
+    },
+    {
+      "id": "merchant_caravan_hub",
+      "Prompt": "isolated ink illustration of an ancient Chinese Merchant Caravan Hub, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Trade route coordination"
+    },
+    {
+      "id": "beast_mount_training_ground",
+      "Prompt": "isolated ink illustration of an ancient Chinese Beast Mount Training Ground, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Flying beast flight practice"
+    },
+    {
+      "id": "treasure_vault",
+      "Prompt": "isolated ink illustration of an ancient Chinese Treasure Vault, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Ultra-secure storage for sect valuables"
+    },
+    {
+      "id": "execution_ground",
+      "Prompt": "isolated ink illustration of an ancient Chinese Execution Ground, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Public punishment area"
+    },
+    {
+      "id": "war_room",
+      "Prompt": "isolated ink illustration of an ancient Chinese War Room, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Strategic planning center"
+    },
+    {
+      "id": "espionage_bureau",
+      "Prompt": "isolated ink illustration of an ancient Chinese Espionage Bureau, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Secret intelligence operations"
+    },
+    {
+      "id": "counterfeiting_detection_lab",
+      "Prompt": "isolated ink illustration of an ancient Chinese Counterfeiting Detection Lab, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Identifies fake items"
+    },
+    {
+      "id": "cursed_item_containment",
+      "Prompt": "isolated ink illustration of an ancient Chinese Cursed Item Containment, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single purple glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Seals dangerous magical items"
+    },
+    {
+      "id": "time_manipulated_chamber",
+      "Prompt": "isolated ink illustration of an ancient Chinese Time-Manipulated Chamber, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Accelerated time for training"
+    },
+    {
+      "id": "pocket_dimension_generator",
+      "Prompt": "isolated ink illustration of an ancient Chinese Pocket Dimension Generator, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Creates temporary spaces"
+    },
+    {
+      "id": "hidden_weapon_development_lab",
+      "Prompt": "isolated ink illustration of an ancient Chinese Hidden Weapon Development Lab, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Secret weapon research"
+    },
+    {
+      "id": "torture_chamber",
+      "Prompt": "isolated ink illustration of an ancient Chinese Torture Chamber, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Interrogation facility"
+    },
+    {
+      "id": "trophy_hall",
+      "Prompt": "isolated ink illustration of an ancient Chinese Trophy Hall, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Displays conquered artifacts/enemies"
+    },
+    {
+      "id": "beast_resurrection_facility",
+      "Prompt": "isolated ink illustration of an ancient Chinese Beast Resurrection Facility, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Revival of defeated creatures"
+    },
+    {
+      "id": "bloodline_purification_chamber",
+      "Prompt": "isolated ink illustration of an ancient Chinese Bloodline Purification Chamber, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single crimson glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Alchemical genetic enhancement"
+    },
+    {
+      "id": "soul_fragment_storage",
+      "Prompt": "isolated ink illustration of an ancient Chinese Soul Fragment Storage, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single purple glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Contains separated soul pieces"
+    },
+    {
+      "id": "demon_summoning_circle",
+      "Prompt": "isolated ink illustration of an ancient Chinese Demon Summoning Circle, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single purple glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Ritual space for demon pacts"
+    },
+    {
+      "id": "reincarnation_pool",
+      "Prompt": "isolated ink illustration of an ancient Chinese Reincarnation Pool, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Rebirth facilitation"
+    },
+    {
+      "id": "clone_cultivation_tank",
+      "Prompt": "isolated ink illustration of an ancient Chinese Clone Cultivation Tank, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Grows duplicate bodies"
+    },
+    {
+      "id": "undead_animation_lab",
+      "Prompt": "isolated ink illustration of an ancient Chinese Undead Animation Lab, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Creates zombie servants"
+    },
+    {
+      "id": "fate_manipulation_shrine",
+      "Prompt": "isolated ink illustration of an ancient Chinese Fate Manipulation Shrine, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Affects destiny/luck"
+    },
+    {
+      "id": "void_gateway",
+      "Prompt": "isolated ink illustration of an ancient Chinese Void Gateway, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single purple glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Accesses outer dimensions"
+    },
+    {
+      "id": "sacred_mountain_peak",
+      "Prompt": "isolated ink illustration of an ancient Chinese Sacred Mountain Peak, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single terracotta glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "High elevation for meditation/power"
+    },
+    {
+      "id": "spiritual_vein_nexus",
+      "Prompt": "isolated ink illustration of an ancient Chinese Spiritual Vein Nexus, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single purple glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Underground convergence of qi"
+    },
+    {
+      "id": "ancient_ruin_excavation",
+      "Prompt": "isolated ink illustration of an ancient Chinese Ancient Ruin Excavation, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Exploration of historical site"
+    },
+    {
+      "id": "meteor_impact_crater",
+      "Prompt": "isolated ink illustration of an ancient Chinese Meteor Impact Crater, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Unusual qi formation"
+    },
+    {
+      "id": "dimensional_rift",
+      "Prompt": "isolated ink illustration of an ancient Chinese Dimensional Rift, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Gateway to other worlds"
+    },
+    {
+      "id": "qi_storm_vortex",
+      "Prompt": "isolated ink illustration of an ancient Chinese Qi Storm Vortex, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Natural phenomenon harnessed for power"
+    },
+    {
+      "id": "celestial_observation_platform",
+      "Prompt": "isolated ink illustration of an ancient Chinese Celestial Observation Platform, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single gold glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Astronomical study site"
+    },
+    {
+      "id": "underworld_gateway",
+      "Prompt": "isolated ink illustration of an ancient Chinese Underworld Gateway, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Access to afterlife realms"
+    },
+    {
+      "id": "dragon_s_lair_replica",
+      "Prompt": "isolated ink illustration of an ancient Chinese Dragon's Lair Replica, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Simulates beast habitat"
+    },
+    {
+      "id": "heavens_fragment",
+      "Prompt": "isolated ink illustration of an ancient Chinese Heavens' Fragment, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single gold glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Piece of celestial realm on ground"
+    },
+    {
+      "id": "floating_island",
+      "Prompt": "isolated ink illustration of an ancient Chinese Floating Island, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Magical levitating landmass"
+    },
+    {
+      "id": "sky_castle",
+      "Prompt": "isolated ink illustration of an ancient Chinese Sky Castle, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single gold glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Fortress in the clouds"
+    },
+    {
+      "id": "cloud_palace",
+      "Prompt": "isolated ink illustration of an ancient Chinese Cloud Palace, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Residence suspended in air"
+    },
+    {
+      "id": "heavenly_pagoda_tower",
+      "Prompt": "isolated ink illustration of an ancient Chinese Heavenly Pagoda Tower, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single gold glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Reaches toward heavens"
+    },
+    {
+      "id": "flying_ship_flagship",
+      "Prompt": "isolated ink illustration of an ancient Chinese Flying Ship Flagship, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Mobile sect headquarters"
+    },
+    {
+      "id": "airship_fleet",
+      "Prompt": "isolated ink illustration of an ancient Chinese Airship Fleet, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Multiple flying vessels"
+    },
+    {
+      "id": "cloud_bridge",
+      "Prompt": "isolated ink illustration of an ancient Chinese Cloud Bridge, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Walkway between sky structures"
+    },
+    {
+      "id": "celestial_observatory_tower",
+      "Prompt": "isolated ink illustration of an ancient Chinese Celestial Observatory Tower, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single gold glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Extended toward stars"
+    },
+    {
+      "id": "sky_garden",
+      "Prompt": "isolated ink illustration of an ancient Chinese Sky Garden, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Floating botanical garden"
+    },
+    {
+      "id": "heaven_s_gate_tower",
+      "Prompt": "isolated ink illustration of an ancient Chinese Heaven's Gate Tower, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single gold glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Ascension monument"
+    },
+    {
+      "id": "central_plaza",
+      "Prompt": "isolated ink illustration of an ancient Chinese Central Plaza, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Gathering area for announcements"
+    },
+    {
+      "id": "courtyard_with_fountain",
+      "Prompt": "isolated ink illustration of an ancient Chinese Courtyard with Fountain, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Decorative gathering space"
+    },
+    {
+      "id": "flower_garden",
+      "Prompt": "isolated ink illustration of an ancient Chinese Flower Garden, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Aesthetic landscaping"
+    },
+    {
+      "id": "rock_garden",
+      "Prompt": "isolated ink illustration of an ancient Chinese Rock Garden, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single green glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Zen-style meditation garden"
+    },
+    {
+      "id": "pagoda_gazebo",
+      "Prompt": "isolated ink illustration of an ancient Chinese Pagoda Gazebo, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single gold glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Covered rest areas"
+    },
+    {
+      "id": "stone_benches_and_path",
+      "Prompt": "isolated ink illustration of an ancient Chinese Stone Benches & Path, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single terracotta glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Scenic walking route"
+    },
+    {
+      "id": "waterfall_grotto",
+      "Prompt": "isolated ink illustration of an ancient Chinese Waterfall Grotto, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Natural water feature"
+    },
+    {
+      "id": "bridge_crossing",
+      "Prompt": "isolated ink illustration of an ancient Chinese Bridge Crossing, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Connects separated areas"
+    },
+    {
+      "id": "torch_lit_pathway",
+      "Prompt": "isolated ink illustration of an ancient Chinese Torch-Lit Pathway, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Illuminated walkway"
+    },
+    {
+      "id": "sect_monument_plaza",
+      "Prompt": "isolated ink illustration of an ancient Chinese Sect Monument Plaza, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Commemorative statue area"
+    },
+    {
+      "id": "training_grounds_field",
+      "Prompt": "isolated ink illustration of an ancient Chinese Training Grounds Field, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single blue glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Large open combat practice area"
+    },
+    {
+      "id": "archery_range_field",
+      "Prompt": "isolated ink illustration of an ancient Chinese Archery Range Field, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Long-distance weapons practice"
+    },
+    {
+      "id": "cliff_meditation_ledge",
+      "Prompt": "isolated ink illustration of an ancient Chinese Cliff Meditation Ledge, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Isolated meditation spot"
+    },
+    {
+      "id": "spirit_pool",
+      "Prompt": "isolated ink illustration of an ancient Chinese Spirit Pool, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single purple glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Natural water with qi properties"
+    },
+    {
+      "id": "ancient_tree_grove",
+      "Prompt": "isolated ink illustration of an ancient Chinese Ancient Tree Grove, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Sacred forest area"
+    },
+    {
+      "id": "moonlight_pavilion",
+      "Prompt": "isolated ink illustration of an ancient Chinese Moonlight Pavilion, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single gold glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Night-time meditation structure"
+    },
+    {
+      "id": "dawn_observation_point",
+      "Prompt": "isolated ink illustration of an ancient Chinese Dawn Observation Point, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Sunrise viewing platform"
+    },
+    {
+      "id": "scenic_overlook",
+      "Prompt": "isolated ink illustration of an ancient Chinese Scenic Overlook, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single golden glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Vista point of surrounding landscape"
+    },
+    {
+      "id": "ritual_bonfire_circle",
+      "Prompt": "isolated ink illustration of an ancient Chinese Ritual Bonfire Circle, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single red glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Ceremonial gathering fire"
+    },
+    {
+      "id": "sacred_burial_ground",
+      "Prompt": "isolated ink illustration of an ancient Chinese Sacred Burial Ground, top down 3/4 view, parchment background, hand drawn brush strokes, minimal shading, black ink, single crimson glowing accent, game map icon, transparent background",
+      "NegativePrompt": "photorealistic, 3d render, bright colors, complex background, text, watermark, signature",
+      "Width": 512,
+      "Height": 512,
+      "description": "Cemetery for honored members"
+    }
+  ]
+}

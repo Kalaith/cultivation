@@ -1,0 +1,26 @@
+{
+  "id": "sect_map_v1",
+  "version": 1,
+  "seed": 1337,
+  "size": { "width": 4096, "height": 4096 },
+  "world_rect": { "x": 0.0, "y": 0.0, "w": 4096.0, "h": 4096.0 },
+  "layers": {
+    "base_map": { "texture": "assets/generated/maps/sect_map_base.png", "cache": true },
+    "roads": { "texture": "assets/generated/maps/sect_map_roads.png", "cache": true }
+  },
+  "placement": {
+    "mode": "freeform",
+    "snap_radius": 0.0,
+    "units": "world_px"
+  },
+  "overlays": [
+    { "id": "feng_shui", "kind": "feng_shui", "texture": null, "blend": "multiply", "opacity": 0.35 },
+    { "id": "spirit_flow", "kind": "spirit_flow", "texture": null, "blend": "screen", "opacity": 0.25 }
+  ],
+  "stamps": {
+    "stamps": [
+      { "id": "bld_sect_hall", "kind": "building", "size_class": "L", "texture": "assets/generated/buildings/bld_sect_hall.png", "element": "none", "anchor": { "x": 0.5, "y": 0.9 }, "bounds": { "w": 52.0, "h": 52.0 } },
+      { "id": "bld_alchemy", "kind": "building", "size_class": "M", "texture": "assets/generated/buildings/bld_alchemy.png", "element": "wood", "anchor": { "x": 0.5, "y": 0.9 }, "bounds": { "w": 42.0, "h": 42.0 } }
+    ]
+  }
+}

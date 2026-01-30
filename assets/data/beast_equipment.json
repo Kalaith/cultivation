@@ -1,0 +1,18 @@
+[
+  {
+    "id": "beast_collar_wood",
+    "name": "Carved Wood Collar",
+    "slot": "Collar",
+    "tier_required": "Mortal",
+    "stats": { "health": 5, "attack": 1, "defense": 1, "speed": 1, "qi": 0 },
+    "beast_only": true
+  },
+  {
+    "id": "beast_harness_leather",
+    "name": "Sturdy Leather Harness",
+    "slot": "Harness",
+    "tier_required": "Mortal",
+    "stats": { "health": 10, "attack": 0, "defense": 2, "speed": 0, "qi": 0 },
+    "beast_only": true
+  }
+]

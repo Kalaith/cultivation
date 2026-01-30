@@ -1,7 +1,7 @@
 {
     "backgrounds": {
         "bg_main_menu": "assets/generated/backgrounds/bg_main_menu.png",
-        "bg_sect_base": "assets/generated/backgrounds/bg_sect_base.png",
+        "bg_sect_base": "assets/map_background.png",
         "bg_roster": "assets/generated/backgrounds/bg_roster.png",
         "bg_world_map": "assets/generated/backgrounds/bg_world_map.png",
         "bg_mission_assign": "assets/generated/backgrounds/bg_mission_assign.png",
@@ -11,6 +11,9 @@
         "bg_trade": "assets/generated/backgrounds/bg_trade.png",
         "bg_tribulation": "assets/generated/backgrounds/bg_tribulation.png",
         "bg_sect_creation": "assets/generated/backgrounds/bg_sect_creation.png"
+    },
+    "maps": {
+        "sect_map_base": "assets/generated/maps/sect_map_base.png"
     },
     "buildings": {
         "bld_sect_hall": "assets/generated/buildings/bld_sect_hall.png",

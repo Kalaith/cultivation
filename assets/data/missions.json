@@ -33,5 +33,40 @@
         "description": "Explore the Tablet of Earth's Legacy.",
         "danger_level": 8,
         "repeatable": false
+    },
+    {
+        "mission_type": "ResourceGathering",
+        "duration": 15,
+        "description": "Gather Iron Ore from the Eastern Mines.",
+        "danger_level": 2,
+        "repeatable": true
+    },
+    {
+        "mission_type": "ResourceGathering",
+        "duration": 30,
+        "description": "Prospect for Spirit Iron in the Deep Caverns.",
+        "danger_level": 4,
+        "repeatable": true
+    },
+    {
+        "mission_type": "MonsterSuppression",
+        "duration": 25,
+        "description": "Hunt Spirit Beasts for Leather Scraps.",
+        "danger_level": 4,
+        "repeatable": true
+    },
+    {
+        "mission_type": "ResourceGathering",
+        "duration": 20,
+        "description": "Collect Spirit Ink from the Moonlit Grotto.",
+        "danger_level": 3,
+        "repeatable": true
+    },
+    {
+        "mission_type": "ResourceGathering",
+        "duration": 15,
+        "description": "Harvest Talisman Paper from the Paper Mulberry Grove.",
+        "danger_level": 1,
+        "repeatable": true
     }
 ]

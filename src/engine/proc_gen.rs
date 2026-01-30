@@ -53,6 +53,7 @@ pub fn generate_disciple(game_data: &GameData) -> Disciple {
         injury: None,
         breakthrough_readiness: 0.0,
         equipment: std::collections::HashMap::new(),
+        breakthrough_bottleneck: None,
     }
 }
 

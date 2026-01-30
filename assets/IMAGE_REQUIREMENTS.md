@@ -5,6 +5,15 @@ All images to be generated using `tools/ink_wash_generator.py` with appropriate 
 
 ---
 
+## 0. SECT MAP LAYERS (2 images)
+
+| ID | Name | Description | Expected Size | Notes |
+|----|------|-------------|---------------|-------|
+| sect_map_base | Sect Map Base | Large ink-wash parchment map for the sect base | 4096x4096 | Flat 2D map. No seal. Edges should fade into black. |
+| sect_map_roads | Sect Map Roads | Empty road overlay (transparent) | 4096x4096 | Transparent PNG for future hand-authored roads. Leave empty for now. |
+
+---
+
 ## 1. SCREEN BACKGROUNDS (11 images)
 
 | ID | Name | Description | Suggested Seed Range |
@@ -208,11 +217,20 @@ Full-screen transitional art.
 
 ## GENERATION NOTES
 
-### Recommended Sizes
-- **Backgrounds**: 1920x1080 or 1280x720
-- **Building/Region**: 512x384 or 512x512
-- **Vignettes**: 256x256 or 256x192
+### Expected Sizes (Authoritative)
+- **Sect map layers**: 4096x4096
+- **Backgrounds**: 1280x720
+- **Buildings**: 512x384
+- **Regions**: 512x384
+- **Missions**: 512x384
+- **Cultivation realms**: 512x384
+- **Elements**: 512x512
+- **Seasons**: 512x384
+- **Factions**: 512x384
+- **Events**: 800x600
+- **Items**: 256x256
 - **UI Elements**: As specified above
+- **Loading screens**: 1920x1080
 
 ### Generator Modifications Needed
 1. **Add color tinting option** - For element-themed images
@@ -221,6 +239,10 @@ Full-screen transitional art.
 4. **Add structure frequency** - More/fewer pagodas
 5. **Add weather effects** - Rain, snow, storm options
 6. **Add golden/celestial glow** - For breakthrough/heavenly scenes
+
+### Collision Requirements (Sect Map)
+- Building sprites must include clean alpha transparency (no solid background) for pixel-perfect placement collisions.
+- Anchor point is bottom-center of the sprite (used for placement and hit testing).
 
 ### Batch Generation Command
 ```bash

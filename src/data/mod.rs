@@ -15,5 +15,6 @@ pub mod missions;
 pub mod relations;
 pub mod resources;
 pub mod stages;
+pub mod spirit_beasts;
 pub mod tech;
 pub mod world_events;

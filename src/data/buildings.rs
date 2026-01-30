@@ -24,6 +24,8 @@ pub enum BuildingType {
     Greenhouse,
     DryingPavilion,
     HerbStorage,
+    // Talisman crafting
+    TalismanScriptorium,
 }
 
 impl std::fmt::Display for BuildingType {
@@ -43,6 +45,7 @@ impl std::fmt::Display for BuildingType {
             BuildingType::Greenhouse => write!(f, "Greenhouse"),
             BuildingType::DryingPavilion => write!(f, "Drying Pavilion"),
             BuildingType::HerbStorage => write!(f, "Herb Storage"),
+            BuildingType::TalismanScriptorium => write!(f, "Talisman Scriptorium"),
         }
     }
 }

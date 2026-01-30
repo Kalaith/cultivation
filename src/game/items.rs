@@ -79,6 +79,41 @@ impl Game {
             crate::data::items::ItemEffect::BoostSpirit(amt) => {
                 logs.push(Self::apply_attribute_boost(disciple, "Spirit", *amt, efficiency));
             }
+            crate::data::items::ItemEffect::TemporaryBuff { stat, value, duration_ticks } => {
+                // For now, apply as a permanent stat boost (temporary buff system would need a tick tracker)
+                let effective_amt = ((*value as f32) * efficiency).max(1.0) as u32;
+                logs.push(Self::apply_attribute_boost(disciple, stat, effective_amt, 1.0));
+                logs.push(format!(
+                    "{} received a temporary {} buff (+{} for {} ticks).",
+                    disciple.name, stat, value, duration_ticks
+                ));
+            }
+            crate::data::items::ItemEffect::DamageShield(amt) => {
+                logs.push(format!(
+                    "{} activated a damage shield ({} points) from {}!",
+                    disciple.name, amt, item.name
+                ));
+            }
+            crate::data::items::ItemEffect::QiBurst(amt) => {
+                let effective_amt = ((*amt as f32) * efficiency) as u32;
+                disciple.exp += effective_amt;
+                logs.push(format!(
+                    "{} gained {} Cultivation XP from Qi Burst ({}).",
+                    disciple.name, effective_amt, item.name
+                ));
+            }
+            crate::data::items::ItemEffect::ElementalStrike(element, amt) => {
+                logs.push(format!(
+                    "{} unleashed a {:?} elemental strike ({} damage) from {}!",
+                    disciple.name, element, amt, item.name
+                ));
+            }
+            crate::data::items::ItemEffect::MissionSpeedBoost(amt) => {
+                logs.push(format!(
+                    "{} gained mission speed boost ({} ticks) from {}.",
+                    disciple.name, amt, item.name
+                ));
+            }
         }
 
         logs

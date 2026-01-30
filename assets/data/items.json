@@ -148,5 +148,191 @@
             { "BoostQi": 40 },
             { "Heal": 25 }
         ]
+    },
+    {
+        "id": "iron_ore",
+        "name": "Iron Ore",
+        "description": "Common iron ore mined from the hills. Used in basic forging.",
+        "item_type": "Resource",
+        "element": "Metal"
+    },
+    {
+        "id": "spirit_iron_ore",
+        "name": "Spirit Iron Ore",
+        "description": "Iron ore infused with spiritual energy. Used for superior forging.",
+        "item_type": "Resource",
+        "element": "Metal"
+    },
+    {
+        "id": "leather_scraps",
+        "name": "Leather Scraps",
+        "description": "Tough leather from spirit beasts. Used for armor crafting.",
+        "item_type": "Resource"
+    },
+    {
+        "id": "spirit_steel_sword",
+        "name": "Spirit Steel Sword",
+        "description": "A sword forged from spirit iron. Hums with spiritual energy.",
+        "item_type": "Artifact",
+        "quality": "Fine",
+        "element": "Metal",
+        "equipment": {
+            "slot": "Weapon",
+            "durability": 150,
+            "modifiers": [
+                { "stat": "body", "value": 5 },
+                { "stat": "spirit", "value": 2 }
+            ]
+        }
+    },
+    {
+        "id": "iron_chest_plate",
+        "name": "Iron Chest Plate",
+        "description": "Heavy iron armor protecting the torso.",
+        "item_type": "Armor",
+        "element": "Metal",
+        "equipment": {
+            "slot": "Chest",
+            "durability": 120,
+            "modifiers": [
+                { "stat": "body", "value": 4 }
+            ]
+        }
+    },
+    {
+        "id": "leather_bracers",
+        "name": "Leather Bracers",
+        "description": "Tough leather arm guards for protection.",
+        "item_type": "Armor",
+        "equipment": {
+            "slot": "Arms",
+            "durability": 80,
+            "modifiers": [
+                { "stat": "body", "value": 2 }
+            ]
+        }
+    },
+    {
+        "id": "iron_helm",
+        "name": "Iron Helm",
+        "description": "A sturdy iron helmet.",
+        "item_type": "Armor",
+        "element": "Metal",
+        "equipment": {
+            "slot": "Head",
+            "durability": 100,
+            "modifiers": [
+                { "stat": "body", "value": 3 }
+            ]
+        }
+    },
+    {
+        "id": "iron_greaves",
+        "name": "Iron Greaves",
+        "description": "Heavy iron leg armor.",
+        "item_type": "Armor",
+        "element": "Metal",
+        "equipment": {
+            "slot": "Legs",
+            "durability": 100,
+            "modifiers": [
+                { "stat": "body", "value": 3 }
+            ]
+        }
+    },
+    {
+        "id": "minor_healing_potion",
+        "name": "Minor Healing Potion",
+        "description": "A potion that temporarily boosts natural recovery.",
+        "item_type": "Potion",
+        "element": "Water",
+        "effects": [
+            { "Heal": 40 },
+            { "TemporaryBuff": { "stat": "body", "value": 3, "duration_ticks": 600 } }
+        ]
+    },
+    {
+        "id": "qi_surge_potion",
+        "name": "Qi Surge Potion",
+        "description": "A potion that temporarily accelerates cultivation speed.",
+        "item_type": "Potion",
+        "element": "Wood",
+        "effects": [
+            { "BoostQi": 150 },
+            { "TemporaryBuff": { "stat": "spirit", "value": 5, "duration_ticks": 600 } }
+        ]
+    },
+    {
+        "id": "body_fortification_potion",
+        "name": "Body Fortification Potion",
+        "description": "A potion that temporarily hardens the body.",
+        "item_type": "Potion",
+        "element": "Earth",
+        "effects": [
+            { "BoostBody": 8 },
+            { "TemporaryBuff": { "stat": "body", "value": 5, "duration_ticks": 900 } }
+        ]
+    },
+    {
+        "id": "mind_clarity_elixir",
+        "name": "Mind Clarity Elixir",
+        "description": "An elixir that sharpens mental acuity.",
+        "item_type": "Potion",
+        "element": "Water",
+        "effects": [
+            { "BoostMind": 8 },
+            { "TemporaryBuff": { "stat": "mind", "value": 5, "duration_ticks": 900 } }
+        ]
+    },
+    {
+        "id": "spirit_ink",
+        "name": "Spirit Ink",
+        "description": "Ink infused with spiritual energy. Essential for talisman inscription.",
+        "item_type": "Resource",
+        "element": "Water"
+    },
+    {
+        "id": "talisman_paper",
+        "name": "Talisman Paper",
+        "description": "Specially prepared paper that can hold spiritual inscriptions.",
+        "item_type": "Resource"
+    },
+    {
+        "id": "fire_strike_talisman",
+        "name": "Fire Strike Talisman",
+        "description": "A one-use talisman that unleashes a burst of fire damage.",
+        "item_type": "Talisman",
+        "element": "Fire",
+        "effects": [
+            { "ElementalStrike": ["Fire", 50] }
+        ]
+    },
+    {
+        "id": "earth_shield_talisman",
+        "name": "Earth Shield Talisman",
+        "description": "A one-use talisman that creates a protective earth barrier.",
+        "item_type": "Talisman",
+        "element": "Earth",
+        "effects": [
+            { "DamageShield": 40 }
+        ]
+    },
+    {
+        "id": "wind_step_scroll",
+        "name": "Wind Step Scroll",
+        "description": "A scroll that grants swiftness, reducing mission duration.",
+        "item_type": "Scroll",
+        "effects": [
+            { "MissionSpeedBoost": 20 }
+        ]
+    },
+    {
+        "id": "qi_gathering_scroll",
+        "name": "Qi Gathering Scroll",
+        "description": "A scroll that channels ambient Qi for a burst of cultivation energy.",
+        "item_type": "Scroll",
+        "effects": [
+            { "QiBurst": 200 }
+        ]
     }
 ]

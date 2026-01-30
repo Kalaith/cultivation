@@ -8,6 +8,7 @@ use crate::data::{
     herbs::Season,
     history::DeceasedDisciple,
     missions::{MissionOutcome, OngoingMission},
+    spirit_beasts::SpiritBeast,
     grid::Grid,
 };
 use crate::engine::world_sim::SavedWorldSim;
@@ -15,7 +16,7 @@ use crate::engine::scheduler::SavedScheduler;
 use serde::{Deserialize, Serialize};
 
 /// Save file version for migration support
-pub const SAVE_VERSION: u32 = 4;
+pub const SAVE_VERSION: u32 = 6;
 
 /// Tutorial state for save/load
 #[derive(Clone, Serialize, Deserialize, Default)]
@@ -72,6 +73,8 @@ pub struct SaveData {
     pub disciples: Vec<Disciple>,
     #[serde(default)]
     pub deceased_disciples: Vec<DeceasedDisciple>,
+    #[serde(default)]
+    pub spirit_beasts: Vec<SpiritBeast>,
 
     // Buildings and missions
     pub buildings: Vec<Building>,
@@ -100,6 +103,10 @@ pub struct SaveData {
     // AI scheduler state (new in v4)
     #[serde(default)]
     pub scheduler: Option<SavedScheduler>,
+
+    // Discovered recipes (new in v5)
+    #[serde(default)]
+    pub discovered_recipes: Vec<String>,
 }
 
 fn default_season() -> Season {
@@ -126,6 +133,17 @@ impl SaveData {
         if self.version < 4 {
             // v3 -> v4: Add scheduler state (will be created fresh on load)
             self.scheduler = None;
+        }
+        if self.version < 5 {
+            // v4 -> v5: Add discovered recipes (start with basics)
+            self.discovered_recipes = vec![
+                "recipe_healing_pill".to_string(),
+                "recipe_iron_sword".to_string(),
+            ];
+        }
+        if self.version < 6 {
+            // v5 -> v6: Add spirit beasts list
+            self.spirit_beasts = Vec::new();
         }
         self.version = SAVE_VERSION;
         self

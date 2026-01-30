@@ -5,6 +5,7 @@ use crate::data::herbs::Season;
 use crate::data::history::DeceasedDisciple;
 use crate::data::loader::GameData;
 use crate::data::missions::{MissionOutcome, OngoingMission};
+use crate::data::spirit_beasts::SpiritBeast;
 use crate::engine::proc_gen::generate_disciple;
 use crate::engine::scheduler::Scheduler;
 use crate::engine::world_sim::WorldSim;
@@ -44,10 +45,12 @@ pub struct Game {
     pub unlocked_techs: Vec<String>,
     pub disciples: Vec<Disciple>,
     pub deceased_disciples: Vec<DeceasedDisciple>,
+    pub spirit_beasts: Vec<SpiritBeast>,
     pub ongoing_missions: Vec<OngoingMission>,
     pub completed_missions: Vec<MissionOutcome>,
     pub completed_history: Vec<String>, // List of descriptions of successfully completed missions
     pub event_log: Vec<String>,
+    pub discovered_recipes: Vec<String>,
     pub tutorial: crate::state::TutorialState,
     tick: u64,
     /// Current season for herb growth
@@ -127,10 +130,15 @@ impl Game {
             unlocked_techs: Vec::new(),
             disciples,
             deceased_disciples: Vec::new(),
+            spirit_beasts: Vec::new(),
             ongoing_missions: Vec::new(),
             completed_missions: Vec::new(),
             completed_history: Vec::new(),
             event_log: vec!["The sect has fallen... We must rebuild.".to_string()],
+            discovered_recipes: vec![
+                "recipe_healing_pill".to_string(),
+                "recipe_iron_sword".to_string(),
+            ],
             tutorial: crate::state::TutorialState::new(),
             tick: 0,
             current_season: Season::Spring,
