@@ -23,6 +23,7 @@ use macroquad_toolkit::rng as game_rng;
 use macroquad::prelude::{
     draw_rectangle, draw_text, is_key_pressed, screen_height, screen_width, Color, KeyCode, Rect,
 };
+use std::collections::HashSet;
 
 impl Game {
     pub fn update(&mut self) {
@@ -30,250 +31,279 @@ impl Game {
             self.show_ai_debug = !self.show_ai_debug;
         }
 
-        // Draw background texture FIRST (before any UI drawing in state.update())
         self.draw_screen_background();
-
         self.tick += 1;
 
-        let disciples_on_mission: std::collections::HashSet<usize> = self
-            .ongoing_missions
-            .iter()
-            .flat_map(|m| m.disciple_indices.iter().copied())
-            .collect();
+        let disciples_on_mission = self.collect_disciples_on_mission();
 
         self.scheduler
             .tick(&mut self.disciples, &self.data.buildings, &disciples_on_mission);
 
         if self.tick % 60 == 0 {
-            // Cultivation Tick - update breakthrough readiness for disciples at threshold
-            // (Breakthroughs are now player-controlled via Action::AttemptBreakthrough)
-            for (i, disciple) in self.disciples.iter_mut().enumerate() {
-                if !disciples_on_mission.contains(&i) && disciple.exp >= disciple.exp_to_next_level {
-                    let old_readiness = disciple.breakthrough_readiness;
-                    disciple.update_readiness();
-
-                    // Notify player when disciple first reaches breakthrough threshold
-                    if old_readiness == 0.0 && disciple.breakthrough_readiness > 0.0 {
-                        // Roll for hidden bottleneck
-                        let realm_index = self.data.stages_order.iter()
-                            .position(|id| id == &disciple.realm)
-                            .unwrap_or(0);
-                        let bottleneck = crate::engine::bottleneck::generate_bottleneck(
-                            disciple, &self.data, realm_index,
-                        );
-                        if let Some(ref bn) = bottleneck {
-                            let desc = bn.description(&self.data);
-                            self.event_log.push(format!(
-                                "{} is ready for breakthrough but faces a bottleneck: {}",
-                                disciple.name, desc
-                            ));
-                            disciple.breakthrough_bottleneck = Some(bn.clone());
-                        } else {
-                            self.event_log.push(format!(
-                                "{} is ready for breakthrough! Visit Roster to attempt.",
-                                disciple.name
-                            ));
-                        }
-                    }
-                }
-            }
-            // Apply Training Yard bonus
-            let (yard_multiplier, yard_score) = self
-                .data
-                .buildings
-                .iter()
-                .find(|b| b.building_type == BuildingType::TrainingYard)
-                .map(|b| (b.get_cultivation_multiplier(), b.feng_shui_score))
-                .unwrap_or((1.0, 0.0));
-
-            // Feng Shui Bonus: Score / 100.0 (e.g. 50.0 score -> +0.5 multiplier)
-            let feng_shui_mod = yard_score / 100.0;
-            let final_yard_multiplier = (yard_multiplier + feng_shui_mod).max(0.1);
-
-            for (i, disciple) in self.disciples.iter_mut().enumerate() {
-                // Skip disciples on missions - they don't cultivate while away
-                if disciples_on_mission.contains(&i) {
-                    continue;
-                }
-
-                // Process healing for injured disciples
-                if disciple.is_injured() {
-                    let was_injured = disciple
-                        .injury
-                        .as_ref()
-                        .map(|inj| inj.recovery_ticks_remaining)
-                        .unwrap_or(0);
-                    disciple.heal_tick();
-
-                    // Check if just healed
-                    if !disciple.is_injured() && was_injured > 0 {
-                        self.event_log.push(format!(
-                            "{} has recovered from their injuries.",
-                            disciple.name
-                        ));
-                    }
-
-                    // Injured disciples cannot cultivate
-                    continue;
-                }
-
-                let mut base_exp = 1 + (disciple.attributes.spirit / 5);
-
-                // --- Law Logic ---
-                let mut law_multiplier = 1.0;
-                if let Some(law_id) = &disciple.law_id {
-                    if let Some(law) = self.data.laws.get(law_id) {
-                        if let Some(yard) = self
-                            .data
-                            .buildings
-                            .iter()
-                            .find(|b| b.building_type == BuildingType::TrainingYard)
-                        {
-                            if let Some(tile) = self.grid.get_tile(yard.x, yard.y) {
-                                let env_element = &tile.dominant_element;
-
-                                if *env_element == law.element {
-                                    law_multiplier += 0.5;
-                                } else if env_element.feeds() == law.element {
-                                    law_multiplier += 0.2;
-                                } else if env_element.suppresses() == law.element {
-                                    law_multiplier -= 0.5;
-                                }
-                            }
-                        }
-
-                        // Stat growth modifiers
-                        base_exp += (disciple.attributes.body * law.stat_growth_modifiers.body) / 10;
-                        base_exp += (disciple.attributes.mind * law.stat_growth_modifiers.mind) / 10;
-                        base_exp += (disciple.attributes.spirit * law.stat_growth_modifiers.spirit) / 10;
-                    }
-                }
-
-                // Sum trait modifiers
-                let trait_cultivation_mod: f32 = disciple
-                    .fate_traits
-                    .iter()
-                    .map(|t| t.cultivation_speed_modifier)
-                    .sum();
-
-                // Bloodline modifiers
-                let mut bloodline_mod = 0.0;
-                if let Some(bloodline_id) = &disciple.bloodline.bloodline_id {
-                    if let Some(bloodline) = self.data.bloodlines.get(bloodline_id) {
-                        bloodline_mod = bloodline.passive_effects.cultivation_speed_modifier
-                            * disciple.bloodline.effectiveness();
-                    }
-                }
-
-                let total_multiplier =
-                    (final_yard_multiplier * law_multiplier + trait_cultivation_mod + bloodline_mod)
-                        .max(0.1);
-
-                let bonus_exp = (base_exp as f32 * total_multiplier) as u32;
-                disciple.exp += bonus_exp;
-            }
-
-            // Apply Sect Hall passive income (meditation/ambient Qi)
-            if self.data.buildings.iter().any(|b| {
-                b.building_type == BuildingType::SectHall
-                    && b.status == crate::data::buildings::BuildingStatus::Active
-            }) {
-                self.spirit_stones += 1; // Base income of 1 SS per cultivation tick
-            }
-
-            // Apply Spirit Garden passive income (Feature 9.1.3: Requires Outer Disciples)
-            if let Some(garden) = self
-                .data
-                .buildings
-                .iter()
-                .find(|b| b.building_type == BuildingType::SpiritGarden)
-            {
-                let outer_count = self.disciples.iter().filter(|d| d.rank == DiscipleRank::Outer).count();
-                if outer_count > 0 {
-                    let income = garden.get_passive_income();
-                    self.spirit_stones += income;
-
-                    // Small chance to find herbs if workers are present
-                    if game_rng::chance(0.1) {
-                        self.herbs += 1;
-                    }
-                }
-            }
-
-            // Herb Garden growth and harvest logic
+            self.update_cultivation_tick(&disciples_on_mission);
+            self.update_passive_income();
             self.process_herb_gardens();
+            self.update_missions();
+            self.update_world_sim();
+        }
 
-            // Mission Tick
-            let mut completed_indices = Vec::new();
-            for (i, mission) in self.ongoing_missions.iter_mut().enumerate() {
-                mission.ticks_remaining = mission.ticks_remaining.saturating_sub(1);
-                if mission.ticks_remaining == 0 {
-                    completed_indices.push(i);
-                }
+        self.update_season();
+
+        if self.tick % 300 == 0 {
+            self.update_world_evolution();
+        }
+
+        if self.tick % 600 == 0 {
+            self.update_salary();
+        }
+
+        self.dispatch_state_update();
+    }
+
+    fn collect_disciples_on_mission(&self) -> HashSet<usize> {
+        self.ongoing_missions
+            .iter()
+            .flat_map(|m| m.disciple_indices.iter().copied())
+            .collect()
+    }
+
+    fn update_cultivation_tick(&mut self, disciples_on_mission: &HashSet<usize>) {
+        // Update breakthrough readiness for disciples at threshold
+        for (i, disciple) in self.disciples.iter_mut().enumerate() {
+            if disciples_on_mission.contains(&i) || disciple.exp < disciple.exp_to_next_level {
+                continue;
             }
 
-            for index in completed_indices.into_iter().rev() {
-                let mission = self.ongoing_missions.remove(index);
-                let outcome = self.calculate_mission_outcome(mission);
-                self.completed_missions.push(outcome);
-                self.transition(StateTransition::ToMissionResolution);
+            let old_readiness = disciple.breakthrough_readiness;
+            disciple.update_readiness();
+
+            if old_readiness == 0.0 && disciple.breakthrough_readiness > 0.0 {
+                let realm_index = self.data.stages_order.iter()
+                    .position(|id| id == &disciple.realm)
+                    .unwrap_or(0);
+                let bottleneck = crate::engine::bottleneck::generate_bottleneck(
+                    disciple, &self.data, realm_index,
+                );
+                if let Some(ref bn) = bottleneck {
+                    let desc = bn.description(&self.data);
+                    self.event_log.push(format!(
+                        "{} is ready for breakthrough but faces a bottleneck: {}",
+                        disciple.name, desc
+                    ));
+                    disciple.breakthrough_bottleneck = Some(bn.clone());
+                } else {
+                    self.event_log.push(format!(
+                        "{} is ready for breakthrough! Visit Roster to attempt.",
+                        disciple.name
+                    ));
+                }
             }
         }
 
-        // Season change logic
+        let (yard_multiplier, yard_score) = self
+            .data
+            .buildings
+            .iter()
+            .find(|b| b.building_type == BuildingType::TrainingYard)
+            .map(|b| (b.get_cultivation_multiplier(), b.feng_shui_score))
+            .unwrap_or((1.0, 0.0));
+
+        let feng_shui_mod = yard_score / 100.0;
+        let final_yard_multiplier = (yard_multiplier + feng_shui_mod).max(0.1);
+
+        for (i, disciple) in self.disciples.iter_mut().enumerate() {
+            if disciples_on_mission.contains(&i) {
+                continue;
+            }
+
+            if disciple.is_injured() {
+                let was_injured = disciple
+                    .injury
+                    .as_ref()
+                    .map(|inj| inj.recovery_ticks_remaining)
+                    .unwrap_or(0);
+                disciple.heal_tick();
+
+                if !disciple.is_injured() && was_injured > 0 {
+                    self.event_log.push(format!(
+                        "{} has recovered from their injuries.",
+                        disciple.name
+                    ));
+                }
+                continue;
+            }
+
+            let base_exp = Self::calculate_cultivation_exp(&self.data, &self.grid, disciple, final_yard_multiplier);
+            disciple.exp += base_exp;
+        }
+    }
+
+    fn calculate_law_multiplier(
+        data: &crate::data::loader::GameData,
+        grid: &crate::data::grid::Grid,
+        disciple: &crate::data::disciples::Disciple,
+    ) -> (f32, u32) {
+        let mut law_multiplier = 1.0;
+        let mut extra_exp = 0u32;
+
+        let Some(law_id) = &disciple.law_id else {
+            return (law_multiplier, extra_exp);
+        };
+        let Some(law) = data.laws.get(law_id) else {
+            return (law_multiplier, extra_exp);
+        };
+
+        let yard = data.buildings.iter()
+            .find(|b| b.building_type == BuildingType::TrainingYard);
+        if let Some(yard) = yard {
+            if let Some(tile) = grid.get_tile(yard.x, yard.y) {
+                let env_element = &tile.dominant_element;
+                if *env_element == law.element {
+                    law_multiplier += 0.5;
+                } else if env_element.feeds() == law.element {
+                    law_multiplier += 0.2;
+                } else if env_element.suppresses() == law.element {
+                    law_multiplier -= 0.5;
+                }
+            }
+        }
+
+        extra_exp += (disciple.attributes.body * law.stat_growth_modifiers.body) / 10;
+        extra_exp += (disciple.attributes.mind * law.stat_growth_modifiers.mind) / 10;
+        extra_exp += (disciple.attributes.spirit * law.stat_growth_modifiers.spirit) / 10;
+
+        (law_multiplier, extra_exp)
+    }
+
+    fn calculate_cultivation_exp(
+        data: &crate::data::loader::GameData,
+        grid: &crate::data::grid::Grid,
+        disciple: &crate::data::disciples::Disciple,
+        final_yard_multiplier: f32,
+    ) -> u32 {
+        let mut base_exp = 1 + (disciple.attributes.spirit / 5);
+
+        let (law_multiplier, law_extra_exp) = Self::calculate_law_multiplier(data, grid, disciple);
+        base_exp += law_extra_exp;
+
+        let trait_cultivation_mod: f32 = disciple
+            .fate_traits
+            .iter()
+            .map(|t| t.cultivation_speed_modifier)
+            .sum();
+
+        let mut bloodline_mod = 0.0;
+        if let Some(bloodline_id) = &disciple.bloodline.bloodline_id {
+            if let Some(bloodline) = data.bloodlines.get(bloodline_id) {
+                bloodline_mod = bloodline.passive_effects.cultivation_speed_modifier
+                    * disciple.bloodline.effectiveness();
+            }
+        }
+
+        let total_multiplier =
+            (final_yard_multiplier * law_multiplier + trait_cultivation_mod + bloodline_mod)
+                .max(0.1);
+
+        (base_exp as f32 * total_multiplier) as u32
+    }
+
+    fn update_passive_income(&mut self) {
+        if self.data.buildings.iter().any(|b| {
+            b.building_type == BuildingType::SectHall
+                && b.status == BuildingStatus::Active
+        }) {
+            self.spirit_stones += 1;
+        }
+
+        if let Some(garden) = self
+            .data
+            .buildings
+            .iter()
+            .find(|b| b.building_type == BuildingType::SpiritGarden)
+        {
+            let outer_count = self.disciples.iter().filter(|d| d.rank == DiscipleRank::Outer).count();
+            if outer_count > 0 {
+                let income = garden.get_passive_income();
+                self.spirit_stones += income;
+
+                if game_rng::chance(0.1) {
+                    self.herbs += 1;
+                }
+            }
+        }
+    }
+
+    fn update_missions(&mut self) {
+        let mut completed_indices = Vec::new();
+        for (i, mission) in self.ongoing_missions.iter_mut().enumerate() {
+            mission.ticks_remaining = mission.ticks_remaining.saturating_sub(1);
+            if mission.ticks_remaining == 0 {
+                completed_indices.push(i);
+            }
+        }
+
+        for index in completed_indices.into_iter().rev() {
+            let mission = self.ongoing_missions.remove(index);
+            let outcome = self.calculate_mission_outcome(mission);
+            self.completed_missions.push(outcome);
+            self.transition(StateTransition::ToMissionResolution);
+        }
+    }
+
+    fn update_season(&mut self) {
         self.season_ticks = self.season_ticks.saturating_sub(1);
         if self.season_ticks == 0 {
             let old_season = self.current_season.clone();
             self.current_season = self.current_season.next();
-            self.season_ticks = 3600; // Reset for next season
+            self.season_ticks = 3600;
             self.event_log
                 .push(format!("The season has changed from {} to {}.", old_season, self.current_season));
-
-            // Apply herb decay at season change
             self.apply_herb_decay();
         }
+    }
 
-        // World Evolution Tick (every 5 seconds approx)
-        if self.tick % 300 == 0 {
-            for node in self.data.map_nodes.iter_mut() {
-                if game_rng::chance(0.3) {
-                    node.corruption += 1;
-                    if node.corruption % 10 == 0 {
-                        self.event_log.push(format!(
-                            "Nodes are corrupting! {} danger increased.",
-                            node.name
-                        ));
-                    }
+    fn update_world_evolution(&mut self) {
+        for node in self.data.map_nodes.iter_mut() {
+            if game_rng::chance(0.3) {
+                node.corruption += 1;
+                if node.corruption % 10 == 0 {
+                    self.event_log.push(format!(
+                        "Nodes are corrupting! {} danger increased.",
+                        node.name
+                    ));
                 }
             }
         }
+    }
 
-        // World Simulation Tick (every 60 ticks = 1 game second)
-        if self.tick % 60 == 0 {
-            let results = self.world_sim.tick(self.tick, &self.current_season);
-            for result in results {
-                self.handle_world_sim_result(result);
-            }
+    fn update_world_sim(&mut self) {
+        let results = self.world_sim.tick(self.tick, &self.current_season);
+        for result in results {
+            self.handle_world_sim_result(result);
+        }
+    }
+
+    fn update_salary(&mut self) {
+        let inner_count = self
+            .disciples
+            .iter()
+            .filter(|d| d.rank == DiscipleRank::Inner || d.rank == DiscipleRank::SectLeader)
+            .count();
+        if inner_count == 0 {
+            return;
         }
 
-        if self.tick % 600 == 0 {
-            let inner_count = self
-                .disciples
-                .iter()
-                .filter(|d| d.rank == DiscipleRank::Inner || d.rank == DiscipleRank::SectLeader)
-                .count();
-            if inner_count > 0 {
-                let salary_cost = inner_count as u32;
-                if self.spirit_stones >= salary_cost {
-                    self.spirit_stones -= salary_cost;
-                } else {
-                    self.spirit_stones = 0;
-                    self.event_log
-                        .push("Warning: Cannot pay salaries! Morale is falling.".to_string());
-                }
-            }
+        let salary_cost = inner_count as u32;
+        if self.spirit_stones >= salary_cost {
+            self.spirit_stones -= salary_cost;
+        } else {
+            self.spirit_stones = 0;
+            self.event_log
+                .push("Warning: Cannot pay salaries! Morale is falling.".to_string());
         }
+    }
 
+    fn dispatch_state_update(&mut self) {
         let update_result = match &mut self.state {
             GameState::MainMenu(s) => s.update(),
             GameState::SectBase(s) => s.update(
@@ -332,10 +362,8 @@ impl Game {
             GameState::TradeScreen(_) => "bg_trade",
         };
 
-        // Draw texture directly without overlay for testing
         self.textures.draw_background(bg_name);
 
-        // Light overlay for readability
         let overlay_alpha = match &self.state {
             GameState::MainMenu(_) => 0.1,
             GameState::Tribulation(_) => 0.05,
@@ -352,7 +380,6 @@ impl Game {
     }
 
     pub fn draw(&mut self) {
-        // State-specific UI drawing (most screens draw in update(), this is for any remaining)
         match &mut self.state {
             GameState::MainMenu(s) => s.draw(&self.data, self.spirit_stones),
             GameState::SectBase(s) => s.draw(&self.data, &self.grid, self.spirit_stones),

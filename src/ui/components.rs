@@ -107,6 +107,46 @@ pub fn draw_button(rect: Rect, text: &str, active: bool) -> bool {
     draw_button_with_font(rect, text, active, None)
 }
 
+/// Draws a muted button for de-emphasized UI areas.
+pub fn draw_button_muted(rect: Rect, text: &str, active: bool) -> bool {
+    let mouse_pos = mouse_position().into();
+    let hovered = rect.contains(mouse_pos);
+    let is_clicked = hovered && is_mouse_button_pressed(MouseButton::Left);
+
+    let stroke_color = if active {
+        Color::new(0.12, 0.10, 0.08, 0.55)
+    } else {
+        Color::new(0.08, 0.06, 0.05, 0.45)
+    };
+
+    let text_color = if active {
+        Color::new(0.85, 0.82, 0.72, 0.85)
+    } else {
+        Color::new(0.75, 0.72, 0.68, 0.75)
+    };
+
+    let intensity = if hovered { 0.8 } else { 0.6 };
+    draw_brush_stroke(rect.x, rect.y, rect.w, rect.h, stroke_color, intensity);
+
+    let font_size = rect.h * 0.42;
+    let dimensions = measure_text(text, None, font_size as u16, 1.0);
+    let text_x = rect.x + (rect.w - dimensions.width) / 2.0;
+    let text_y = rect.y + (rect.h + dimensions.height) / 2.0;
+
+    draw_text_ex(
+        text,
+        text_x,
+        text_y,
+        TextParams {
+            font_size: font_size as u16,
+            color: text_color,
+            ..Default::default()
+        },
+    );
+
+    is_clicked
+}
+
 /// Draws a button with brush stroke styling using optional custom font.
 pub fn draw_button_with_font(rect: Rect, text: &str, active: bool, font: Option<&Font>) -> bool {
     let mouse_pos = mouse_position().into();
