@@ -29,14 +29,17 @@ impl TextureManager {
                 }
             }
             Err(e) => {
-                self.load_errors.push(format!("Failed to load textures: {}", e));
+                self.load_errors
+                    .push(format!("Failed to load textures: {}", e));
                 eprintln!("Texture Data Load Error: {}", e);
             }
         }
 
-
-        println!("Texture loading complete: {} loaded, {} errors",
-            self.textures.len(), self.load_errors.len());
+        println!(
+            "Texture loading complete: {} loaded, {} errors",
+            self.textures.len(),
+            self.load_errors.len()
+        );
 
         if !self.load_errors.is_empty() {
             eprintln!("Texture loading errors:");

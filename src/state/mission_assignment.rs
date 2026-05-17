@@ -31,16 +31,22 @@ impl MissionAssignmentState {
         // --- Header ---
         draw_panel(Rect::new(0.0, 0.0, screen_w, header_h), None);
         draw_text("ASSIGN DISCIPLES", 20.0, 40.0, FONT_TITLE_SIZE, PRIMARY);
-        draw_text(&format!("Mission: {}", self.mission_description), 400.0, 40.0, FONT_HEADER_SIZE, TEXT_HIGHLIGHT);
+        draw_text(
+            &format!("Mission: {}", self.mission_description),
+            400.0,
+            40.0,
+            FONT_HEADER_SIZE,
+            TEXT_HIGHLIGHT,
+        );
 
         // --- Layout ---
         let content_y = header_h + 10.0;
         let content_h = screen_h - content_y - 10.0;
         let left_w = screen_w - 300.0;
-        
+
         let list_rect = Rect::new(10.0, content_y, left_w, content_h);
         draw_panel(list_rect, Some("Select Disciples (Max 3)"));
-        
+
         let mut btn_y = list_rect.y + 50.0;
         for (i, disciple) in disciples.iter().enumerate() {
             let is_selected = self.selected_disciples.contains(&i);
@@ -55,12 +61,11 @@ impl MissionAssignmentState {
                 .unwrap_or_default();
 
             // Estimated power calculation based on stage base stats
-            let stage_power = stage
-                .map(|s| (s.base_hp + s.base_qi) / 100)
-                .unwrap_or(1);
+            let stage_power = stage.map(|s| (s.base_hp + s.base_qi) / 100).unwrap_or(1);
 
             let injury_label = if is_injured { " [INJURED]" } else { "" };
-            let label = format!("{}{} ({}{}) - Power: {}",
+            let label = format!(
+                "{}{} ({}{}) - Power: {}",
                 disciple.name, injury_label, stage_name, sub_stage_name, stage_power
             );
 
@@ -68,8 +73,20 @@ impl MissionAssignmentState {
 
             // Draw injured disciples with red tint and disabled
             if is_injured {
-                draw_rectangle(btn_rect.x, btn_rect.y, btn_rect.w, btn_rect.h, Color::new(0.4, 0.15, 0.15, 0.5));
-                draw_text(&label, btn_rect.x + 10.0, btn_rect.y + 25.0, FONT_BODY_SIZE, Color::new(0.5, 0.4, 0.4, 1.0));
+                draw_rectangle(
+                    btn_rect.x,
+                    btn_rect.y,
+                    btn_rect.w,
+                    btn_rect.h,
+                    Color::new(0.4, 0.15, 0.15, 0.5),
+                );
+                draw_text(
+                    &label,
+                    btn_rect.x + 10.0,
+                    btn_rect.y + 25.0,
+                    FONT_BODY_SIZE,
+                    Color::new(0.5, 0.4, 0.4, 1.0),
+                );
             } else if draw_button(btn_rect, &label, is_selected) {
                 if is_selected {
                     if let Some(pos) = self.selected_disciples.iter().position(|&idx| idx == i) {
@@ -86,19 +103,39 @@ impl MissionAssignmentState {
         let right_rect = Rect::new(left_w + 20.0, content_y, 250.0, content_h);
         draw_panel(right_rect, Some("Orders"));
 
-        draw_text("Selected Team:", right_rect.x + 20.0, right_rect.y + 60.0, FONT_BODY_SIZE, TEXT_SECONDARY);
+        draw_text(
+            "Selected Team:",
+            right_rect.x + 20.0,
+            right_rect.y + 60.0,
+            FONT_BODY_SIZE,
+            TEXT_SECONDARY,
+        );
         let mut y = right_rect.y + 90.0;
         for &idx in &self.selected_disciples {
             if let Some(d) = disciples.get(idx) {
-                draw_text(&format!("- {}", d.name), right_rect.x + 20.0, y, FONT_BODY_SIZE, TEXT_PRIMARY);
+                draw_text(
+                    &format!("- {}", d.name),
+                    right_rect.x + 20.0,
+                    y,
+                    FONT_BODY_SIZE,
+                    TEXT_PRIMARY,
+                );
                 y += 25.0;
             }
         }
 
         let start_active = !self.selected_disciples.is_empty();
-        let btn_label = if start_active { "Depart" } else { "Select Team" };
-        
-        if draw_button(Rect::new(right_rect.x + 20.0, right_rect.h - 80.0, 210.0, 50.0), btn_label, start_active) {
+        let btn_label = if start_active {
+            "Depart"
+        } else {
+            "Select Team"
+        };
+
+        if draw_button(
+            Rect::new(right_rect.x + 20.0, right_rect.h - 80.0, 210.0, 50.0),
+            btn_label,
+            start_active,
+        ) {
             if start_active {
                 return UpdateResult::new()
                     .with_action(Action::StartMission(
@@ -108,10 +145,14 @@ impl MissionAssignmentState {
                     .with_transition(StateTransition::ToSectBase);
             }
         }
-        
+
         // Back Button
-        if draw_button(Rect::new(right_rect.x + 20.0, right_rect.h - 140.0, 210.0, 40.0), "Cancel", false) {
-             return UpdateResult::new().with_transition(StateTransition::ToSectBase);
+        if draw_button(
+            Rect::new(right_rect.x + 20.0, right_rect.h - 140.0, 210.0, 40.0),
+            "Cancel",
+            false,
+        ) {
+            return UpdateResult::new().with_transition(StateTransition::ToSectBase);
         }
 
         UpdateResult::new()

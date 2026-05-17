@@ -3,26 +3,18 @@ use crate::data::buildings::{BuildingStatus, BuildingType};
 use crate::data::disciples::DiscipleRank;
 use crate::engine::world_sim::WorldSimResult;
 use crate::state::{
-    faction_screen::FactionScreenState,
-    library::LibraryState,
-    main_menu::MainMenuState,
-    mission_assignment::MissionAssignmentState,
-    mission_resolution::MissionResolutionState,
-    roster::DiscipleRosterState,
-    sect_base::SectBaseState,
-    sect_creation::SectCreationState,
-    trade_screen::TradeScreenState,
-    world_map::WorldMapState,
-    tribulation::TribulationEncounterState,
-    GameState,
-    StateTransition,
+    faction_screen::FactionScreenState, library::LibraryState, main_menu::MainMenuState,
+    mission_assignment::MissionAssignmentState, mission_resolution::MissionResolutionState,
+    roster::DiscipleRosterState, sect_base::SectBaseState, sect_creation::SectCreationState,
+    trade_screen::TradeScreenState, tribulation::TribulationEncounterState,
+    world_map::WorldMapState, GameState, StateTransition,
 };
 use crate::ui::components::{draw_panel, draw_progress_bar};
 use crate::ui::theme::*;
-use macroquad_toolkit::rng as game_rng;
 use macroquad::prelude::{
     draw_rectangle, draw_text, is_key_pressed, screen_height, screen_width, Color, KeyCode, Rect,
 };
+use macroquad_toolkit::rng as game_rng;
 use std::collections::HashSet;
 
 impl Game {
@@ -36,8 +28,11 @@ impl Game {
 
         let disciples_on_mission = self.collect_disciples_on_mission();
 
-        self.scheduler
-            .tick(&mut self.disciples, &self.data.buildings, &disciples_on_mission);
+        self.scheduler.tick(
+            &mut self.disciples,
+            &self.data.buildings,
+            &disciples_on_mission,
+        );
 
         if self.tick % 60 == 0 {
             self.update_cultivation_tick(&disciples_on_mission);
@@ -78,11 +73,16 @@ impl Game {
             disciple.update_readiness();
 
             if old_readiness == 0.0 && disciple.breakthrough_readiness > 0.0 {
-                let realm_index = self.data.stages_order.iter()
+                let realm_index = self
+                    .data
+                    .stages_order
+                    .iter()
                     .position(|id| id == &disciple.realm)
                     .unwrap_or(0);
                 let bottleneck = crate::engine::bottleneck::generate_bottleneck(
-                    disciple, &self.data, realm_index,
+                    disciple,
+                    &self.data,
+                    realm_index,
                 );
                 if let Some(ref bn) = bottleneck {
                     let desc = bn.description(&self.data);
@@ -133,7 +133,12 @@ impl Game {
                 continue;
             }
 
-            let base_exp = Self::calculate_cultivation_exp(&self.data, &self.grid, disciple, final_yard_multiplier);
+            let base_exp = Self::calculate_cultivation_exp(
+                &self.data,
+                &self.grid,
+                disciple,
+                final_yard_multiplier,
+            );
             disciple.exp += base_exp;
         }
     }
@@ -153,7 +158,9 @@ impl Game {
             return (law_multiplier, extra_exp);
         };
 
-        let yard = data.buildings.iter()
+        let yard = data
+            .buildings
+            .iter()
             .find(|b| b.building_type == BuildingType::TrainingYard);
         if let Some(yard) = yard {
             if let Some(tile) = grid.get_tile(yard.x, yard.y) {
@@ -209,8 +216,7 @@ impl Game {
 
     fn update_passive_income(&mut self) {
         if self.data.buildings.iter().any(|b| {
-            b.building_type == BuildingType::SectHall
-                && b.status == BuildingStatus::Active
+            b.building_type == BuildingType::SectHall && b.status == BuildingStatus::Active
         }) {
             self.spirit_stones += 1;
         }
@@ -221,7 +227,11 @@ impl Game {
             .iter()
             .find(|b| b.building_type == BuildingType::SpiritGarden)
         {
-            let outer_count = self.disciples.iter().filter(|d| d.rank == DiscipleRank::Outer).count();
+            let outer_count = self
+                .disciples
+                .iter()
+                .filter(|d| d.rank == DiscipleRank::Outer)
+                .count();
             if outer_count > 0 {
                 let income = garden.get_passive_income();
                 self.spirit_stones += income;
@@ -256,8 +266,10 @@ impl Game {
             let old_season = self.current_season.clone();
             self.current_season = self.current_season.next();
             self.season_ticks = 3600;
-            self.event_log
-                .push(format!("The season has changed from {} to {}.", old_season, self.current_season));
+            self.event_log.push(format!(
+                "The season has changed from {} to {}.",
+                old_season, self.current_season
+            ));
             self.apply_herb_decay();
         }
     }
@@ -330,12 +342,16 @@ impl Game {
             GameState::DiscipleRoster(s) => s.update(&self.data, &self.disciples, &self.inventory),
             GameState::WorldMap(s) => s.update(&self.data),
             GameState::MissionResolution(s) => s.update(&mut self.completed_missions),
-            GameState::Library(s) => s.update(&self.data, self.spirit_stones, &self.deceased_disciples),
+            GameState::Library(s) => {
+                s.update(&self.data, self.spirit_stones, &self.deceased_disciples)
+            }
             GameState::MissionAssignment(s) => s.update(&self.data, &self.disciples),
             GameState::SectCreation(s) => s.update(),
             GameState::Tribulation(s) => s.update(),
             GameState::FactionScreen(s) => s.update(&self.world_sim),
-            GameState::TradeScreen(s) => s.update(&self.world_sim, self.spirit_stones, &self.inventory),
+            GameState::TradeScreen(s) => {
+                s.update(&self.world_sim, self.spirit_stones, &self.inventory)
+            }
         };
 
         if let Some(action) = update_result.action {
@@ -386,8 +402,12 @@ impl Game {
             GameState::DiscipleRoster(s) => s.draw(&self.data, &self.disciples, self.spirit_stones),
             GameState::WorldMap(s) => s.draw(&self.data, self.spirit_stones),
             GameState::MissionResolution(s) => s.draw(&self.data, self.spirit_stones),
-            GameState::Library(s) => s.draw(&self.data, self.spirit_stones, &self.deceased_disciples),
-            GameState::MissionAssignment(s) => s.draw(&self.data, &self.disciples, self.spirit_stones),
+            GameState::Library(s) => {
+                s.draw(&self.data, self.spirit_stones, &self.deceased_disciples)
+            }
+            GameState::MissionAssignment(s) => {
+                s.draw(&self.data, &self.disciples, self.spirit_stones)
+            }
             GameState::SectCreation(s) => s.draw(&self.data),
             GameState::Tribulation(s) => s.draw(&self.data, &self.disciples),
             GameState::FactionScreen(s) => s.draw(&self.world_sim),
@@ -405,7 +425,10 @@ impl Game {
         let panel_x = screen_width() - panel_w - 10.0;
         let panel_y = 10.0;
 
-        draw_panel(Rect::new(panel_x, panel_y, panel_w, panel_h), Some("AI Debug (F9)"));
+        draw_panel(
+            Rect::new(panel_x, panel_y, panel_w, panel_h),
+            Some("AI Debug (F9)"),
+        );
 
         let mut y = panel_y + 55.0;
         draw_text(
@@ -444,7 +467,13 @@ impl Game {
             let bar_w = panel_w - 30.0;
             let bar_h = 10.0;
 
-            draw_text("Hunger", panel_x + 15.0, y + 10.0, FONT_SMALL_SIZE, TEXT_SECONDARY);
+            draw_text(
+                "Hunger",
+                panel_x + 15.0,
+                y + 10.0,
+                FONT_SMALL_SIZE,
+                TEXT_SECONDARY,
+            );
             draw_progress_bar(
                 Rect::new(panel_x + 85.0, y, bar_w - 70.0, bar_h),
                 disciple.needs.hunger.current / disciple.needs.hunger.max,
@@ -452,7 +481,13 @@ impl Game {
             );
             y += 16.0;
 
-            draw_text("Rest", panel_x + 15.0, y + 10.0, FONT_SMALL_SIZE, TEXT_SECONDARY);
+            draw_text(
+                "Rest",
+                panel_x + 15.0,
+                y + 10.0,
+                FONT_SMALL_SIZE,
+                TEXT_SECONDARY,
+            );
             draw_progress_bar(
                 Rect::new(panel_x + 85.0, y, bar_w - 70.0, bar_h),
                 disciple.needs.rest.current / disciple.needs.rest.max,
@@ -460,7 +495,13 @@ impl Game {
             );
             y += 16.0;
 
-            draw_text("Qi", panel_x + 15.0, y + 10.0, FONT_SMALL_SIZE, TEXT_SECONDARY);
+            draw_text(
+                "Qi",
+                panel_x + 15.0,
+                y + 10.0,
+                FONT_SMALL_SIZE,
+                TEXT_SECONDARY,
+            );
             draw_progress_bar(
                 Rect::new(panel_x + 85.0, y, bar_w - 70.0, bar_h),
                 disciple.needs.qi.current / disciple.needs.qi.max,
@@ -468,7 +509,13 @@ impl Game {
             );
             y += 16.0;
 
-            draw_text("Morale", panel_x + 15.0, y + 10.0, FONT_SMALL_SIZE, TEXT_SECONDARY);
+            draw_text(
+                "Morale",
+                panel_x + 15.0,
+                y + 10.0,
+                FONT_SMALL_SIZE,
+                TEXT_SECONDARY,
+            );
             draw_progress_bar(
                 Rect::new(panel_x + 85.0, y, bar_w - 70.0, bar_h),
                 disciple.needs.morale.current / disciple.needs.morale.max,
@@ -482,7 +529,9 @@ impl Game {
         self.state = match transition {
             StateTransition::ToMainMenu => GameState::MainMenu(MainMenuState::new()),
             StateTransition::ToSectBase => GameState::SectBase(SectBaseState::new()),
-            StateTransition::ToDiscipleRoster => GameState::DiscipleRoster(DiscipleRosterState::new()),
+            StateTransition::ToDiscipleRoster => {
+                GameState::DiscipleRoster(DiscipleRosterState::new())
+            }
             StateTransition::ToWorldMap => GameState::WorldMap(WorldMapState::new()),
             StateTransition::ToMissionAssignment(desc) => {
                 GameState::MissionAssignment(MissionAssignmentState::new(desc))

@@ -108,7 +108,13 @@ impl FactionScreenState {
             } else {
                 WARNING
             };
-            draw_rectangle(bar_x, bar_y, bar_width * fill_percent, bar_height, fill_color);
+            draw_rectangle(
+                bar_x,
+                bar_y,
+                bar_width * fill_percent,
+                bar_height,
+                fill_color,
+            );
 
             // Reputation text
             draw_text(
@@ -219,7 +225,8 @@ impl FactionScreenState {
 
                     let tier = rel.reputation_tier();
                     let (r, g, b) = tier.color();
-                    let tier_color = Color::new(r as f32 / 255.0, g as f32 / 255.0, b as f32 / 255.0, 1.0);
+                    let tier_color =
+                        Color::new(r as f32 / 255.0, g as f32 / 255.0, b as f32 / 255.0, 1.0);
 
                     draw_text(
                         &format!("Reputation: {} ({})", rel.reputation, tier),
@@ -265,11 +272,7 @@ impl FactionScreenState {
                     let btn_width = 150.0;
                     let btn_height = 35.0;
 
-                    if draw_button(
-                        Rect::new(dx, dy, btn_width, btn_height),
-                        "Send Gift",
-                        false,
-                    ) {
+                    if draw_button(Rect::new(dx, dy, btn_width, btn_height), "Send Gift", false) {
                         // Would trigger Action::SendDiplomat
                     }
 
@@ -293,11 +296,7 @@ impl FactionScreenState {
         }
 
         // Back button
-        if draw_button(
-            Rect::new(20.0, screen_h - 60.0, 100.0, 40.0),
-            "Back",
-            false,
-        ) {
+        if draw_button(Rect::new(20.0, screen_h - 60.0, 100.0, 40.0), "Back", false) {
             return UpdateResult::new().with_transition(StateTransition::ToSectBase);
         }
 

@@ -6,7 +6,11 @@ use rand::prelude::*;
 
 /// Generate a bottleneck for a disciple reaching breakthrough readiness.
 /// Returns `Some(bottleneck)` with increasing probability at higher realms.
-pub fn generate_bottleneck(disciple: &Disciple, data: &GameData, realm_index: usize) -> Option<Bottleneck> {
+pub fn generate_bottleneck(
+    disciple: &Disciple,
+    data: &GameData,
+    realm_index: usize,
+) -> Option<Bottleneck> {
     let chance = (0.40 + realm_index as f64 * 0.03).min(0.70);
     if game_rng::rand() >= chance as f32 {
         return None;
@@ -23,9 +27,8 @@ pub fn generate_bottleneck(disciple: &Disciple, data: &GameData, realm_index: us
         }
         1 => {
             // CraftItem — pick a random recipe with difficulty <= 50
-            let easy_recipes: Vec<&crate::data::items::Recipe> = data.recipes.iter()
-                .filter(|r| r.difficulty <= 50)
-                .collect();
+            let easy_recipes: Vec<&crate::data::items::Recipe> =
+                data.recipes.iter().filter(|r| r.difficulty <= 50).collect();
             if easy_recipes.is_empty() {
                 Some(Bottleneck::EquipSlot(EquipmentSlot::Weapon))
             } else {
@@ -51,7 +54,9 @@ pub fn generate_bottleneck(disciple: &Disciple, data: &GameData, realm_index: us
         }
         3 => {
             // UseItem — pick a random pill/potion from data.items
-            let consumables: Vec<&str> = data.items.values()
+            let consumables: Vec<&str> = data
+                .items
+                .values()
                 .filter(|i| matches!(i.item_type, ItemType::Pill | ItemType::Potion))
                 .map(|i| i.id.as_str())
                 .collect();
@@ -91,8 +96,14 @@ pub fn is_bottleneck_resolved(
             data.missions.iter().any(|m| {
                 let matches_type = match (&m.mission_type, mt.as_str()) {
                     (crate::data::missions::MissionType::Exploration, "Exploration") => true,
-                    (crate::data::missions::MissionType::ResourceGathering, "ResourceGathering") => true,
-                    (crate::data::missions::MissionType::MonsterSuppression, "MonsterSuppression") => true,
+                    (
+                        crate::data::missions::MissionType::ResourceGathering,
+                        "ResourceGathering",
+                    ) => true,
+                    (
+                        crate::data::missions::MissionType::MonsterSuppression,
+                        "MonsterSuppression",
+                    ) => true,
                     (crate::data::missions::MissionType::Diplomacy, "Diplomacy") => true,
                     (crate::data::missions::MissionType::RuinDelve, "RuinDelve") => true,
                     _ => false,
@@ -121,8 +132,6 @@ pub fn is_bottleneck_resolved(
             // Cleared event-driven only (when item is actually used)
             false
         }
-        Bottleneck::EquipSlot(slot) => {
-            disciple.equipment.contains_key(slot)
-        }
+        Bottleneck::EquipSlot(slot) => disciple.equipment.contains_key(slot),
     }
 }

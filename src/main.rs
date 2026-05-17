@@ -2,12 +2,12 @@
 
 use macroquad::prelude::*;
 
-mod game;
-mod state;
 mod data;
 mod engine;
-mod ui;
+mod game;
 mod save;
+mod state;
+mod ui;
 
 use game::Game;
 
@@ -27,7 +27,7 @@ async fn main() {
 
     loop {
         clear_background(Color::from_rgba(10, 10, 10, 255));
-        
+
         game.update();
         game.draw();
 

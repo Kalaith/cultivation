@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use crate::data::elements::Element;
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub enum BloodlineRarity {
@@ -106,10 +106,10 @@ impl DiscipleBloodline {
     /// Returns the effectiveness multiplier based on awakening state
     pub fn effectiveness(&self) -> f32 {
         match self.awakening_state {
-            AwakeningState::Dormant => 0.25,   // 25% of passive effects
-            AwakeningState::Partial => 0.5,    // 50% of passive effects
-            AwakeningState::Full => 1.0,       // 100% of passive effects
-            AwakeningState::Ancestor => 1.5,   // 150% of passive effects
+            AwakeningState::Dormant => 0.25, // 25% of passive effects
+            AwakeningState::Partial => 0.5,  // 50% of passive effects
+            AwakeningState::Full => 1.0,     // 100% of passive effects
+            AwakeningState::Ancestor => 1.5, // 150% of passive effects
         }
     }
 }

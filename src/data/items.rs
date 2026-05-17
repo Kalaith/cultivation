@@ -1,6 +1,6 @@
-use serde::{Deserialize, Serialize};
 use crate::data::buildings::BuildingType;
 use crate::data::elements::Element;
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub enum ItemType {
@@ -100,13 +100,17 @@ pub struct EquipmentData {
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ItemEffect {
-    Heal(u32),        // Reduce injury recovery time by this amount (ticks)
-    BoostQi(u32),     // Add XP/Qi
-    BoostBody(u32),   // Perm stat boost
+    Heal(u32),      // Reduce injury recovery time by this amount (ticks)
+    BoostQi(u32),   // Add XP/Qi
+    BoostBody(u32), // Perm stat boost
     BoostMind(u32),
     BoostSpirit(u32),
     // Potion effects: temporary buffs (stat, value, duration_ticks)
-    TemporaryBuff { stat: String, value: i32, duration_ticks: u32 },
+    TemporaryBuff {
+        stat: String,
+        value: i32,
+        duration_ticks: u32,
+    },
     // Talisman effects
     DamageShield(u32),
     QiBurst(u32),
@@ -138,7 +142,7 @@ pub struct Recipe {
     pub output_item_id: String,
     pub output_amount: u32,
     pub ingredients: Vec<(String, u32)>, // Item ID (or "spirit_stones", "herbs"), Amount
-    pub craft_time: u32, // Ticks
+    pub craft_time: u32,                 // Ticks
     pub required_building: BuildingType,
     #[serde(default)]
     pub recipe_type: RecipeType,

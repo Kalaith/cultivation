@@ -5,14 +5,14 @@
 use crate::data::{
     buildings::Building,
     disciples::Disciple,
+    grid::Grid,
     herbs::Season,
     history::DeceasedDisciple,
     missions::{MissionOutcome, OngoingMission},
     spirit_beasts::SpiritBeast,
-    grid::Grid,
 };
-use crate::engine::world_sim::SavedWorldSim;
 use crate::engine::scheduler::SavedScheduler;
+use crate::engine::world_sim::SavedWorldSim;
 use serde::{Deserialize, Serialize};
 
 /// Save file version for migration support
@@ -171,8 +171,7 @@ pub mod storage {
 
         #[cfg(not(target_arch = "wasm32"))]
         {
-            fs::write(SAVE_FILE, &json)
-                .map_err(|e| format!("File write error: {}", e))?;
+            fs::write(SAVE_FILE, &json).map_err(|e| format!("File write error: {}", e))?;
         }
 
         #[cfg(target_arch = "wasm32")]
@@ -188,19 +187,17 @@ pub mod storage {
         let json = {
             #[cfg(not(target_arch = "wasm32"))]
             {
-                fs::read_to_string(SAVE_FILE)
-                    .map_err(|e| format!("File read error: {}", e))?
+                fs::read_to_string(SAVE_FILE).map_err(|e| format!("File read error: {}", e))?
             }
 
             #[cfg(target_arch = "wasm32")]
             {
-                LocalStorage::get(SAVE_KEY)
-                    .ok_or_else(|| "No save found".to_string())?
+                LocalStorage::get(SAVE_KEY).ok_or_else(|| "No save found".to_string())?
             }
         };
 
-        let save_data: SaveData = serde_json::from_str(&json)
-            .map_err(|e| format!("Deserialization error: {}", e))?;
+        let save_data: SaveData =
+            serde_json::from_str(&json).map_err(|e| format!("Deserialization error: {}", e))?;
 
         // Apply migrations if needed
         Ok(save_data.migrate())

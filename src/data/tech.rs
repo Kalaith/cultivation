@@ -1,6 +1,6 @@
-use serde::{Deserialize, Serialize};
 use crate::data::buildings::BuildingType;
 use crate::data::missions::MissionType;
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Technology {

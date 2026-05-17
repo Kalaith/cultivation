@@ -47,7 +47,10 @@ impl Game {
         }
 
         let difficulty = (ongoing.mission.danger_level * 2) as i32;
-        logs.push(format!("Team Power: {} vs Difficulty: {}", team_power, difficulty));
+        logs.push(format!(
+            "Team Power: {} vs Difficulty: {}",
+            team_power, difficulty
+        ));
 
         let base_chance = 0.5;
         let power_modifier = (team_power - difficulty) as f32 * 0.08;

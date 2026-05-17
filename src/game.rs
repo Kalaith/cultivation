@@ -26,10 +26,10 @@ const FOUNDATION_TRIAL_MISSION: &str = "Foundation Trial (Solo)";
 /// Result of a breakthrough attempt
 pub enum BreakthroughResult {
     Success,
-    Failure,           // Died
-    Injured,           // Survived but didn't advance
+    Failure,                                                  // Died
+    Injured,                                                  // Survived but didn't advance
     Tribulation(crate::engine::tribulation::TribulationType), // Needs tribulation
-    Blocked,           // Blocked by requirements
+    Blocked,                                                  // Blocked by requirements
 }
 
 pub struct Game {
@@ -122,8 +122,8 @@ impl Game {
             data,
             grid,
             sect_name: "Unnamed Sect".to_string(), // Initial placeholder
-            spirit_stones: 50, // Reduced to 50 as Sect Hall is free
-            herbs: 10,         // Some supplies
+            spirit_stones: 50,                     // Reduced to 50 as Sect Hall is free
+            herbs: 10,                             // Some supplies
             influence: 0,
             relics: 0,
             inventory: std::collections::HashMap::new(),

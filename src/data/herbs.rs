@@ -1,6 +1,6 @@
-use serde::{Deserialize, Serialize};
 use crate::data::elements::Element;
 use crate::data::items::ItemEffect;
+use serde::{Deserialize, Serialize};
 
 /// Seasons affect which herbs can grow
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -105,7 +105,7 @@ pub fn calculate_elemental_bonus(herb_element: &Element, recipe_element: &Elemen
         1.2 // Matching element: +20% potency
     } else {
         match herb_element.get_interaction(recipe_element) {
-            InteractionResult::Feeds => 1.1,     // Fed by herb: +10% potency
+            InteractionResult::Feeds => 1.1,      // Fed by herb: +10% potency
             InteractionResult::Suppresses => 0.8, // Suppressed: -20% potency
             InteractionResult::Neutral => 1.0,
         }

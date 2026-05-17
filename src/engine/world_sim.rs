@@ -1,15 +1,12 @@
-use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 use crate::data::{
     economy::{EconomyNode, EconomyState, PriceModifier, TradeRoute},
     factions::{Faction, FactionAI, FactionAction},
     herbs::Season,
     relations::{DiplomaticAction, FactionRelation, Treaty, TreatyRequest},
-    world_events::{
-        ActiveWorldEvent, EventEffect, EventTrigger, QueuedEvent,
-        WorldEvent,
-    },
+    world_events::{ActiveWorldEvent, EventEffect, EventTrigger, QueuedEvent, WorldEvent},
 };
 
 /// Results from world simulation tick
@@ -18,17 +15,35 @@ pub enum WorldSimResult {
     /// An event triggered
     EventTriggered(ActiveWorldEvent),
     /// An event expired or was resolved
-    EventResolved { event_id: String, effects: Vec<EventEffect> },
+    EventResolved {
+        event_id: String,
+        effects: Vec<EventEffect>,
+    },
     /// Faction took an action
-    FactionAction { faction_id: String, action: FactionAction },
+    FactionAction {
+        faction_id: String,
+        action: FactionAction,
+    },
     /// War declared
     WarDeclared { aggressor: String, defender: String },
     /// War ended
-    WarEnded { faction_a: String, faction_b: String, victor: Option<String> },
+    WarEnded {
+        faction_a: String,
+        faction_b: String,
+        victor: Option<String>,
+    },
     /// Territory changed hands
-    TerritoryChanged { node_id: String, old_faction: String, new_faction: String },
+    TerritoryChanged {
+        node_id: String,
+        old_faction: String,
+        new_faction: String,
+    },
     /// Price changed significantly
-    PriceChanged { item_id: String, old_price: u32, new_price: u32 },
+    PriceChanged {
+        item_id: String,
+        old_price: u32,
+        new_price: u32,
+    },
     /// Trade route disrupted
     RouteDisrupted { route_id: String, reason: String },
     /// Notification for player
@@ -241,7 +256,8 @@ impl WorldSim {
         self.seasonal_modifiers = SeasonalModifiers::for_season(season);
 
         // Collect event IDs to trigger
-        let events_to_trigger: Vec<String> = self.event_definitions
+        let events_to_trigger: Vec<String> = self
+            .event_definitions
             .iter()
             .filter(|event| {
                 if let EventTrigger::SeasonChange(trigger_season) = &event.trigger {
@@ -258,9 +274,10 @@ impl WorldSim {
             self.trigger_event(&event_id, results);
         }
 
-        results.push(WorldSimResult::Notification(
-            format!("{} has arrived.", season)
-        ));
+        results.push(WorldSimResult::Notification(format!(
+            "{} has arrived.",
+            season
+        )));
     }
 
     /// Update diplomatic relations
@@ -270,7 +287,8 @@ impl WorldSim {
         let world_tick = self.world_tick;
 
         // Build faction lookup
-        let faction_map: HashMap<String, (i32, String)> = self.factions
+        let faction_map: HashMap<String, (i32, String)> = self
+            .factions
             .iter()
             .map(|f| (f.id.clone(), (f.disposition, f.name.clone())))
             .collect();
@@ -281,17 +299,20 @@ impl WorldSim {
 
                 if let Some(treaty) = &relation.treaty {
                     if treaty.is_expired(world_tick) {
-                        results.push(WorldSimResult::Notification(
-                            format!("{} with {} has expired.", treaty.name(), name)
-                        ));
+                        results.push(WorldSimResult::Notification(format!(
+                            "{} with {} has expired.",
+                            treaty.name(),
+                            name
+                        )));
                         relation.treaty = None;
                     }
                 }
 
                 if relation.reputation < hostility_threshold && !relation.at_war {
-                    results.push(WorldSimResult::Notification(
-                        format!("{} has become hostile!", name)
-                    ));
+                    results.push(WorldSimResult::Notification(format!(
+                        "{} has become hostile!",
+                        name
+                    )));
                 }
             }
         }
@@ -306,11 +327,13 @@ impl WorldSim {
         self.economy.tick(world_tick, regen_rate);
 
         // Build war zone info
-        let war_faction_territories: Vec<Vec<String>> = self.relations
+        let war_faction_territories: Vec<Vec<String>> = self
+            .relations
             .iter()
             .filter(|r| r.at_war)
             .filter_map(|r| {
-                self.factions.iter()
+                self.factions
+                    .iter()
                     .find(|f| f.id == r.faction_id)
                     .map(|f| f.territory_nodes.clone())
             })
@@ -320,7 +343,9 @@ impl WorldSim {
         for route in &mut self.economy.routes {
             let mut safety = 1.0;
 
-            let route_nodes: Vec<String> = self.economy.nodes
+            let route_nodes: Vec<String> = self
+                .economy
+                .nodes
                 .iter()
                 .filter(|n| n.id == route.from_node || n.id == route.to_node)
                 .map(|n| n.map_node_id.clone())
@@ -350,11 +375,11 @@ impl WorldSim {
 
     /// Update faction AI decisions
     fn update_faction_ai(&mut self, results: &mut Vec<WorldSimResult>) {
-        let power_map: HashMap<String, u32> = self.factions
+        let power_map: HashMap<String, u32> = self
+            .factions
             .iter()
             .map(|f| (f.id.clone(), f.power_level))
             .collect();
-
 
         let world_tick = self.world_tick;
 
@@ -422,13 +447,15 @@ impl WorldSim {
 
             let should_trigger = match &event.trigger {
                 EventTrigger::SeasonChange(_) => false,
-                EventTrigger::ReputationThreshold { faction_id, threshold } => {
-                    self.relations
-                        .iter()
-                        .find(|r| &r.faction_id == faction_id)
-                        .map(|r| r.reputation >= *threshold)
-                        .unwrap_or(false)
-                }
+                EventTrigger::ReputationThreshold {
+                    faction_id,
+                    threshold,
+                } => self
+                    .relations
+                    .iter()
+                    .find(|r| &r.faction_id == faction_id)
+                    .map(|r| r.reputation >= *threshold)
+                    .unwrap_or(false),
                 EventTrigger::TickInterval(interval) => world_tick % interval == 0,
                 EventTrigger::RandomChance(chance) => random_roll < *chance,
                 EventTrigger::FactionPowerShift => {
@@ -450,7 +477,12 @@ impl WorldSim {
 
     /// Trigger a specific event by ID
     fn trigger_event(&mut self, event_id: &str, results: &mut Vec<WorldSimResult>) {
-        if let Some(event) = self.event_definitions.iter().find(|e| e.id == event_id).cloned() {
+        if let Some(event) = self
+            .event_definitions
+            .iter()
+            .find(|e| e.id == event_id)
+            .cloned()
+        {
             let active = ActiveWorldEvent::from_event(&event, self.world_tick);
 
             if !event.repeatable {
@@ -465,7 +497,8 @@ impl WorldSim {
     /// Process queued events
     fn process_event_queue(&mut self, results: &mut Vec<WorldSimResult>) {
         let world_tick = self.world_tick;
-        let ready_events: Vec<_> = self.event_queue
+        let ready_events: Vec<_> = self
+            .event_queue
             .iter()
             .filter(|q| world_tick >= q.trigger_tick)
             .map(|q| q.event_id.clone())
@@ -536,7 +569,9 @@ impl WorldSim {
     }
 
     pub fn get_relation_mut(&mut self, faction_id: &str) -> Option<&mut FactionRelation> {
-        self.relations.iter_mut().find(|r| r.faction_id == faction_id)
+        self.relations
+            .iter_mut()
+            .find(|r| r.faction_id == faction_id)
     }
 
     /// Process a diplomatic action from the player
@@ -552,7 +587,11 @@ impl WorldSim {
         let treaty_break_penalty = self.balance.treaty_break_penalty;
 
         // Find the relation index
-        let relation_idx = match self.relations.iter().position(|r| r.faction_id == faction_id) {
+        let relation_idx = match self
+            .relations
+            .iter()
+            .position(|r| r.faction_id == faction_id)
+        {
             Some(idx) => idx,
             None => return results,
         };
@@ -562,15 +601,16 @@ impl WorldSim {
                 let rep_gain = (value / 100).min(20) as i32;
                 self.relations[relation_idx].modify_reputation(rep_gain);
                 self.relations[relation_idx].record_friendly_action(world_tick);
-                results.push(WorldSimResult::Notification(
-                    format!("Gift sent. Reputation +{}", rep_gain)
-                ));
+                results.push(WorldSimResult::Notification(format!(
+                    "Gift sent. Reputation +{}",
+                    rep_gain
+                )));
             }
             DiplomaticAction::Threaten => {
                 self.relations[relation_idx].modify_reputation(-10);
                 self.relations[relation_idx].record_hostile_action(world_tick);
                 results.push(WorldSimResult::Notification(
-                    "Threat delivered. Reputation -10".to_string()
+                    "Threat delivered. Reputation -10".to_string(),
                 ));
             }
             DiplomaticAction::RequestTreaty { treaty_type } => {
@@ -582,30 +622,33 @@ impl WorldSim {
 
                 if self.relations[relation_idx].reputation >= acceptance_threshold {
                     let treaty = match treaty_type {
-                        TreatyRequest::NonAggression { duration_ticks } => {
-                            Treaty::NonAggression { expires_tick: world_tick + duration_ticks }
-                        }
-                        TreatyRequest::TradeAgreement { discount_percent, duration_ticks } => {
-                            Treaty::TradeAgreement {
-                                discount_percent,
-                                expires_tick: world_tick + duration_ticks,
-                            }
-                        }
-                        TreatyRequest::Alliance { mutual_defense, duration_ticks } => {
-                            Treaty::Alliance {
-                                mutual_defense,
-                                expires_tick: world_tick + duration_ticks,
-                            }
-                        }
+                        TreatyRequest::NonAggression { duration_ticks } => Treaty::NonAggression {
+                            expires_tick: world_tick + duration_ticks,
+                        },
+                        TreatyRequest::TradeAgreement {
+                            discount_percent,
+                            duration_ticks,
+                        } => Treaty::TradeAgreement {
+                            discount_percent,
+                            expires_tick: world_tick + duration_ticks,
+                        },
+                        TreatyRequest::Alliance {
+                            mutual_defense,
+                            duration_ticks,
+                        } => Treaty::Alliance {
+                            mutual_defense,
+                            expires_tick: world_tick + duration_ticks,
+                        },
                     };
-                    results.push(WorldSimResult::Notification(
-                        format!("{} accepted!", treaty.name())
-                    ));
+                    results.push(WorldSimResult::Notification(format!(
+                        "{} accepted!",
+                        treaty.name()
+                    )));
                     self.relations[relation_idx].treaty = Some(treaty);
                     self.relations[relation_idx].record_friendly_action(world_tick);
                 } else {
                     results.push(WorldSimResult::Notification(
-                        "Treaty rejected. Improve relations first.".to_string()
+                        "Treaty rejected. Improve relations first.".to_string(),
                     ));
                 }
             }
@@ -614,9 +657,10 @@ impl WorldSim {
                     self.relations[relation_idx].treaty = None;
                     self.relations[relation_idx].modify_reputation(treaty_break_penalty);
                     self.relations[relation_idx].record_hostile_action(world_tick);
-                    results.push(WorldSimResult::Notification(
-                        format!("Treaty broken. Reputation {}", treaty_break_penalty)
-                    ));
+                    results.push(WorldSimResult::Notification(format!(
+                        "Treaty broken. Reputation {}",
+                        treaty_break_penalty
+                    )));
                 }
             }
             DiplomaticAction::DeclareWar => {
@@ -640,7 +684,7 @@ impl WorldSim {
             DiplomaticAction::RequestAudience => {
                 self.relations[relation_idx].record_friendly_action(world_tick);
                 results.push(WorldSimResult::Notification(
-                    "Audience requested.".to_string()
+                    "Audience requested.".to_string(),
                 ));
             }
         }
@@ -649,7 +693,11 @@ impl WorldSim {
     }
 
     pub fn respond_to_event(&mut self, event_id: &str, choice_idx: usize) -> Vec<EventEffect> {
-        if let Some(event) = self.active_events.iter_mut().find(|e| e.event_id == event_id) {
+        if let Some(event) = self
+            .active_events
+            .iter_mut()
+            .find(|e| e.event_id == event_id)
+        {
             event.resolve_with_choice(choice_idx);
             return event.get_resolution_effects();
         }
@@ -657,7 +705,8 @@ impl WorldSim {
     }
 
     pub fn get_item_price(&self, node_id: &str, item_id: &str) -> Option<u32> {
-        self.economy.get_effective_price(node_id, item_id, self.balance.price_elasticity)
+        self.economy
+            .get_effective_price(node_id, item_id, self.balance.price_elasticity)
     }
 
     pub fn queue_event(&mut self, event_id: String, delay_ticks: u32) {

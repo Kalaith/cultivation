@@ -11,11 +11,11 @@ pub fn generate_disciple(game_data: &GameData) -> Disciple {
     let name = NAMES.choose(&mut rng).unwrap_or(&"Unnamed").to_string();
 
     let talent = match rng.gen_range(0..=99) {
-        0..=49 => Talent::Low,      // 50%
-        50..=79 => Talent::Medium,   // 30%
-        80..=94 => Talent::High,     // 15%
-        95..=98 => Talent::Genius,   // 4%
-        _ => Talent::HeavenSent, // 1%
+        0..=49 => Talent::Low,     // 50%
+        50..=79 => Talent::Medium, // 30%
+        80..=94 => Talent::High,   // 15%
+        95..=98 => Talent::Genius, // 4%
+        _ => Talent::HeavenSent,   // 1%
     };
 
     let attributes = Attributes {
@@ -25,7 +25,8 @@ pub fn generate_disciple(game_data: &GameData) -> Disciple {
     };
 
     let num_traits = rng.gen_range(1..=2);
-    let fate_traits = game_data.fate_traits
+    let fate_traits = game_data
+        .fate_traits
         .choose_multiple(&mut rng, num_traits)
         .cloned()
         .collect();
@@ -64,10 +65,10 @@ fn generate_bloodline(game_data: &GameData, rng: &mut ThreadRng) -> DiscipleBloo
 
     // 60% no bloodline, 25% Mortal, 10% Spirit, 4% Ancient, 0.9% Primordial, 0.1% Mythic
     let target_rarity = match bloodline_roll {
-        0..=59 => return DiscipleBloodline::none(),  // No bloodline
-        60..=84 => BloodlineRarity::Mortal,          // 25%
-        85..=94 => BloodlineRarity::Spirit,          // 10%
-        95..=98 => BloodlineRarity::Ancient,         // 4%
+        0..=59 => return DiscipleBloodline::none(), // No bloodline
+        60..=84 => BloodlineRarity::Mortal,         // 25%
+        85..=94 => BloodlineRarity::Spirit,         // 10%
+        95..=98 => BloodlineRarity::Ancient,        // 4%
         99 => {
             // 1% chance, split between Primordial (0.9%) and Mythic (0.1%)
             if rng.gen_range(0..10) == 0 {
@@ -80,7 +81,9 @@ fn generate_bloodline(game_data: &GameData, rng: &mut ThreadRng) -> DiscipleBloo
     };
 
     // Filter bloodlines by target rarity
-    let matching_bloodlines: Vec<_> = game_data.bloodlines.values()
+    let matching_bloodlines: Vec<_> = game_data
+        .bloodlines
+        .values()
         .filter(|b| b.rarity == target_rarity)
         .collect();
 

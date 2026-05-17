@@ -26,9 +26,13 @@ impl Game {
             Action::AssignLaw(disciple_idx, law_id) => self.handle_assign_law(disciple_idx, law_id),
             Action::CraftItem(recipe_id) => self.handle_craft_item(recipe_id),
             Action::UseItem(item_id, disciple_idx) => self.handle_use_item(item_id, disciple_idx),
-            Action::EquipItem(item_id, disciple_idx) => self.handle_equip_item(item_id, disciple_idx),
+            Action::EquipItem(item_id, disciple_idx) => {
+                self.handle_equip_item(item_id, disciple_idx)
+            }
             Action::UnequipItem(slot, disciple_idx) => self.handle_unequip_item(slot, disciple_idx),
-            Action::RepairItem(item_id, disciple_idx) => self.handle_repair_item(item_id, disciple_idx),
+            Action::RepairItem(item_id, disciple_idx) => {
+                self.handle_repair_item(item_id, disciple_idx)
+            }
             Action::ResearchTech(tech_id) => self.handle_research_tech(tech_id),
             Action::RepairBuilding(id) => self.handle_repair_building(id),
             Action::ConstructBuilding(b_type, x, y) => self.handle_construct_building(b_type, x, y),
@@ -48,11 +52,14 @@ impl Game {
             Action::SendDiplomat { faction_id, action } => {
                 self.handle_send_diplomat(faction_id, action)
             }
-            Action::RespondToEvent { event_id, choice_idx } => {
-                self.handle_respond_to_event(event_id, choice_idx)
-            }
+            Action::RespondToEvent {
+                event_id,
+                choice_idx,
+            } => self.handle_respond_to_event(event_id, choice_idx),
             Action::RecruitSpiritBeast(def_id) => self.handle_recruit_spirit_beast(def_id),
-            Action::EquipBeastItem(beast_id, item_id) => self.handle_equip_beast_item(beast_id, item_id),
+            Action::EquipBeastItem(beast_id, item_id) => {
+                self.handle_equip_beast_item(beast_id, item_id)
+            }
         }
     }
 

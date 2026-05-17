@@ -10,25 +10,30 @@ impl Game {
     pub(in crate::game) fn handle_recruit_disciple(&mut self) {
         let capacity = self.get_population_capacity();
         if capacity == 0 || self.disciples.len() as u32 >= capacity {
-            self.event_log
-                .push("Population cap reached. Build Dormitories or upgrade the Sect Hall.".to_string());
+            self.event_log.push(
+                "Population cap reached. Build Dormitories or upgrade the Sect Hall.".to_string(),
+            );
             return;
         }
 
         let new_disciple = generate_disciple(&self.data);
-        self.event_log.push(format!("Recruited: {}", new_disciple.name));
+        self.event_log
+            .push(format!("Recruited: {}", new_disciple.name));
         self.disciples.push(new_disciple);
     }
 
     pub(in crate::game) fn handle_promote_disciple(&mut self, idx: usize) {
-        let Some(disciple) = self.disciples.get_mut(idx) else { return };
+        let Some(disciple) = self.disciples.get_mut(idx) else {
+            return;
+        };
 
         if disciple.rank != DiscipleRank::Outer {
             return;
         }
 
         if disciple.realm == "Mortal" {
-            self.event_log.push("Cannot Promote: Must reach Qi Refinement first.".to_string());
+            self.event_log
+                .push("Cannot Promote: Must reach Qi Refinement first.".to_string());
             return;
         }
 
@@ -50,7 +55,9 @@ impl Game {
     }
 
     pub(in crate::game) fn handle_attempt_breakthrough_action(&mut self, idx: usize) {
-        let Some(disciple) = self.disciples.get(idx).cloned() else { return };
+        let Some(disciple) = self.disciples.get(idx).cloned() else {
+            return;
+        };
 
         if !disciple.can_attempt_breakthrough() {
             if disciple.is_injured() {
@@ -92,11 +99,14 @@ impl Game {
     }
 
     pub(in crate::game) fn handle_assign_law(&mut self, disciple_idx: usize, law_id: String) {
-        let Some(disciple) = self.disciples.get_mut(disciple_idx) else { return };
+        let Some(disciple) = self.disciples.get_mut(disciple_idx) else {
+            return;
+        };
 
         if self.data.laws.contains_key(&law_id) {
             disciple.law_id = Some(law_id.clone());
-            self.event_log.push(format!("{} is now practicing {}.", disciple.name, law_id));
+            self.event_log
+                .push(format!("{} is now practicing {}.", disciple.name, law_id));
         }
     }
 

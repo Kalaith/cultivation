@@ -11,7 +11,14 @@ impl SectBaseState {
         _unlocked_techs: &[String],
     ) -> Option<UpdateResult> {
         draw_panel(rect, Some("Sect Map"));
-        draw_rectangle_lines(rect.x, rect.y, rect.w, rect.h, 2.5, Color::new(TEXT_HIGHLIGHT.r, TEXT_HIGHLIGHT.g, TEXT_HIGHLIGHT.b, 0.35));
+        draw_rectangle_lines(
+            rect.x,
+            rect.y,
+            rect.w,
+            rect.h,
+            2.5,
+            Color::new(TEXT_HIGHLIGHT.r, TEXT_HIGHLIGHT.g, TEXT_HIGHLIGHT.b, 0.35),
+        );
 
         let mouse = vec2(mouse_position().0, mouse_position().1);
 
@@ -77,12 +84,21 @@ impl SectBaseState {
                 top_left.y,
                 WHITE,
                 DrawTextureParams {
-                    dest_size: Some(vec2(SECT_MAP_WIDTH * self.map_zoom, SECT_MAP_HEIGHT * self.map_zoom)),
+                    dest_size: Some(vec2(
+                        SECT_MAP_WIDTH * self.map_zoom,
+                        SECT_MAP_HEIGHT * self.map_zoom,
+                    )),
                     ..Default::default()
                 },
             );
         } else {
-            draw_rectangle(rect.x, rect.y, rect.w, rect.h, Color::new(0.12, 0.11, 0.10, 1.0));
+            draw_rectangle(
+                rect.x,
+                rect.y,
+                rect.w,
+                rect.h,
+                Color::new(0.12, 0.11, 0.10, 1.0),
+            );
         }
     }
 
@@ -155,7 +171,16 @@ impl SectBaseState {
 
     pub(super) fn draw_placement_preview(&mut self, rect: Rect, _map_x: f32, _map_y: f32) {
         if let Some(place_type) = &self.placement_mode {
-            draw_text(&format!("Placing: {:?} (Click to Build, RMB/Esc to Cancel)", place_type), rect.x + 20.0, rect.y + rect.h - 40.0, FONT_HEADER_SIZE, TEXT_HIGHLIGHT);
+            draw_text(
+                &format!(
+                    "Placing: {:?} (Click to Build, RMB/Esc to Cancel)",
+                    place_type
+                ),
+                rect.x + 20.0,
+                rect.y + rect.h - 40.0,
+                FONT_HEADER_SIZE,
+                TEXT_HIGHLIGHT,
+            );
         }
     }
 
@@ -174,7 +199,10 @@ impl SectBaseState {
     }
 
     pub(super) fn clamp_map_center(&mut self, rect: Rect) {
-        let half_view = vec2(rect.w / (2.0 * self.map_zoom), rect.h / (2.0 * self.map_zoom));
+        let half_view = vec2(
+            rect.w / (2.0 * self.map_zoom),
+            rect.h / (2.0 * self.map_zoom),
+        );
         let min_x = half_view.x;
         let min_y = half_view.y;
         let max_x = SECT_MAP_WIDTH - half_view.x;
@@ -235,7 +263,9 @@ impl SectBaseState {
         world_pos: Vec2,
         tint: Color,
     ) {
-        if let Some((key, top_left, size, _tex_size)) = self.building_sprite_metrics(textures, b_type, world_pos) {
+        if let Some((key, top_left, size, _tex_size)) =
+            self.building_sprite_metrics(textures, b_type, world_pos)
+        {
             if let Some(tex) = textures.get(&key) {
                 let screen_pos = self.world_to_screen(rect, top_left);
                 let draw_size = size * self.map_zoom;
@@ -254,7 +284,14 @@ impl SectBaseState {
         }
 
         let screen_pos = self.world_to_screen(rect, world_pos);
-        draw_brush_stroke(screen_pos.x - 12.0, screen_pos.y - 12.0, 24.0, 24.0, tint, 1.0);
+        draw_brush_stroke(
+            screen_pos.x - 12.0,
+            screen_pos.y - 12.0,
+            24.0,
+            24.0,
+            tint,
+            1.0,
+        );
     }
 
     fn get_texture_mask<'a>(
@@ -317,12 +354,15 @@ impl SectBaseState {
         b_type: &BuildingType,
         world_pos: Vec2,
     ) -> bool {
-        let Some((key, top_left, size, _tex_size)) = self.building_sprite_metrics(textures, b_type, world_pos) else {
+        let Some((key, top_left, size, _tex_size)) =
+            self.building_sprite_metrics(textures, b_type, world_pos)
+        else {
             return false;
         };
 
         let bottom_right = top_left + size;
-        if top_left.x < 0.0 || top_left.y < 0.0
+        if top_left.x < 0.0
+            || top_left.y < 0.0
             || bottom_right.x > SECT_MAP_WIDTH
             || bottom_right.y > SECT_MAP_HEIGHT
         {
@@ -351,7 +391,11 @@ impl SectBaseState {
         let Some((existing_key, existing_top_left, existing_size, _existing_tex_size)) =
             self.building_sprite_metrics(textures, &existing.building_type, existing_pos)
         else {
-            return self.check_bounding_box_overlap(candidate_top_left, candidate_size, existing_pos);
+            return self.check_bounding_box_overlap(
+                candidate_top_left,
+                candidate_size,
+                existing_pos,
+            );
         };
 
         let a_max = candidate_top_left + candidate_size;
@@ -368,13 +412,22 @@ impl SectBaseState {
 
         let candidate_mask = self.get_texture_mask(textures, candidate_key).cloned();
         let existing_mask = self.get_texture_mask(textures, &existing_key).cloned();
-        let Some(candidate_mask) = candidate_mask else { return true };
-        let Some(existing_mask) = existing_mask else { return true };
+        let Some(candidate_mask) = candidate_mask else {
+            return true;
+        };
+        let Some(existing_mask) = existing_mask else {
+            return true;
+        };
 
         self.check_pixel_overlap(
-            &candidate_mask, candidate_top_left,
-            &existing_mask, existing_top_left,
-            inter_left, inter_top, inter_right, inter_bottom,
+            &candidate_mask,
+            candidate_top_left,
+            &existing_mask,
+            existing_top_left,
+            inter_left,
+            inter_top,
+            inter_right,
+            inter_bottom,
         )
     }
 
@@ -409,12 +462,20 @@ impl SectBaseState {
             for x in inter_left..inter_right {
                 let world = vec2(x as f32 + 0.5, y as f32 + 0.5);
                 let cand_local = (world - candidate_top_left) / BUILDING_SCALE;
-                let cand_alpha = Self::alpha_at(candidate_mask, cand_local.x.floor() as i32, cand_local.y.floor() as i32);
+                let cand_alpha = Self::alpha_at(
+                    candidate_mask,
+                    cand_local.x.floor() as i32,
+                    cand_local.y.floor() as i32,
+                );
                 if cand_alpha <= ALPHA_THRESHOLD {
                     continue;
                 }
                 let ex_local = (world - existing_top_left) / BUILDING_SCALE;
-                let ex_alpha = Self::alpha_at(existing_mask, ex_local.x.floor() as i32, ex_local.y.floor() as i32);
+                let ex_alpha = Self::alpha_at(
+                    existing_mask,
+                    ex_local.x.floor() as i32,
+                    ex_local.y.floor() as i32,
+                );
                 if ex_alpha > ALPHA_THRESHOLD {
                     return true;
                 }

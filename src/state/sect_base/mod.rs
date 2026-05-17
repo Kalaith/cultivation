@@ -8,18 +8,18 @@ mod tutorial;
 use crate::data::buildings::{BuildingStatus, BuildingType};
 use crate::data::disciples::Disciple;
 use crate::data::elements::Element;
+use crate::data::grid::Grid;
 use crate::data::herbs::Season;
 use crate::data::loader::GameData;
-use crate::data::grid::Grid;
 use crate::data::missions::{MissionOutcome, OngoingMission};
 use crate::data::spirit_beasts::SpiritBeast;
 use crate::engine::actions::Action;
 use crate::state::{StateTransition, TutorialState, UpdateResult};
 use crate::ui::components::*;
 use crate::ui::herbs;
-use crate::ui::TextureManager;
 use crate::ui::tech::{self, TechTreeState};
 use crate::ui::theme::*;
+use crate::ui::TextureManager;
 use macroquad::prelude::*;
 use std::collections::HashMap;
 
@@ -117,21 +117,57 @@ impl SectBaseState {
 
         let center_rect = Rect::new(left_panel_w, header_h, center_w, screen_h - header_h);
         if let Some(res) = self.draw_center_panel(
-            center_rect, data, grid, textures, spirit_stones, herbs, inventory,
-            unlocked_techs, ongoing_missions, completed_missions, completed_history,
-            disciples, spirit_beasts, current_season, discovered_recipes,
+            center_rect,
+            data,
+            grid,
+            textures,
+            spirit_stones,
+            herbs,
+            inventory,
+            unlocked_techs,
+            ongoing_missions,
+            completed_missions,
+            completed_history,
+            disciples,
+            spirit_beasts,
+            current_season,
+            discovered_recipes,
         ) {
             return res;
         }
 
-        self.draw_header(screen_w, header_h, spirit_stones, herbs, influence, relics, current_season, season_ticks, tutorial);
+        self.draw_header(
+            screen_w,
+            header_h,
+            spirit_stones,
+            herbs,
+            influence,
+            relics,
+            current_season,
+            season_ticks,
+            tutorial,
+        );
 
         if let Some(res) = self.draw_left_panel(header_h, screen_h, left_panel_w, data) {
             return res;
         }
 
-        self.update_tutorial_progress(tutorial, data, unlocked_techs, disciples, ongoing_missions, completed_history);
-        self.draw_right_panel(header_h, screen_h, left_panel_w, center_w, right_panel_w, event_log);
+        self.update_tutorial_progress(
+            tutorial,
+            data,
+            unlocked_techs,
+            disciples,
+            ongoing_missions,
+            completed_history,
+        );
+        self.draw_right_panel(
+            header_h,
+            screen_h,
+            left_panel_w,
+            center_w,
+            right_panel_w,
+            event_log,
+        );
 
         if tutorial.active && !tutorial.hidden {
             self.draw_tutorial_overlay(screen_w, screen_h, tutorial);
@@ -192,13 +228,27 @@ impl SectBaseState {
         discovered_recipes: &[String],
     ) -> Option<UpdateResult> {
         match self.view {
-            SectView::Map => self.draw_map_view(rect, data, grid, textures, spirit_stones, unlocked_techs),
+            SectView::Map => {
+                self.draw_map_view(rect, data, grid, textures, spirit_stones, unlocked_techs)
+            }
             SectView::BuildingDetails(id) => self.draw_building_details(
-                rect, id, data, spirit_stones, herbs, inventory, unlocked_techs,
-                ongoing_missions, completed_missions, completed_history,
-                disciples, current_season, discovered_recipes,
+                rect,
+                id,
+                data,
+                spirit_stones,
+                herbs,
+                inventory,
+                unlocked_techs,
+                ongoing_missions,
+                completed_missions,
+                completed_history,
+                disciples,
+                current_season,
+                discovered_recipes,
             ),
-            SectView::SpiritBeasts => self.draw_spirit_beasts_view(rect, data, spirit_beasts, inventory),
+            SectView::SpiritBeasts => {
+                self.draw_spirit_beasts_view(rect, data, spirit_beasts, inventory)
+            }
         }
     }
 }

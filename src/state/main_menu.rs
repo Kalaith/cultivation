@@ -2,7 +2,7 @@ use crate::data::loader::GameData;
 use crate::save::storage;
 use crate::state::{StateTransition, UpdateResult};
 use crate::ui::components::draw_button;
-use crate::ui::theme::{FONT_TITLE_SIZE, FONT_SMALL_SIZE, PRIMARY, TEXT_SECONDARY, TEXT_HIGHLIGHT};
+use crate::ui::theme::{FONT_SMALL_SIZE, FONT_TITLE_SIZE, PRIMARY, TEXT_HIGHLIGHT, TEXT_SECONDARY};
 use macroquad::prelude::*;
 
 pub struct MainMenuState {
@@ -43,9 +43,15 @@ impl MainMenuState {
 
         // New Game button
         let new_game_btn = Rect::new(btn_x, btn_y, btn_width, btn_height);
-        let new_game_label = if self.has_save { "New Game" } else { "Start Journey" };
+        let new_game_label = if self.has_save {
+            "New Game"
+        } else {
+            "Start Journey"
+        };
         if draw_button(new_game_btn, new_game_label, !self.has_save) {
-            return UpdateResult::new().with_action(crate::engine::actions::Action::StartNewGame("Test".to_string()));
+            return UpdateResult::new().with_action(crate::engine::actions::Action::StartNewGame(
+                "Test".to_string(),
+            ));
         }
         btn_y += 60.0;
 

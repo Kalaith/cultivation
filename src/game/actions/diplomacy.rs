@@ -6,7 +6,9 @@ impl Game {
         faction_id: String,
         action: crate::data::relations::DiplomaticAction,
     ) {
-        let results = self.world_sim.process_diplomatic_action(&faction_id, action);
+        let results = self
+            .world_sim
+            .process_diplomatic_action(&faction_id, action);
         for result in results {
             self.handle_world_sim_result(result);
         }

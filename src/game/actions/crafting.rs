@@ -4,12 +4,19 @@ impl Game {
     pub(in crate::game) fn handle_craft_item(&mut self, recipe_id: String) {
         use crate::engine::crafting::{self, CraftingContext};
 
-        let Some(recipe) = self.data.recipes.iter().find(|r| r.id == recipe_id).cloned() else {
+        let Some(recipe) = self
+            .data
+            .recipes
+            .iter()
+            .find(|r| r.id == recipe_id)
+            .cloned()
+        else {
             return;
         };
 
         if !self.has_ingredients(&recipe.ingredients) {
-            self.event_log.push("Cannot Craft: Missing ingredients.".to_string());
+            self.event_log
+                .push("Cannot Craft: Missing ingredients.".to_string());
             return;
         }
 
@@ -37,10 +44,15 @@ impl Game {
 
         if result.success {
             self.deduct_ingredients(&recipe.ingredients, 1.0);
-            *self.inventory.entry(recipe.output_item_id.clone()).or_insert(0) += result.output_amount;
+            *self
+                .inventory
+                .entry(recipe.output_item_id.clone())
+                .or_insert(0) += result.output_amount;
 
             for disciple in &mut self.disciples {
-                if let Some(crate::data::disciples::Bottleneck::CraftItem(ref bn_recipe)) = disciple.breakthrough_bottleneck {
+                if let Some(crate::data::disciples::Bottleneck::CraftItem(ref bn_recipe)) =
+                    disciple.breakthrough_bottleneck
+                {
                     if *bn_recipe == recipe_id {
                         self.event_log.push(format!(
                             "{} overcame their bottleneck: Craft {}!",
@@ -99,14 +111,18 @@ impl Game {
             return;
         };
 
-        let prereqs_met = tech.prerequisites.iter().all(|p| self.unlocked_techs.contains(p));
+        let prereqs_met = tech
+            .prerequisites
+            .iter()
+            .all(|p| self.unlocked_techs.contains(p));
         if !prereqs_met {
             self.event_log.push("Prerequisites not met.".to_string());
             return;
         }
 
         if self.spirit_stones < tech.cost_spirit_stones {
-            self.event_log.push("Not enough Spirit Stones to research.".to_string());
+            self.event_log
+                .push("Not enough Spirit Stones to research.".to_string());
             return;
         }
 

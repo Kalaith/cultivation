@@ -7,9 +7,7 @@ pub struct FontManager {
 
 impl FontManager {
     pub fn new() -> Self {
-        Self {
-            brush_font: None,
-        }
+        Self { brush_font: None }
     }
 
     /// Load all game fonts asynchronously
@@ -25,7 +23,6 @@ impl FontManager {
             }
         }
     }
-
 }
 
 impl Default for FontManager {

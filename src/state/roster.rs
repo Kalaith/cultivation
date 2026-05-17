@@ -29,7 +29,10 @@ impl RosterFilter {
         match self {
             RosterFilter::All => true,
             RosterFilter::Outer => disciple.rank == DiscipleRank::Outer,
-            RosterFilter::Inner => matches!(disciple.rank, DiscipleRank::Inner | DiscipleRank::Elder | DiscipleRank::SectLeader),
+            RosterFilter::Inner => matches!(
+                disciple.rank,
+                DiscipleRank::Inner | DiscipleRank::Elder | DiscipleRank::SectLeader
+            ),
             RosterFilter::Injured => disciple.is_injured(),
             RosterFilter::Ready => disciple.can_attempt_breakthrough(),
         }
@@ -58,7 +61,12 @@ impl DiscipleRosterState {
         }
     }
 
-    pub fn update(&mut self, data: &GameData, disciples: &[Disciple], inventory: &std::collections::HashMap<String, u32>) -> UpdateResult {
+    pub fn update(
+        &mut self,
+        data: &GameData,
+        disciples: &[Disciple],
+        inventory: &std::collections::HashMap<String, u32>,
+    ) -> UpdateResult {
         if is_key_pressed(KeyCode::Escape) {
             return UpdateResult::new().with_transition(StateTransition::ToSectBase);
         }
@@ -75,7 +83,8 @@ impl DiscipleRosterState {
             .collect();
 
         // Get selected disciple's actual index
-        let selected_actual_index = self.selected_filtered_index
+        let selected_actual_index = self
+            .selected_filtered_index
             .and_then(|fi| filtered.get(fi))
             .map(|(actual_idx, _)| *actual_idx);
 
@@ -85,10 +94,21 @@ impl DiscipleRosterState {
 
         // Count stats for header
         let injured_count = disciples.iter().filter(|d| d.is_injured()).count();
-        let ready_count = disciples.iter().filter(|d| d.can_attempt_breakthrough()).count();
+        let ready_count = disciples
+            .iter()
+            .filter(|d| d.can_attempt_breakthrough())
+            .count();
         draw_text(
-            &format!("Total: {} | Injured: {} | Ready: {}", disciples.len(), injured_count, ready_count),
-            screen_w - 350.0, 40.0, FONT_BODY_SIZE, TEXT_HIGHLIGHT
+            &format!(
+                "Total: {} | Injured: {} | Ready: {}",
+                disciples.len(),
+                injured_count,
+                ready_count
+            ),
+            screen_w - 350.0,
+            40.0,
+            FONT_BODY_SIZE,
+            TEXT_HIGHLIGHT,
         );
 
         // --- Layout ---
@@ -103,13 +123,23 @@ impl DiscipleRosterState {
 
         // Filter buttons
         let filter_y = left_rect.y + 40.0;
-        let filters = [RosterFilter::All, RosterFilter::Outer, RosterFilter::Inner, RosterFilter::Injured, RosterFilter::Ready];
+        let filters = [
+            RosterFilter::All,
+            RosterFilter::Outer,
+            RosterFilter::Inner,
+            RosterFilter::Injured,
+            RosterFilter::Ready,
+        ];
         let btn_width = (left_w - 30.0) / filters.len() as f32;
 
         for (i, f) in filters.iter().enumerate() {
             let btn_x = left_rect.x + 10.0 + (i as f32 * btn_width);
             let is_active = self.filter == *f;
-            if draw_button(Rect::new(btn_x, filter_y, btn_width - 5.0, 25.0), f.label(), is_active) {
+            if draw_button(
+                Rect::new(btn_x, filter_y, btn_width - 5.0, 25.0),
+                f.label(),
+                is_active,
+            ) {
                 if self.filter != *f {
                     self.filter = *f;
                     self.selected_filtered_index = None;
@@ -131,7 +161,9 @@ impl DiscipleRosterState {
             let wheel = mouse_wheel().1;
             if total_height > list_h {
                 self.scroll_offset -= wheel * 30.0;
-                self.scroll_offset = self.scroll_offset.clamp(0.0, (total_height - list_h).max(0.0));
+                self.scroll_offset = self
+                    .scroll_offset
+                    .clamp(0.0, (total_height - list_h).max(0.0));
             } else {
                 self.scroll_offset = 0.0;
             }
@@ -171,9 +203,21 @@ impl DiscipleRosterState {
 
             // Background tint for status
             if disciple.is_injured() {
-                draw_rectangle(btn_rect.x, btn_rect.y, btn_rect.w, btn_rect.h, Color::new(0.5, 0.2, 0.2, 0.3));
+                draw_rectangle(
+                    btn_rect.x,
+                    btn_rect.y,
+                    btn_rect.w,
+                    btn_rect.h,
+                    Color::new(0.5, 0.2, 0.2, 0.3),
+                );
             } else if disciple.can_attempt_breakthrough() {
-                draw_rectangle(btn_rect.x, btn_rect.y, btn_rect.w, btn_rect.h, Color::new(0.2, 0.4, 0.3, 0.3));
+                draw_rectangle(
+                    btn_rect.x,
+                    btn_rect.y,
+                    btn_rect.w,
+                    btn_rect.h,
+                    Color::new(0.2, 0.4, 0.3, 0.3),
+                );
             }
 
             if draw_button(btn_rect, &label, is_selected) {
@@ -197,12 +241,22 @@ impl DiscipleRosterState {
         // Show filtered count
         draw_text(
             &format!("Showing {} of {}", filtered.len(), disciples.len()),
-            left_rect.x + 10.0, left_rect.y + content_h - 10.0, FONT_SMALL_SIZE, TEXT_SECONDARY
+            left_rect.x + 10.0,
+            left_rect.y + content_h - 10.0,
+            FONT_SMALL_SIZE,
+            TEXT_SECONDARY,
         );
 
         // --- Right Panel: Details ---
         let right_rect = Rect::new(left_w + 20.0, content_y, right_w, content_h);
-        draw_panel(right_rect, Some(if selected_actual_index.is_some() { "Disciple Details" } else { "Select a Disciple" }));
+        draw_panel(
+            right_rect,
+            Some(if selected_actual_index.is_some() {
+                "Disciple Details"
+            } else {
+                "Select a Disciple"
+            }),
+        );
 
         if let Some(idx) = selected_actual_index {
             if let Some(disciple) = disciples.get(idx) {
@@ -247,14 +301,25 @@ impl DiscipleRosterState {
         }
 
         // Back Button
-        if draw_button(Rect::new(screen_w - 120.0, screen_h - 50.0, 100.0, 40.0), "Back", false) {
+        if draw_button(
+            Rect::new(screen_w - 120.0, screen_h - 50.0, 100.0, 40.0),
+            "Back",
+            false,
+        ) {
             return UpdateResult::new().with_transition(StateTransition::ToSectBase);
         }
 
         UpdateResult::new()
     }
 
-    fn draw_disciple_details(&mut self, data: &GameData, disciple: &Disciple, _idx: usize, right_rect: &Rect, _inventory: &std::collections::HashMap<String, u32>) {
+    fn draw_disciple_details(
+        &mut self,
+        data: &GameData,
+        disciple: &Disciple,
+        _idx: usize,
+        right_rect: &Rect,
+        _inventory: &std::collections::HashMap<String, u32>,
+    ) {
         let x = right_rect.x + 20.0;
         let mut y = right_rect.y + 50.0;
 
@@ -267,7 +332,13 @@ impl DiscipleRosterState {
             DiscipleRank::Elder => "Elder",
             DiscipleRank::SectLeader => "Sect Leader",
         };
-        draw_text(&format!("Rank: {}", rank_str), x, y, FONT_HEADER_SIZE, SECONDARY);
+        draw_text(
+            &format!("Rank: {}", rank_str),
+            x,
+            y,
+            FONT_HEADER_SIZE,
+            SECONDARY,
+        );
         y += 35.0;
 
         let stage = data.stages.get(&disciple.realm);
@@ -277,24 +348,56 @@ impl DiscipleRosterState {
             .map(|ss| format!(" - {}", ss.name))
             .unwrap_or_default();
 
-        draw_text(&format!("Realm: {}{}", realm_name, sub_stage_name), x, y, FONT_BODY_SIZE, TEXT_PRIMARY);
+        draw_text(
+            &format!("Realm: {}{}", realm_name, sub_stage_name),
+            x,
+            y,
+            FONT_BODY_SIZE,
+            TEXT_PRIMARY,
+        );
         y += 25.0;
-        draw_text(&format!("Talent: {:?}", disciple.talent), x, y, FONT_SMALL_SIZE, TEXT_SECONDARY);
+        draw_text(
+            &format!("Talent: {:?}", disciple.talent),
+            x,
+            y,
+            FONT_SMALL_SIZE,
+            TEXT_SECONDARY,
+        );
         y += 25.0;
 
         // Injury Status
         if let Some(ref injury) = disciple.injury {
-            draw_rectangle(x - 5.0, y - 5.0, 400.0, 60.0, Color::new(0.5, 0.2, 0.2, 0.3));
-            draw_text(&format!("INJURED: {} {}", injury.severity_str(), injury.injury_type), x, y, FONT_BODY_SIZE, FAILURE);
+            draw_rectangle(
+                x - 5.0,
+                y - 5.0,
+                400.0,
+                60.0,
+                Color::new(0.5, 0.2, 0.2, 0.3),
+            );
+            draw_text(
+                &format!("INJURED: {} {}", injury.severity_str(), injury.injury_type),
+                x,
+                y,
+                FONT_BODY_SIZE,
+                FAILURE,
+            );
             y += 20.0;
 
             // Recovery ticks = seconds (healing happens once per cultivation tick, ~1/sec)
-            let heal_rate = crate::data::disciples::Injury::get_recovery_rate(disciple.attributes.body);
+            let heal_rate =
+                crate::data::disciples::Injury::get_recovery_rate(disciple.attributes.body);
             let recovery_secs = injury.recovery_ticks_remaining / heal_rate.max(1);
             let display = if recovery_secs >= 60 {
-                format!("~{} min remaining (heal rate: {}/sec)", recovery_secs / 60, heal_rate)
+                format!(
+                    "~{} min remaining (heal rate: {}/sec)",
+                    recovery_secs / 60,
+                    heal_rate
+                )
             } else {
-                format!("~{} sec remaining (heal rate: {}/sec)", recovery_secs, heal_rate)
+                format!(
+                    "~{} sec remaining (heal rate: {}/sec)",
+                    recovery_secs, heal_rate
+                )
             };
             draw_text(&display, x + 10.0, y, FONT_SMALL_SIZE, WARNING);
             y += 30.0;
@@ -302,9 +405,14 @@ impl DiscipleRosterState {
 
         // Attributes (compact)
         draw_text(
-            &format!("Body: {}  Mind: {}  Spirit: {}",
-                disciple.attributes.body, disciple.attributes.mind, disciple.attributes.spirit),
-            x, y, FONT_BODY_SIZE, TEXT_PRIMARY
+            &format!(
+                "Body: {}  Mind: {}  Spirit: {}",
+                disciple.attributes.body, disciple.attributes.mind, disciple.attributes.spirit
+            ),
+            x,
+            y,
+            FONT_BODY_SIZE,
+            TEXT_PRIMARY,
         );
         y += 30.0;
 
@@ -346,22 +454,42 @@ impl DiscipleRosterState {
                 .map(|item| item.name.clone())
                 .unwrap_or_else(|| "Empty".to_string());
 
-            draw_text(&format!("{}: {}", slot_name, item_label), x + 10.0, y, FONT_SMALL_SIZE, TEXT_SECONDARY);
+            draw_text(
+                &format!("{}: {}", slot_name, item_label),
+                x + 10.0,
+                y,
+                FONT_SMALL_SIZE,
+                TEXT_SECONDARY,
+            );
             y += 18.0;
         }
         y += 10.0;
 
         // Qi (for non-mortals)
         if disciple.rank != DiscipleRank::Outer && disciple.realm != "Mortal" {
-            draw_text(&format!("Qi: {} / {}", disciple.qi, disciple.max_qi), x, y, FONT_BODY_SIZE, TEXT_HIGHLIGHT);
+            draw_text(
+                &format!("Qi: {} / {}", disciple.qi, disciple.max_qi),
+                x,
+                y,
+                FONT_BODY_SIZE,
+                TEXT_HIGHLIGHT,
+            );
             y += 25.0;
 
             // Law
-            let law_name = disciple.law_id.as_ref()
+            let law_name = disciple
+                .law_id
+                .as_ref()
                 .and_then(|id| data.laws.get(id))
                 .map(|l| l.name.as_str())
                 .unwrap_or("None");
-            draw_text(&format!("Law: {}", law_name), x, y, FONT_SMALL_SIZE, TEXT_SECONDARY);
+            draw_text(
+                &format!("Law: {}", law_name),
+                x,
+                y,
+                FONT_SMALL_SIZE,
+                TEXT_SECONDARY,
+            );
             y += 25.0;
         }
 
@@ -371,24 +499,50 @@ impl DiscipleRosterState {
                 let rarity_color = match bloodline.rarity {
                     crate::data::bloodlines::BloodlineRarity::Mortal => TEXT_SECONDARY,
                     crate::data::bloodlines::BloodlineRarity::Spirit => SUCCESS,
-                    crate::data::bloodlines::BloodlineRarity::Ancient => Color::new(0.4, 0.4, 1.0, 1.0),
-                    crate::data::bloodlines::BloodlineRarity::Primordial => Color::new(0.8, 0.4, 0.8, 1.0),
+                    crate::data::bloodlines::BloodlineRarity::Ancient => {
+                        Color::new(0.4, 0.4, 1.0, 1.0)
+                    }
+                    crate::data::bloodlines::BloodlineRarity::Primordial => {
+                        Color::new(0.8, 0.4, 0.8, 1.0)
+                    }
                     crate::data::bloodlines::BloodlineRarity::Mythic => WARNING,
                 };
-                draw_text(&format!("Bloodline: {} ({:.0}%)", bloodline.name, disciple.bloodline.awakening_progress * 100.0), x, y, FONT_SMALL_SIZE, rarity_color);
+                draw_text(
+                    &format!(
+                        "Bloodline: {} ({:.0}%)",
+                        bloodline.name,
+                        disciple.bloodline.awakening_progress * 100.0
+                    ),
+                    x,
+                    y,
+                    FONT_SMALL_SIZE,
+                    rarity_color,
+                );
                 y += 25.0;
             }
         }
 
         // Traits (compact, max 2 shown)
         if !disciple.fate_traits.is_empty() {
-            let traits_str: String = disciple.fate_traits.iter()
+            let traits_str: String = disciple
+                .fate_traits
+                .iter()
                 .take(2)
                 .map(|t| t.name.as_str())
                 .collect::<Vec<_>>()
                 .join(", ");
-            let suffix = if disciple.fate_traits.len() > 2 { "..." } else { "" };
-            draw_text(&format!("Traits: {}{}", traits_str, suffix), x, y, FONT_SMALL_SIZE, TEXT_SECONDARY);
+            let suffix = if disciple.fate_traits.len() > 2 {
+                "..."
+            } else {
+                ""
+            };
+            draw_text(
+                &format!("Traits: {}{}", traits_str, suffix),
+                x,
+                y,
+                FONT_SMALL_SIZE,
+                TEXT_SECONDARY,
+            );
             y += 25.0;
         }
 
@@ -401,20 +555,45 @@ impl DiscipleRosterState {
 
         // Show overflow if ready
         if disciple.exp >= disciple.exp_to_next_level {
-            let overflow_pct = ((disciple.exp as f32 / disciple.exp_to_next_level as f32 - 1.0) * 100.0) as u32;
-            draw_text(&format!("+{}% overflow", overflow_pct), x + 360.0, y + 12.0, FONT_SMALL_SIZE, SUCCESS);
+            let overflow_pct =
+                ((disciple.exp as f32 / disciple.exp_to_next_level as f32 - 1.0) * 100.0) as u32;
+            draw_text(
+                &format!("+{}% overflow", overflow_pct),
+                x + 360.0,
+                y + 12.0,
+                FONT_SMALL_SIZE,
+                SUCCESS,
+            );
         }
 
         // Show bottleneck if present
         if let Some(ref bottleneck) = disciple.breakthrough_bottleneck {
             y += 25.0;
             let desc = bottleneck.description(data);
-            draw_rectangle(x - 5.0, y - 5.0, 400.0, 25.0, Color::new(0.5, 0.4, 0.1, 0.3));
-            draw_text(&format!("Bottleneck: {}", desc), x, y + 12.0, FONT_SMALL_SIZE, WARNING);
+            draw_rectangle(
+                x - 5.0,
+                y - 5.0,
+                400.0,
+                25.0,
+                Color::new(0.5, 0.4, 0.1, 0.3),
+            );
+            draw_text(
+                &format!("Bottleneck: {}", desc),
+                x,
+                y + 12.0,
+                FONT_SMALL_SIZE,
+                WARNING,
+            );
         }
     }
 
-    fn handle_detail_actions(&mut self, data: &GameData, disciples: &[Disciple], idx: usize, _inventory: &std::collections::HashMap<String, u32>) -> Option<UpdateResult> {
+    fn handle_detail_actions(
+        &mut self,
+        data: &GameData,
+        disciples: &[Disciple],
+        idx: usize,
+        _inventory: &std::collections::HashMap<String, u32>,
+    ) -> Option<UpdateResult> {
         let disciple = disciples.get(idx)?;
         let right_x = 350.0;
         let screen_h = screen_height();
@@ -429,19 +608,29 @@ impl DiscipleRosterState {
         if disciple.can_attempt_breakthrough() {
             if disciple.breakthrough_bottleneck.is_some() {
                 // Bottleneck present — show amber text instead of button
-                let desc = disciple.breakthrough_bottleneck.as_ref().unwrap().description(data);
+                let desc = disciple
+                    .breakthrough_bottleneck
+                    .as_ref()
+                    .unwrap()
+                    .description(data);
                 draw_text(
                     &format!("Blocked: {}", desc),
-                    right_x, btn_y + 22.0, FONT_SMALL_SIZE, WARNING,
+                    right_x,
+                    btn_y + 22.0,
+                    FONT_SMALL_SIZE,
+                    WARNING,
                 );
             } else {
                 let readiness_bonus = (disciple.get_readiness_bonus() * 100.0) as u32;
                 if draw_button(
                     Rect::new(right_x, btn_y, btn_w * 2.0 + spacing, btn_h),
                     &format!("Attempt Breakthrough (+{}%)", readiness_bonus),
-                    false
+                    false,
                 ) {
-                    return Some(UpdateResult::new().with_action(crate::engine::actions::Action::AttemptBreakthrough(idx)));
+                    return Some(
+                        UpdateResult::new()
+                            .with_action(crate::engine::actions::Action::AttemptBreakthrough(idx)),
+                    );
                 }
             }
         }
@@ -453,7 +642,11 @@ impl DiscipleRosterState {
             self.item_modal_open = true;
         }
 
-        if draw_button(Rect::new(right_x + btn_w + spacing, row2_y, btn_w, btn_h), "Equip Gear", false) {
+        if draw_button(
+            Rect::new(right_x + btn_w + spacing, row2_y, btn_w, btn_h),
+            "Equip Gear",
+            false,
+        ) {
             self.equip_modal_open = true;
         }
 
@@ -461,7 +654,11 @@ impl DiscipleRosterState {
         let row3_y = row2_y + btn_h + spacing;
 
         if disciple.rank != DiscipleRank::Outer && disciple.realm != "Mortal" {
-            if draw_button(Rect::new(right_x, row3_y, btn_w * 2.0 + spacing, btn_h), "Change Law", false) {
+            if draw_button(
+                Rect::new(right_x, row3_y, btn_w * 2.0 + spacing, btn_h),
+                "Change Law",
+                false,
+            ) {
                 self.law_modal_open = true;
             }
         }
@@ -470,11 +667,24 @@ impl DiscipleRosterState {
         let row4_y = row3_y + btn_h + spacing;
 
         if disciple.rank == DiscipleRank::Outer && disciple.realm != "Mortal" {
-            if draw_button(Rect::new(right_x, row4_y, btn_w * 2.0 + spacing, btn_h), "Promote to Inner (100 SS)", false) {
-                return Some(UpdateResult::new().with_action(crate::engine::actions::Action::PromoteDisciple(idx)));
+            if draw_button(
+                Rect::new(right_x, row4_y, btn_w * 2.0 + spacing, btn_h),
+                "Promote to Inner (100 SS)",
+                false,
+            ) {
+                return Some(
+                    UpdateResult::new()
+                        .with_action(crate::engine::actions::Action::PromoteDisciple(idx)),
+                );
             }
         } else if disciple.rank == DiscipleRank::Outer && disciple.realm == "Mortal" {
-            draw_text("Reach Qi Refinement to promote", right_x, row4_y + 20.0, FONT_SMALL_SIZE, TEXT_SECONDARY);
+            draw_text(
+                "Reach Qi Refinement to promote",
+                right_x,
+                row4_y + 20.0,
+                FONT_SMALL_SIZE,
+                TEXT_SECONDARY,
+            );
         }
 
         None
@@ -490,28 +700,52 @@ impl DiscipleRosterState {
         let modal_x = (screen_w - modal_w) / 2.0;
         let modal_y = (screen_h - modal_h) / 2.0;
 
-        draw_panel(Rect::new(modal_x, modal_y, modal_w, modal_h), Some("Select Cultivation Law"));
+        draw_panel(
+            Rect::new(modal_x, modal_y, modal_w, modal_h),
+            Some("Select Cultivation Law"),
+        );
 
-        if draw_button(Rect::new(modal_x + modal_w - 60.0, modal_y + 10.0, 50.0, 30.0), "X", false) {
+        if draw_button(
+            Rect::new(modal_x + modal_w - 60.0, modal_y + 10.0, 50.0, 30.0),
+            "X",
+            false,
+        ) {
             self.law_modal_open = false;
         }
 
         let mut m_y = modal_y + 50.0;
         for law in data.laws.values() {
-            if draw_button(Rect::new(modal_x + 20.0, m_y, modal_w - 40.0, 35.0), &format!("{} [{:?}]", law.name, law.element), false) {
+            if draw_button(
+                Rect::new(modal_x + 20.0, m_y, modal_w - 40.0, 35.0),
+                &format!("{} [{:?}]", law.name, law.element),
+                false,
+            ) {
                 self.law_modal_open = false;
-                return Some(UpdateResult::new().with_action(crate::engine::actions::Action::AssignLaw(idx, law.id.clone())));
+                return Some(UpdateResult::new().with_action(
+                    crate::engine::actions::Action::AssignLaw(idx, law.id.clone()),
+                ));
             }
             m_y += 40.0;
 
-            draw_text(&law.description, modal_x + 25.0, m_y, FONT_SMALL_SIZE, TEXT_SECONDARY);
+            draw_text(
+                &law.description,
+                modal_x + 25.0,
+                m_y,
+                FONT_SMALL_SIZE,
+                TEXT_SECONDARY,
+            );
             m_y += 25.0;
         }
 
         None
     }
 
-    fn draw_item_modal(&mut self, data: &GameData, idx: usize, inventory: &std::collections::HashMap<String, u32>) -> Option<UpdateResult> {
+    fn draw_item_modal(
+        &mut self,
+        data: &GameData,
+        idx: usize,
+        inventory: &std::collections::HashMap<String, u32>,
+    ) -> Option<UpdateResult> {
         let screen_w = screen_width();
         let screen_h = screen_height();
 
@@ -521,9 +755,16 @@ impl DiscipleRosterState {
         let modal_x = (screen_w - modal_w) / 2.0;
         let modal_y = (screen_h - modal_h) / 2.0;
 
-        draw_panel(Rect::new(modal_x, modal_y, modal_w, modal_h), Some("Use Item"));
+        draw_panel(
+            Rect::new(modal_x, modal_y, modal_w, modal_h),
+            Some("Use Item"),
+        );
 
-        if draw_button(Rect::new(modal_x + modal_w - 60.0, modal_y + 10.0, 50.0, 30.0), "X", false) {
+        if draw_button(
+            Rect::new(modal_x + modal_w - 60.0, modal_y + 10.0, 50.0, 30.0),
+            "X",
+            false,
+        ) {
             self.item_modal_open = false;
         }
 
@@ -537,12 +778,20 @@ impl DiscipleRosterState {
                         continue;
                     }
                     found_any = true;
-                    if draw_button(Rect::new(modal_x + 20.0, i_y, modal_w - 40.0, 35.0), &format!("{} (x{})", item.name, count), false) {
+                    if draw_button(
+                        Rect::new(modal_x + 20.0, i_y, modal_w - 40.0, 35.0),
+                        &format!("{} (x{})", item.name, count),
+                        false,
+                    ) {
                         self.item_modal_open = false;
-                        return Some(UpdateResult::new().with_action(crate::engine::actions::Action::UseItem(item_id.clone(), idx)));
+                        return Some(UpdateResult::new().with_action(
+                            crate::engine::actions::Action::UseItem(item_id.clone(), idx),
+                        ));
                     }
 
-                    if Rect::new(modal_x + 20.0, i_y, modal_w - 40.0, 35.0).contains(mouse_position().into()) {
+                    if Rect::new(modal_x + 20.0, i_y, modal_w - 40.0, 35.0)
+                        .contains(mouse_position().into())
+                    {
                         draw_tooltip(mouse_position().into(), &item.description);
                     }
 
@@ -552,7 +801,13 @@ impl DiscipleRosterState {
         }
 
         if !found_any {
-            draw_text("Inventory Empty", modal_x + 20.0, i_y, FONT_BODY_SIZE, TEXT_SECONDARY);
+            draw_text(
+                "Inventory Empty",
+                modal_x + 20.0,
+                i_y,
+                FONT_BODY_SIZE,
+                TEXT_SECONDARY,
+            );
         }
 
         None
@@ -574,9 +829,16 @@ impl DiscipleRosterState {
         let modal_x = (screen_w - modal_w) / 2.0;
         let modal_y = (screen_h - modal_h) / 2.0;
 
-        draw_panel(Rect::new(modal_x, modal_y, modal_w, modal_h), Some("Equip Gear"));
+        draw_panel(
+            Rect::new(modal_x, modal_y, modal_w, modal_h),
+            Some("Equip Gear"),
+        );
 
-        if draw_button(Rect::new(modal_x + modal_w - 60.0, modal_y + 10.0, 50.0, 30.0), "X", false) {
+        if draw_button(
+            Rect::new(modal_x + modal_w - 60.0, modal_y + 10.0, 50.0, 30.0),
+            "X",
+            false,
+        ) {
             self.equip_modal_open = false;
         }
 
@@ -586,7 +848,13 @@ impl DiscipleRosterState {
 
         // Current equipment list
         let mut y = modal_y + 50.0;
-        draw_text("Equipped", modal_x + 20.0, y, FONT_BODY_SIZE, TEXT_HIGHLIGHT);
+        draw_text(
+            "Equipped",
+            modal_x + 20.0,
+            y,
+            FONT_BODY_SIZE,
+            TEXT_HIGHLIGHT,
+        );
         y += 20.0;
 
         let slots = [
@@ -617,15 +885,37 @@ impl DiscipleRosterState {
             };
 
             if let Some(item_id) = disciple.equipment.get(slot) {
-                let item_name = data.items.get(item_id).map(|i| i.name.as_str()).unwrap_or("Unknown");
-                draw_text(&format!("{}: {}", slot_name, item_name), modal_x + 20.0, y, FONT_SMALL_SIZE, TEXT_SECONDARY);
+                let item_name = data
+                    .items
+                    .get(item_id)
+                    .map(|i| i.name.as_str())
+                    .unwrap_or("Unknown");
+                draw_text(
+                    &format!("{}: {}", slot_name, item_name),
+                    modal_x + 20.0,
+                    y,
+                    FONT_SMALL_SIZE,
+                    TEXT_SECONDARY,
+                );
 
-                if draw_button(Rect::new(modal_x + modal_w - 110.0, y - 14.0, 80.0, 24.0), "Unequip", false) {
+                if draw_button(
+                    Rect::new(modal_x + modal_w - 110.0, y - 14.0, 80.0, 24.0),
+                    "Unequip",
+                    false,
+                ) {
                     self.equip_modal_open = false;
-                    return Some(UpdateResult::new().with_action(crate::engine::actions::Action::UnequipItem(slot.clone(), idx)));
+                    return Some(UpdateResult::new().with_action(
+                        crate::engine::actions::Action::UnequipItem(slot.clone(), idx),
+                    ));
                 }
             } else {
-                draw_text(&format!("{}: Empty", slot_name), modal_x + 20.0, y, FONT_SMALL_SIZE, TEXT_SECONDARY);
+                draw_text(
+                    &format!("{}: Empty", slot_name),
+                    modal_x + 20.0,
+                    y,
+                    FONT_SMALL_SIZE,
+                    TEXT_SECONDARY,
+                );
             }
 
             y += 22.0;
@@ -635,7 +925,13 @@ impl DiscipleRosterState {
         }
 
         y = modal_y + 240.0;
-        draw_text("Inventory", modal_x + 20.0, y, FONT_BODY_SIZE, TEXT_HIGHLIGHT);
+        draw_text(
+            "Inventory",
+            modal_x + 20.0,
+            y,
+            FONT_BODY_SIZE,
+            TEXT_HIGHLIGHT,
+        );
         y += 20.0;
 
         let mut found_any = false;
@@ -643,8 +939,12 @@ impl DiscipleRosterState {
             if *count == 0 {
                 continue;
             }
-            let Some(item) = data.items.get(item_id) else { continue; };
-            let Some(eq) = item.equipment.as_ref() else { continue; };
+            let Some(item) = data.items.get(item_id) else {
+                continue;
+            };
+            let Some(eq) = item.equipment.as_ref() else {
+                continue;
+            };
 
             found_any = true;
             let slot_name = match eq.slot {
@@ -666,10 +966,13 @@ impl DiscipleRosterState {
                 false,
             ) {
                 self.equip_modal_open = false;
-                return Some(UpdateResult::new().with_action(crate::engine::actions::Action::EquipItem(item_id.clone(), idx)));
+                return Some(UpdateResult::new().with_action(
+                    crate::engine::actions::Action::EquipItem(item_id.clone(), idx),
+                ));
             }
 
-            if Rect::new(modal_x + 20.0, y, modal_w - 40.0, 30.0).contains(mouse_position().into()) {
+            if Rect::new(modal_x + 20.0, y, modal_w - 40.0, 30.0).contains(mouse_position().into())
+            {
                 draw_tooltip(mouse_position().into(), &item.description);
             }
 
@@ -680,7 +983,13 @@ impl DiscipleRosterState {
         }
 
         if !found_any {
-            draw_text("No equippable items in inventory", modal_x + 20.0, y, FONT_BODY_SIZE, TEXT_SECONDARY);
+            draw_text(
+                "No equippable items in inventory",
+                modal_x + 20.0,
+                y,
+                FONT_BODY_SIZE,
+                TEXT_SECONDARY,
+            );
         }
 
         None

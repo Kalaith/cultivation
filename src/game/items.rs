@@ -38,16 +38,13 @@ impl Game {
                     } else {
                         logs.push(format!(
                             "{} fully healed {} with {}!",
-                            disciple.name,
-                            disciple.name,
-                            item.name
+                            disciple.name, disciple.name, item.name
                         ));
                     }
                 } else {
                     logs.push(format!(
                         "{} is not injured. {} had no effect.",
-                        disciple.name,
-                        item.name
+                        disciple.name, item.name
                     ));
                 }
             }
@@ -57,32 +54,43 @@ impl Game {
                 if is_herb {
                     logs.push(format!(
                         "{} gained {} Cultivation XP from {} (50% herb efficiency).",
-                        disciple.name,
-                        effective_amt,
-                        item.name
+                        disciple.name, effective_amt, item.name
                     ));
                 } else {
                     logs.push(format!(
                         "{} gained {} Cultivation XP from {}.",
-                        disciple.name,
-                        effective_amt,
-                        item.name
+                        disciple.name, effective_amt, item.name
                     ));
                 }
             }
             crate::data::items::ItemEffect::BoostBody(amt) => {
-                logs.push(Self::apply_attribute_boost(disciple, "Body", *amt, efficiency));
+                logs.push(Self::apply_attribute_boost(
+                    disciple, "Body", *amt, efficiency,
+                ));
             }
             crate::data::items::ItemEffect::BoostMind(amt) => {
-                logs.push(Self::apply_attribute_boost(disciple, "Mind", *amt, efficiency));
+                logs.push(Self::apply_attribute_boost(
+                    disciple, "Mind", *amt, efficiency,
+                ));
             }
             crate::data::items::ItemEffect::BoostSpirit(amt) => {
-                logs.push(Self::apply_attribute_boost(disciple, "Spirit", *amt, efficiency));
+                logs.push(Self::apply_attribute_boost(
+                    disciple, "Spirit", *amt, efficiency,
+                ));
             }
-            crate::data::items::ItemEffect::TemporaryBuff { stat, value, duration_ticks } => {
+            crate::data::items::ItemEffect::TemporaryBuff {
+                stat,
+                value,
+                duration_ticks,
+            } => {
                 // For now, apply as a permanent stat boost (temporary buff system would need a tick tracker)
                 let effective_amt = ((*value as f32) * efficiency).max(1.0) as u32;
-                logs.push(Self::apply_attribute_boost(disciple, stat, effective_amt, 1.0));
+                logs.push(Self::apply_attribute_boost(
+                    disciple,
+                    stat,
+                    effective_amt,
+                    1.0,
+                ));
                 logs.push(format!(
                     "{} received a temporary {} buff (+{} for {} ticks).",
                     disciple.name, stat, value, duration_ticks
@@ -132,7 +140,10 @@ impl Game {
             "Spirit" => disciple.attributes.spirit += effective_amt,
             _ => {}
         }
-        format!("{}'s {} increased by {}!", disciple.name, label, effective_amt)
+        format!(
+            "{}'s {} increased by {}!",
+            disciple.name, label, effective_amt
+        )
     }
 
     pub(super) fn apply_equipment_modifiers(

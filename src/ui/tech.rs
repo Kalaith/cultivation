@@ -2,12 +2,12 @@
 //!
 //! Data-driven UI for the sect's research system.
 
-use macroquad::prelude::*;
 use crate::data::loader::GameData;
 use crate::data::tech::Technology;
 use crate::engine::actions::Action;
 use crate::ui::components::*;
 use crate::ui::theme::*;
+use macroquad::prelude::*;
 
 /// State for the tech tree modal
 pub struct TechTreeState {
@@ -27,7 +27,8 @@ impl TechTreeState {
 /// Calculate the display height needed for a single tech entry
 fn calc_tech_entry_height(tech: &Technology) -> f32 {
     let base_height = 70.0; // Name + description + spacing
-    let unlocks_height = if !tech.unlocks_buildings.is_empty() || !tech.unlocks_missions.is_empty() {
+    let unlocks_height = if !tech.unlocks_buildings.is_empty() || !tech.unlocks_missions.is_empty()
+    {
         25.0
     } else {
         0.0
@@ -57,7 +58,10 @@ pub fn draw_tech_tree_modal(
     let modal_x = (screen_w - modal_w) / 2.0;
     let modal_y = (screen_h - modal_h) / 2.0;
 
-    draw_panel(Rect::new(modal_x, modal_y, modal_w, modal_h), Some("Sect Knowledge Tree"));
+    draw_panel(
+        Rect::new(modal_x, modal_y, modal_w, modal_h),
+        Some("Sect Knowledge Tree"),
+    );
 
     // Close button (top-right)
     draw_button(
@@ -93,7 +97,9 @@ pub fn draw_tech_tree_modal(
     if content_rect.contains(mouse_pos) {
         let wheel = mouse_wheel().1;
         state.scroll_offset -= wheel * 30.0;
-        state.scroll_offset = state.scroll_offset.clamp(0.0, (total_height - content_h + 20.0).max(0.0));
+        state.scroll_offset = state
+            .scroll_offset
+            .clamp(0.0, (total_height - content_h + 20.0).max(0.0));
     }
 
     // Begin scissor/clip region for scrolling
@@ -137,10 +143,22 @@ pub fn draw_tech_tree_modal(
     // Draw scroll indicators and scrollbar if needed
     if total_height > content_h {
         if state.scroll_offset > 0.0 {
-            draw_text("^ Scroll up ^", modal_x + modal_w / 2.0 - 40.0, content_y + 15.0, FONT_SMALL_SIZE, TEXT_SECONDARY);
+            draw_text(
+                "^ Scroll up ^",
+                modal_x + modal_w / 2.0 - 40.0,
+                content_y + 15.0,
+                FONT_SMALL_SIZE,
+                TEXT_SECONDARY,
+            );
         }
         if state.scroll_offset < total_height - content_h {
-            draw_text("v Scroll down v", modal_x + modal_w / 2.0 - 45.0, modal_y + modal_h - 15.0, FONT_SMALL_SIZE, TEXT_SECONDARY);
+            draw_text(
+                "v Scroll down v",
+                modal_x + modal_w / 2.0 - 45.0,
+                modal_y + modal_h - 15.0,
+                FONT_SMALL_SIZE,
+                TEXT_SECONDARY,
+            );
         }
 
         let track_x = content_x + content_w - 6.0;
@@ -213,7 +231,10 @@ fn draw_tech_entry(
     state: &mut TechTreeState,
 ) -> Option<Action> {
     let is_unlocked = unlocked_techs.contains(&tech.id);
-    let prereqs_met = tech.prerequisites.iter().all(|p| unlocked_techs.contains(p));
+    let prereqs_met = tech
+        .prerequisites
+        .iter()
+        .all(|p| unlocked_techs.contains(p));
     let can_afford = spirit_stones >= tech.cost_spirit_stones;
     let can_research = !is_unlocked && prereqs_met && can_afford;
 
@@ -229,7 +250,13 @@ fn draw_tech_entry(
     let entry_height = calc_tech_entry_height(tech);
     let entry_rect = Rect::new(x, y, width, entry_height - 5.0);
 
-    draw_rectangle(entry_rect.x, entry_rect.y, entry_rect.w, entry_rect.h, bg_color);
+    draw_rectangle(
+        entry_rect.x,
+        entry_rect.y,
+        entry_rect.w,
+        entry_rect.h,
+        bg_color,
+    );
 
     // Border color based on status
     let border_color = if is_unlocked {
@@ -241,7 +268,14 @@ fn draw_tech_entry(
     } else {
         PANEL_BORDER
     };
-    draw_rectangle_lines(entry_rect.x, entry_rect.y, entry_rect.w, entry_rect.h, 2.0, border_color);
+    draw_rectangle_lines(
+        entry_rect.x,
+        entry_rect.y,
+        entry_rect.w,
+        entry_rect.h,
+        2.0,
+        border_color,
+    );
 
     // Check hover for tooltip
     let mouse_pos: Vec2 = mouse_position().into();
@@ -252,7 +286,13 @@ fn draw_tech_entry(
     let mut text_y = y + 22.0;
 
     // Tech name with status indicator
-    let status_icon = if is_unlocked { "[OK]" } else if prereqs_met { "[?]" } else { "[X]" };
+    let status_icon = if is_unlocked {
+        "[OK]"
+    } else if prereqs_met {
+        "[?]"
+    } else {
+        "[X]"
+    };
     let name_color = if is_unlocked {
         SUCCESS
     } else if prereqs_met {
@@ -268,7 +308,13 @@ fn draw_tech_entry(
     if !is_unlocked {
         let cost_text = format!("{} SS", tech.cost_spirit_stones);
         let cost_color = if can_afford { TEXT_HIGHLIGHT } else { FAILURE };
-        draw_text(&cost_text, x + width - 100.0, text_y, FONT_BODY_SIZE, cost_color);
+        draw_text(
+            &cost_text,
+            x + width - 100.0,
+            text_y,
+            FONT_BODY_SIZE,
+            cost_color,
+        );
     }
 
     text_y += 22.0;
@@ -288,12 +334,20 @@ fn draw_tech_entry(
         let mut unlocks_parts: Vec<String> = Vec::new();
 
         if !tech.unlocks_buildings.is_empty() {
-            let buildings: Vec<String> = tech.unlocks_buildings.iter().map(|b| format!("{}", b)).collect();
+            let buildings: Vec<String> = tech
+                .unlocks_buildings
+                .iter()
+                .map(|b| format!("{}", b))
+                .collect();
             unlocks_parts.push(format!("Buildings: {}", buildings.join(", ")));
         }
 
         if !tech.unlocks_missions.is_empty() {
-            let missions: Vec<String> = tech.unlocks_missions.iter().map(|m| format!("{:?}", m)).collect();
+            let missions: Vec<String> = tech
+                .unlocks_missions
+                .iter()
+                .map(|m| format!("{:?}", m))
+                .collect();
             unlocks_parts.push(format!("Missions: {}", missions.join(", ")));
         }
 
@@ -304,7 +358,9 @@ fn draw_tech_entry(
 
     // Prerequisites (if not met)
     if !tech.prerequisites.is_empty() && !is_unlocked {
-        let prereq_names: Vec<String> = tech.prerequisites.iter()
+        let prereq_names: Vec<String> = tech
+            .prerequisites
+            .iter()
             .filter_map(|id| data.techs.get(id))
             .map(|t| {
                 if unlocked_techs.contains(&t.id) {
@@ -316,7 +372,13 @@ fn draw_tech_entry(
             .collect();
 
         let prereq_color = if prereqs_met { TEXT_SECONDARY } else { FAILURE };
-        draw_text(&format!("Requires: {}", prereq_names.join(", ")), x + 15.0, text_y, FONT_SMALL_SIZE, prereq_color);
+        draw_text(
+            &format!("Requires: {}", prereq_names.join(", ")),
+            x + 15.0,
+            text_y,
+            FONT_SMALL_SIZE,
+            prereq_color,
+        );
     }
 
     // Research button
@@ -326,7 +388,13 @@ fn draw_tech_entry(
             return Some(Action::ResearchTech(tech.id.clone()));
         }
     } else if is_unlocked {
-        draw_text("Learned", x + width - 80.0, y + entry_height - 25.0, FONT_SMALL_SIZE, SUCCESS);
+        draw_text(
+            "Learned",
+            x + width - 80.0,
+            y + entry_height - 25.0,
+            FONT_SMALL_SIZE,
+            SUCCESS,
+        );
     }
 
     None
@@ -349,7 +417,11 @@ fn draw_tech_tooltip(tech: &Technology, data: &GameData, unlocked_techs: &[Strin
         lines.push("Prerequisites:".to_string());
         for prereq_id in &tech.prerequisites {
             if let Some(prereq) = data.techs.get(prereq_id) {
-                let status = if unlocked_techs.contains(prereq_id) { " [Learned]" } else { "" };
+                let status = if unlocked_techs.contains(prereq_id) {
+                    " [Learned]"
+                } else {
+                    ""
+                };
                 lines.push(format!("  - {}{}", prereq.name, status));
             }
         }

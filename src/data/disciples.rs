@@ -1,9 +1,9 @@
-use serde::{Deserialize, Serialize};
 use crate::data::ai::AiSchedulerTuning;
 use crate::data::bloodlines::DiscipleBloodline;
 use crate::data::items::EquipmentSlot;
 use crate::data::loader::GameData;
 use crate::data::missions::MissionType;
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct NeedState {
@@ -186,12 +186,12 @@ impl Injury {
         // Mortals recover faster (not dealing with Qi deviation, just exhaustion)
         // Higher realms = longer recovery due to Qi complexity
         let realm_multiplier = match realm {
-            "Mortal" => 0.5,              // ~5 sec per severity = 10 sec for moderate
-            "QiRefinement" => 1.0,        // ~10 sec per severity = 20 sec for moderate
+            "Mortal" => 0.5,                  // ~5 sec per severity = 10 sec for moderate
+            "QiRefinement" => 1.0,            // ~10 sec per severity = 20 sec for moderate
             "FoundationEstablishment" => 1.5, // 30 sec for moderate
-            "CoreFormation" => 2.0,       // 40 sec for moderate
-            "NascentSoul" => 2.5,         // 50 sec for moderate
-            _ => 3.0,                     // 60 sec for moderate
+            "CoreFormation" => 2.0,           // 40 sec for moderate
+            "NascentSoul" => 2.5,             // 50 sec for moderate
+            _ => 3.0,                         // 60 sec for moderate
         };
 
         let base_recovery = 10 * severity; // 10 seconds per severity level
@@ -205,7 +205,11 @@ impl Injury {
         };
 
         Self {
-            injury_type: if realm == "Mortal" { InjuryType::MeridianDamage } else { InjuryType::QiDeviation },
+            injury_type: if realm == "Mortal" {
+                InjuryType::MeridianDamage
+            } else {
+                InjuryType::QiDeviation
+            },
             severity,
             recovery_ticks_remaining: recovery_ticks,
             description,
@@ -271,7 +275,9 @@ impl Bottleneck {
         match self {
             Bottleneck::CompleteMission(mt) => format!("Complete a {} mission", mt),
             Bottleneck::CraftItem(recipe_id) => {
-                let name = data.recipes.iter()
+                let name = data
+                    .recipes
+                    .iter()
                     .find(|r| r.id == *recipe_id)
                     .map(|r| r.name.as_str())
                     .unwrap_or(recipe_id.as_str());
@@ -279,7 +285,9 @@ impl Bottleneck {
             }
             Bottleneck::ReachStat { stat, value } => format!("Reach {} {}", value, stat),
             Bottleneck::UseItem(item_id) => {
-                let name = data.items.get(item_id)
+                let name = data
+                    .items
+                    .get(item_id)
                     .map(|i| i.name.as_str())
                     .unwrap_or(item_id.as_str());
                 format!("Use {}", name)

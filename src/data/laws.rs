@@ -1,6 +1,6 @@
-use serde::{Deserialize, Serialize};
-use crate::data::elements::Element;
 use crate::data::disciples::Attributes;
+use crate::data::elements::Element;
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct CultivationLaw {

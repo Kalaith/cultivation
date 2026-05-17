@@ -1,5 +1,5 @@
 use super::{BreakthroughResult, Game, FOUNDATION_TRIAL_MISSION};
-use crate::data::disciples::{Disciple, Talent, Injury};
+use crate::data::disciples::{Disciple, Injury, Talent};
 use crate::engine::tribulation::TribulationType;
 use macroquad_toolkit::rng as game_rng;
 
@@ -14,7 +14,11 @@ impl Game {
     }
 
     /// Attempts a breakthrough. Returns result logic.
-    pub(super) fn attempt_breakthrough(&mut self, disciple: &mut Disciple, disciple_idx: usize) -> BreakthroughResult {
+    pub(super) fn attempt_breakthrough(
+        &mut self,
+        disciple: &mut Disciple,
+        disciple_idx: usize,
+    ) -> BreakthroughResult {
         // Check hidden bottleneck
         if let Some(ref bottleneck) = disciple.breakthrough_bottleneck {
             let resolved = crate::engine::bottleneck::is_bottleneck_resolved(
@@ -65,7 +69,11 @@ impl Game {
         };
 
         // Apply trait modifiers
-        let trait_modifier: f32 = disciple.fate_traits.iter().map(|t| t.breakthrough_modifier).sum();
+        let trait_modifier: f32 = disciple
+            .fate_traits
+            .iter()
+            .map(|t| t.breakthrough_modifier)
+            .sum();
 
         // Bloodline modifiers
         let mut bloodline_breakthrough_mod = 0.0;
@@ -75,7 +83,8 @@ impl Game {
         if let Some(bloodline_id) = &disciple.bloodline.bloodline_id {
             if let Some(bloodline) = self.data.bloodlines.get(bloodline_id) {
                 let effectiveness = disciple.bloodline.effectiveness();
-                bloodline_breakthrough_mod = bloodline.passive_effects.breakthrough_modifier * effectiveness;
+                bloodline_breakthrough_mod =
+                    bloodline.passive_effects.breakthrough_modifier * effectiveness;
                 bloodline_injury_mod = bloodline.passive_effects.injury_modifier * effectiveness;
                 if bloodline.passive_effects.survivor {
                     bloodline_survivor = true;
@@ -97,9 +106,12 @@ impl Game {
         // Readiness bonus from accumulated experience (0 to 0.5)
         let readiness_bonus = disciple.get_readiness_bonus();
 
-        let success_chance =
-            (base_chance + trait_modifier + law_modifier + bloodline_breakthrough_mod + readiness_bonus)
-                .clamp(0.05, 0.99);
+        let success_chance = (base_chance
+            + trait_modifier
+            + law_modifier
+            + bloodline_breakthrough_mod
+            + readiness_bonus)
+            .clamp(0.05, 0.99);
 
         self.event_log.push(format!(
             "{} attempts breakthrough ({}% chance, readiness bonus: +{:.0}%)",
@@ -110,7 +122,11 @@ impl Game {
 
         if game_rng::rand() < success_chance {
             // Find current stage index using stages_order
-            let stage_idx = self.data.stages_order.iter().position(|id| id == &disciple.realm);
+            let stage_idx = self
+                .data
+                .stages_order
+                .iter()
+                .position(|id| id == &disciple.realm);
             let stage = self.data.stages.get(&disciple.realm);
 
             if let (Some(stage_idx), Some(stage)) = (stage_idx, stage) {
@@ -147,8 +163,10 @@ impl Game {
                             );
 
                             if needs_tribulation {
-                                self.event_log
-                                    .push(format!("Tribulation clouds gather above {}...", disciple.name));
+                                self.event_log.push(format!(
+                                    "Tribulation clouds gather above {}...",
+                                    disciple.name
+                                ));
 
                                 let t_type = match disciple.realm.as_str() {
                                     "FoundationEstablishment" => TribulationType::GoldenCore,
@@ -163,10 +181,13 @@ impl Game {
                                 // Instant success for early realms
                                 disciple.realm = next_stage.id.clone();
                                 disciple.sub_stage = 0;
-                                self.event_log
-                                    .push(format!("{} broke through to {} realm!", disciple.name, next_stage.name));
+                                self.event_log.push(format!(
+                                    "{} broke through to {} realm!",
+                                    disciple.name, next_stage.name
+                                ));
                                 disciple.exp = 0;
-                                disciple.exp_to_next_level = (disciple.exp_to_next_level as f32 * 2.5) as u32;
+                                disciple.exp_to_next_level =
+                                    (disciple.exp_to_next_level as f32 * 2.5) as u32;
                             }
                         }
                     } else {
@@ -179,8 +200,10 @@ impl Game {
                     }
                 }
             } else {
-                self.event_log
-                    .push(format!("Error: Unknown realm {} for {}", disciple.realm, disciple.name));
+                self.event_log.push(format!(
+                    "Error: Unknown realm {} for {}",
+                    disciple.realm, disciple.name
+                ));
             }
 
             BreakthroughResult::Success
@@ -190,8 +213,10 @@ impl Game {
             let death_chance = (0.1 + injury_modifier + bloodline_injury_mod).clamp(0.0, 0.5);
 
             if !is_survivor && game_rng::rand() < death_chance {
-                self.event_log
-                    .push(format!("{} perished attempting to break through!", disciple.name));
+                self.event_log.push(format!(
+                    "{} perished attempting to break through!",
+                    disciple.name
+                ));
                 BreakthroughResult::Failure
             } else {
                 // Survivor trait or lucky - just injured

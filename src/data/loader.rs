@@ -13,11 +13,11 @@ use crate::data::{
 };
 use crate::engine::world_sim::WorldSimBalance;
 
-
 #[derive(Clone)]
 pub struct GameData {
     pub buildings: Vec<Building>,
-    pub building_definitions: std::collections::HashMap<crate::data::buildings::BuildingType, BuildingDefinition>,
+    pub building_definitions:
+        std::collections::HashMap<crate::data::buildings::BuildingType, BuildingDefinition>,
     pub bloodlines: std::collections::HashMap<String, Bloodline>,
     pub fate_traits: Vec<FateTrait>,
     pub map_nodes: Vec<MapNode>,
@@ -84,7 +84,10 @@ impl GameData {
         // Load building definitions (templates for what can be built)
         let defs_json = std::fs::read_to_string("assets/data/buildings.json")?;
         let defs_list: Vec<BuildingDefinition> = serde_json::from_str(&defs_json)?;
-        let building_definitions = defs_list.into_iter().map(|d| (d.building_type.clone(), d)).collect();
+        let building_definitions = defs_list
+            .into_iter()
+            .map(|d| (d.building_type.clone(), d))
+            .collect();
 
         let traits_json = std::fs::read_to_string("assets/data/fatetraits.json")?;
         let fate_traits: Vec<FateTrait> = serde_json::from_str(&traits_json)?;
@@ -95,62 +98,77 @@ impl GameData {
         let missions_json = std::fs::read_to_string("assets/data/missions.json")?;
         let missions: Vec<Mission> = serde_json::from_str(&missions_json)?;
 
-        let laws_json = std::fs::read_to_string("assets/data/laws.json").unwrap_or_else(|_| "[]".to_string());
+        let laws_json =
+            std::fs::read_to_string("assets/data/laws.json").unwrap_or_else(|_| "[]".to_string());
         let laws_list: Vec<crate::data::laws::CultivationLaw> = serde_json::from_str(&laws_json)?;
         let laws = laws_list.into_iter().map(|l| (l.id.clone(), l)).collect();
 
-        let items_json = std::fs::read_to_string("assets/data/items.json").unwrap_or_else(|_| "[]".to_string());
+        let items_json =
+            std::fs::read_to_string("assets/data/items.json").unwrap_or_else(|_| "[]".to_string());
         let items_list: Vec<crate::data::items::Item> = serde_json::from_str(&items_json)?;
         let items = items_list.into_iter().map(|i| (i.id.clone(), i)).collect();
 
-        let recipes_json = std::fs::read_to_string("assets/data/recipes.json").unwrap_or_else(|_| "[]".to_string());
+        let recipes_json = std::fs::read_to_string("assets/data/recipes.json")
+            .unwrap_or_else(|_| "[]".to_string());
         let recipes: Vec<crate::data::items::Recipe> = serde_json::from_str(&recipes_json)?;
 
-        let techs_json = std::fs::read_to_string("assets/data/tech.json").unwrap_or_else(|_| "[]".to_string());
+        let techs_json =
+            std::fs::read_to_string("assets/data/tech.json").unwrap_or_else(|_| "[]".to_string());
         let techs_list: Vec<crate::data::tech::Technology> = serde_json::from_str(&techs_json)?;
         let techs = techs_list.into_iter().map(|t| (t.id.clone(), t)).collect();
 
-        let stages_json = std::fs::read_to_string("assets/data/stages.json").unwrap_or_else(|_| "[]".to_string());
+        let stages_json =
+            std::fs::read_to_string("assets/data/stages.json").unwrap_or_else(|_| "[]".to_string());
         let stages_list: Vec<StageDefinition> = serde_json::from_str(&stages_json)?;
         let stages_order: Vec<String> = stages_list.iter().map(|s| s.id.clone()).collect();
         let stages = stages_list.into_iter().map(|s| (s.id.clone(), s)).collect();
 
-        let bloodlines_json = std::fs::read_to_string("assets/data/bloodlines.json").unwrap_or_else(|_| "[]".to_string());
+        let bloodlines_json = std::fs::read_to_string("assets/data/bloodlines.json")
+            .unwrap_or_else(|_| "[]".to_string());
         let bloodlines_list: Vec<Bloodline> = serde_json::from_str(&bloodlines_json)?;
-        let bloodlines = bloodlines_list.into_iter().map(|b| (b.id.clone(), b)).collect();
-
-        let herbs_json = std::fs::read_to_string("assets/data/herbs.json").unwrap_or_else(|_| "[]".to_string());
-        let herbs_list: Vec<Herb> = serde_json::from_str(&herbs_json)?;
-        let herbs = herbs_list.into_iter().map(|h| (h.id.clone(), h)).collect();
-
-        // Load faction data
-        let factions_json = std::fs::read_to_string("assets/data/factions.json").unwrap_or_else(|_| "[]".to_string());
-        let factions: Vec<Faction> = serde_json::from_str(&factions_json)?;
-
-        // Load economy data
-        let economy_json = std::fs::read_to_string("assets/data/economy.json").unwrap_or_else(|_| r#"{"nodes":[],"routes":[]}"#.to_string());
-        let economy_data: EconomyData = serde_json::from_str(&economy_json)?;
-
-        // Load world events
-        let events_json = std::fs::read_to_string("assets/data/world_events.json").unwrap_or_else(|_| "[]".to_string());
-        let world_events: Vec<WorldEvent> = serde_json::from_str(&events_json)?;
-
-        // Load balance configuration
-        let balance_json = std::fs::read_to_string("assets/data/balance.json").unwrap_or_else(|_| "{}".to_string());
-        let balance: WorldSimBalance = serde_json::from_str(&balance_json).unwrap_or_default();
-
-        let ai_json = std::fs::read_to_string("assets/data/ai_scheduler.json").unwrap_or_else(|_| "{}".to_string());
-        let ai_scheduler: AiSchedulerTuning = serde_json::from_str(&ai_json).unwrap_or_default();
-
-        let beasts_json = std::fs::read_to_string("assets/data/spirit_beasts.json").unwrap_or_else(|_| "[]".to_string());
-        let beasts_list: Vec<SpiritBeastDefinition> = serde_json::from_str(&beasts_json)?;
-        let spirit_beast_definitions = beasts_list
+        let bloodlines = bloodlines_list
             .into_iter()
             .map(|b| (b.id.clone(), b))
             .collect();
 
-        let beast_equipment_json = std::fs::read_to_string("assets/data/beast_equipment.json").unwrap_or_else(|_| "[]".to_string());
-        let beast_equipment_list: Vec<BeastEquipmentItem> = serde_json::from_str(&beast_equipment_json)?;
+        let herbs_json =
+            std::fs::read_to_string("assets/data/herbs.json").unwrap_or_else(|_| "[]".to_string());
+        let herbs_list: Vec<Herb> = serde_json::from_str(&herbs_json)?;
+        let herbs = herbs_list.into_iter().map(|h| (h.id.clone(), h)).collect();
+
+        // Load faction data
+        let factions_json = std::fs::read_to_string("assets/data/factions.json")
+            .unwrap_or_else(|_| "[]".to_string());
+        let factions: Vec<Faction> = serde_json::from_str(&factions_json)?;
+
+        // Load economy data
+        let economy_json = std::fs::read_to_string("assets/data/economy.json")
+            .unwrap_or_else(|_| r#"{"nodes":[],"routes":[]}"#.to_string());
+        let economy_data: EconomyData = serde_json::from_str(&economy_json)?;
+
+        // Load world events
+        let events_json = std::fs::read_to_string("assets/data/world_events.json")
+            .unwrap_or_else(|_| "[]".to_string());
+        let world_events: Vec<WorldEvent> = serde_json::from_str(&events_json)?;
+
+        // Load balance configuration
+        let balance_json = std::fs::read_to_string("assets/data/balance.json")
+            .unwrap_or_else(|_| "{}".to_string());
+        let balance: WorldSimBalance = serde_json::from_str(&balance_json).unwrap_or_default();
+
+        let ai_json = std::fs::read_to_string("assets/data/ai_scheduler.json")
+            .unwrap_or_else(|_| "{}".to_string());
+        let ai_scheduler: AiSchedulerTuning = serde_json::from_str(&ai_json).unwrap_or_default();
+
+        let beasts_json = std::fs::read_to_string("assets/data/spirit_beasts.json")
+            .unwrap_or_else(|_| "[]".to_string());
+        let beasts_list: Vec<SpiritBeastDefinition> = serde_json::from_str(&beasts_json)?;
+        let spirit_beast_definitions = beasts_list.into_iter().map(|b| (b.id.clone(), b)).collect();
+
+        let beast_equipment_json = std::fs::read_to_string("assets/data/beast_equipment.json")
+            .unwrap_or_else(|_| "[]".to_string());
+        let beast_equipment_list: Vec<BeastEquipmentItem> =
+            serde_json::from_str(&beast_equipment_json)?;
         let beast_equipment_definitions = beast_equipment_list
             .into_iter()
             .map(|b| (b.id.clone(), b))

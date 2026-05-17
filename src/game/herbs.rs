@@ -16,7 +16,8 @@ impl Game {
         };
 
         if building.building_type != BuildingType::DryingPavilion {
-            self.event_log.push("This is not a Drying Pavilion.".to_string());
+            self.event_log
+                .push("This is not a Drying Pavilion.".to_string());
             return;
         }
 
@@ -28,8 +29,10 @@ impl Game {
 
         let current_count = *self.inventory.get(herb_id).unwrap_or(&0);
         if current_count < 5 {
-            self.event_log
-                .push(format!("Need at least 5 {} to dry (have {}).", herb_id, current_count));
+            self.event_log.push(format!(
+                "Need at least 5 {} to dry (have {}).",
+                herb_id, current_count
+            ));
             return;
         }
 
@@ -53,7 +56,11 @@ impl Game {
     }
 
     /// Set or clear greenhouse elemental infusion
-    pub(super) fn set_greenhouse_infusion(&mut self, building_id: u64, element: Option<crate::data::elements::Element>) {
+    pub(super) fn set_greenhouse_infusion(
+        &mut self,
+        building_id: u64,
+        element: Option<crate::data::elements::Element>,
+    ) {
         if let Some(building) = self.data.buildings.iter_mut().find(|b| b.id == building_id) {
             if building.building_type != BuildingType::Greenhouse {
                 self.event_log.push("This is not a Greenhouse.".to_string());
@@ -62,10 +69,12 @@ impl Game {
 
             if let Some(ref elem) = element {
                 building.infused_element = Some(elem.clone());
-                self.event_log.push(format!("Greenhouse infused with {} element.", elem));
+                self.event_log
+                    .push(format!("Greenhouse infused with {} element.", elem));
             } else {
                 building.infused_element = None;
-                self.event_log.push("Greenhouse infusion cleared.".to_string());
+                self.event_log
+                    .push("Greenhouse infusion cleared.".to_string());
             }
         }
     }
@@ -256,13 +265,19 @@ impl Game {
         // Plant the herb
         let growing = GrowingHerb::new(herb_id.to_string(), herb.grow_time_ticks);
         building.herb_plots[plot_index].growing = Some(growing);
-        self.event_log
-            .push(format!("Planted {} in {}.", herb.name, building.building_type));
+        self.event_log.push(format!(
+            "Planted {} in {}.",
+            herb.name, building.building_type
+        ));
         true
     }
 
     /// Assign a disciple to work a building
-    pub fn assign_disciple_to_building(&mut self, building_id: u64, disciple_id: Option<u64>) -> bool {
+    pub fn assign_disciple_to_building(
+        &mut self,
+        building_id: u64,
+        disciple_id: Option<u64>,
+    ) -> bool {
         // If assigning, validate disciple exists and is Outer rank
         if let Some(d_id) = disciple_id {
             let is_valid_worker = self
@@ -276,7 +291,11 @@ impl Game {
             }
 
             // Check if disciple is already assigned elsewhere
-            let already_assigned = self.data.buildings.iter().any(|b| b.assigned_disciple == Some(d_id));
+            let already_assigned = self
+                .data
+                .buildings
+                .iter()
+                .any(|b| b.assigned_disciple == Some(d_id));
             if already_assigned {
                 self.event_log
                     .push("This disciple is already assigned to another building.".to_string());
@@ -288,10 +307,13 @@ impl Game {
         if let Some(building) = self.data.buildings.iter_mut().find(|b| b.id == building_id) {
             building.assigned_disciple = disciple_id;
             if disciple_id.is_some() {
-                self.event_log.push(format!("Assigned disciple to {}.", building.building_type));
-            } else {
                 self.event_log
-                    .push(format!("Removed assignment from {}.", building.building_type));
+                    .push(format!("Assigned disciple to {}.", building.building_type));
+            } else {
+                self.event_log.push(format!(
+                    "Removed assignment from {}.",
+                    building.building_type
+                ));
             }
             return true;
         }

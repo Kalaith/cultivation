@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use crate::data::herbs::Season;
+use serde::{Deserialize, Serialize};
 
 /// Type of world event
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -62,19 +62,30 @@ pub enum EventEffect {
     /// Modify relation with a faction
     ModifyRelation { faction_id: String, delta: i32 },
     /// Modify market prices temporarily
-    ModifyPrices { item_id: String, modifier: f32, duration_ticks: u32 },
+    ModifyPrices {
+        item_id: String,
+        modifier: f32,
+        duration_ticks: u32,
+    },
     /// Spawn a new mission
     SpawnMission { mission_id: String },
     /// Modify a resource
     ModifyResource { resource: ResourceType, delta: i32 },
     /// Trigger combat encounter
-    TriggerCombat { enemy_power: u32, description: String },
+    TriggerCombat {
+        enemy_power: u32,
+        description: String,
+    },
     /// Unlock a technology
     UnlockTech { tech_id: String },
     /// Modify corruption at a map node
     ModifyCorruption { node_id: String, delta: i32 },
     /// Change faction territory
-    ChangeFactionTerritory { faction_id: String, node_id: String, gain: bool },
+    ChangeFactionTerritory {
+        faction_id: String,
+        node_id: String,
+        gain: bool,
+    },
     /// Add an item to player inventory
     GiveItem { item_id: String, amount: u32 },
     /// Modify cultivation speed globally
@@ -108,7 +119,10 @@ impl ChoiceRequirement {
         match self {
             ChoiceRequirement::MinSpiritStones(n) => format!("Requires {} Spirit Stones", n),
             ChoiceRequirement::MinInfluence(n) => format!("Requires {} Influence", n),
-            ChoiceRequirement::MinReputation { faction_id, min_rep } => {
+            ChoiceRequirement::MinReputation {
+                faction_id,
+                min_rep,
+            } => {
                 format!("Requires {} reputation with {}", min_rep, faction_id)
             }
             ChoiceRequirement::HasItem { item_id, amount } => {
@@ -116,7 +130,9 @@ impl ChoiceRequirement {
             }
             ChoiceRequirement::HasTech(tech) => format!("Requires tech: {}", tech),
             ChoiceRequirement::MinDiscipleCount(n) => format!("Requires {} disciples", n),
-            ChoiceRequirement::MinDiscipleRealm(realm) => format!("Requires {} realm disciple", realm),
+            ChoiceRequirement::MinDiscipleRealm(realm) => {
+                format!("Requires {} realm disciple", realm)
+            }
         }
     }
 }
@@ -190,7 +206,9 @@ impl ActiveWorldEvent {
     }
 
     pub fn is_expired(&self, current_tick: u64) -> bool {
-        self.expires_tick.map(|t| current_tick >= t).unwrap_or(false)
+        self.expires_tick
+            .map(|t| current_tick >= t)
+            .unwrap_or(false)
     }
 
     pub fn requires_choice(&self) -> bool {

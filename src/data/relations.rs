@@ -229,7 +229,15 @@ pub enum DiplomaticAction {
 /// Treaty types that can be requested
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum TreatyRequest {
-    NonAggression { duration_ticks: u64 },
-    TradeAgreement { discount_percent: u8, duration_ticks: u64 },
-    Alliance { mutual_defense: bool, duration_ticks: u64 },
+    NonAggression {
+        duration_ticks: u64,
+    },
+    TradeAgreement {
+        discount_percent: u8,
+        duration_ticks: u64,
+    },
+    Alliance {
+        mutual_defense: bool,
+        duration_ticks: u64,
+    },
 }

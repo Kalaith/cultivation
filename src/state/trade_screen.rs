@@ -200,7 +200,13 @@ impl TradeScreenState {
                     } else {
                         FAILURE
                     };
-                    draw_text(&format!("{}", supply), col3, dy, FONT_SMALL_SIZE, supply_color);
+                    draw_text(
+                        &format!("{}", supply),
+                        col3,
+                        dy,
+                        FONT_SMALL_SIZE,
+                        supply_color,
+                    );
 
                     let demand_color = if demand > 1.2 {
                         FAILURE
@@ -209,7 +215,13 @@ impl TradeScreenState {
                     } else {
                         TEXT_SECONDARY
                     };
-                    draw_text(&format!("{:.1}x", demand), col4, dy, FONT_SMALL_SIZE, demand_color);
+                    draw_text(
+                        &format!("{:.1}x", demand),
+                        col4,
+                        dy,
+                        FONT_SMALL_SIZE,
+                        demand_color,
+                    );
 
                     dy += 20.0;
                 }
@@ -221,7 +233,13 @@ impl TradeScreenState {
                 dy += 25.0;
 
                 if inventory.is_empty() {
-                    draw_text("No items in inventory", dx, dy, FONT_SMALL_SIZE, TEXT_SECONDARY);
+                    draw_text(
+                        "No items in inventory",
+                        dx,
+                        dy,
+                        FONT_SMALL_SIZE,
+                        TEXT_SECONDARY,
+                    );
                 } else {
                     for (item_id, count) in inventory {
                         if *count > 0 {
@@ -245,7 +263,10 @@ impl TradeScreenState {
                 draw_text("Seasonal Modifiers:", dx, dy, FONT_BODY_SIZE, ACCENT);
                 dy += 25.0;
                 draw_text(
-                    &format!("Trade Activity: {:.0}%", season_mod.trade_activity_mod * 100.0),
+                    &format!(
+                        "Trade Activity: {:.0}%",
+                        season_mod.trade_activity_mod * 100.0
+                    ),
                     dx,
                     dy,
                     FONT_SMALL_SIZE,
@@ -267,11 +288,7 @@ impl TradeScreenState {
         }
 
         // Back button
-        if draw_button(
-            Rect::new(20.0, screen_h - 60.0, 100.0, 40.0),
-            "Back",
-            false,
-        ) {
+        if draw_button(Rect::new(20.0, screen_h - 60.0, 100.0, 40.0), "Back", false) {
             return UpdateResult::new().with_transition(StateTransition::ToSectBase);
         }
 

@@ -2,7 +2,7 @@ use super::Game;
 use crate::data::grid::Grid;
 use crate::engine::scheduler::Scheduler;
 use crate::engine::world_sim::WorldSim;
-use crate::save::{SaveData, SavedTutorialState, SAVE_VERSION, storage};
+use crate::save::{storage, SaveData, SavedTutorialState, SAVE_VERSION};
 
 impl Game {
     pub(super) fn save(&self) {
@@ -64,7 +64,9 @@ impl Game {
                 let fonts = std::mem::take(&mut self.fonts);
 
                 let mut new_game = Self {
-                    state: crate::state::GameState::SectBase(crate::state::sect_base::SectBaseState::new()),
+                    state: crate::state::GameState::SectBase(
+                        crate::state::sect_base::SectBaseState::new(),
+                    ),
                     data: self.data.clone(),
                     grid: save_data.grid.unwrap_or_else(|| Grid::new(20, 20)),
                     sect_name: save_data.sect_name,

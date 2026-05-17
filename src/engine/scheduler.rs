@@ -2,8 +2,8 @@ use std::collections::{HashMap, HashSet};
 
 use serde::{Deserialize, Serialize};
 
-use crate::data::buildings::{Building, BuildingStatus};
 use crate::data::ai::AiSchedulerTuning;
+use crate::data::buildings::{Building, BuildingStatus};
 use crate::data::disciples::{Disciple, DiscipleRank};
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -204,7 +204,8 @@ impl Scheduler {
                 let timeout_limit = active
                     .task
                     .duration_ticks
-                    .saturating_add(self.tuning.timeout_grace as u32) as u64;
+                    .saturating_add(self.tuning.timeout_grace as u32)
+                    as u64;
                 let timed_out = self.tick.saturating_sub(active.started_at) > timeout_limit;
                 let target_invalid = active
                     .task
@@ -218,7 +219,11 @@ impl Scheduler {
                     if let Some(target_id) = task.target_id {
                         self.release_reservation(target_id, disciple.id);
                     }
-                    self.set_cooldown(disciple.id, task.task_type.clone(), self.tuning.cooldown_on_fail);
+                    self.set_cooldown(
+                        disciple.id,
+                        task.task_type.clone(),
+                        self.tuning.cooldown_on_fail,
+                    );
                     has_active_task = false;
                 }
             }
@@ -242,7 +247,11 @@ impl Scheduler {
                 }
                 let result = apply_task_effect(disciple, &task, buildings);
                 if matches!(result, TaskResult::Failed(_) | TaskResult::Canceled) {
-                    self.set_cooldown(disciple.id, task.task_type.clone(), self.tuning.cooldown_on_fail);
+                    self.set_cooldown(
+                        disciple.id,
+                        task.task_type.clone(),
+                        self.tuning.cooldown_on_fail,
+                    );
                 }
             }
 
@@ -261,12 +270,18 @@ impl Scheduler {
         }
     }
 
-    fn select_task(&mut self, disciple_id: u64, disciple: &Disciple, buildings: &[Building]) -> Option<Task> {
+    fn select_task(
+        &mut self,
+        disciple_id: u64,
+        disciple: &Disciple,
+        buildings: &[Building],
+    ) -> Option<Task> {
         let mut best: Option<(Task, f32)> = None;
 
         let hunger_urgency = disciple.needs.hunger.urgency();
         if hunger_urgency > 0.0 && !self.is_on_cooldown(disciple_id, TaskType::Eat) {
-            let score = self.tuning.tasks.eat_base + hunger_urgency * self.tuning.tasks.eat_urgency_weight;
+            let score =
+                self.tuning.tasks.eat_base + hunger_urgency * self.tuning.tasks.eat_urgency_weight;
             consider_task(
                 &mut best,
                 Task::new(
@@ -283,7 +298,8 @@ impl Scheduler {
 
         let rest_urgency = disciple.needs.rest.urgency();
         if rest_urgency > 0.0 && !self.is_on_cooldown(disciple_id, TaskType::Rest) {
-            let score = self.tuning.tasks.rest_base + rest_urgency * self.tuning.tasks.rest_urgency_weight;
+            let score =
+                self.tuning.tasks.rest_base + rest_urgency * self.tuning.tasks.rest_urgency_weight;
             consider_task(
                 &mut best,
                 Task::new(
@@ -300,7 +316,8 @@ impl Scheduler {
 
         let morale_urgency = disciple.needs.morale.urgency();
         if morale_urgency > 0.0 && !self.is_on_cooldown(disciple_id, TaskType::Idle) {
-            let score = self.tuning.tasks.morale_base + morale_urgency * self.tuning.tasks.morale_urgency_weight;
+            let score = self.tuning.tasks.morale_base
+                + morale_urgency * self.tuning.tasks.morale_urgency_weight;
             consider_task(
                 &mut best,
                 Task::new(
@@ -315,9 +332,12 @@ impl Scheduler {
             );
         }
 
-        if is_inner_or_above(&disciple.rank) && !self.is_on_cooldown(disciple_id, TaskType::Cultivate) {
+        if is_inner_or_above(&disciple.rank)
+            && !self.is_on_cooldown(disciple_id, TaskType::Cultivate)
+        {
             let qi_urgency = disciple.needs.qi.urgency();
-            let score = self.tuning.tasks.cultivate_base + qi_urgency * self.tuning.tasks.cultivate_urgency_weight;
+            let score = self.tuning.tasks.cultivate_base
+                + qi_urgency * self.tuning.tasks.cultivate_urgency_weight;
             consider_task(
                 &mut best,
                 Task::new(
@@ -352,7 +372,11 @@ impl Scheduler {
                         score,
                     );
                 } else {
-                    self.set_cooldown(disciple_id, TaskType::WorkBuilding, self.tuning.cooldown_on_fail);
+                    self.set_cooldown(
+                        disciple_id,
+                        TaskType::WorkBuilding,
+                        self.tuning.cooldown_on_fail,
+                    );
                 }
             }
         }
@@ -361,7 +385,11 @@ impl Scheduler {
             if can_take_task(&disciple.rank, &task) {
                 if let Some(target_id) = task.target_id {
                     if !self.try_reserve(target_id, disciple_id, task.duration_ticks) {
-                        self.set_cooldown(disciple_id, task.task_type.clone(), self.tuning.cooldown_on_fail);
+                        self.set_cooldown(
+                            disciple_id,
+                            task.task_type.clone(),
+                            self.tuning.cooldown_on_fail,
+                        );
                         return Some(Task::new(
                             TaskType::Idle,
                             DiscipleRank::Outer,
@@ -420,7 +448,8 @@ impl Scheduler {
 
     fn clear_expired_reservations(&mut self) {
         let tick = self.tick;
-        self.reservations.retain(|_, reservation| reservation.expires_at > tick);
+        self.reservations
+            .retain(|_, reservation| reservation.expires_at > tick);
     }
 
     fn set_cooldown(&mut self, disciple_id: u64, task_type: TaskType, duration: u64) {
@@ -489,11 +518,7 @@ fn can_take_task(rank: &DiscipleRank, task: &Task) -> bool {
     }
 }
 
-fn apply_task_effect(
-    disciple: &mut Disciple,
-    task: &Task,
-    buildings: &[Building],
-) -> TaskResult {
+fn apply_task_effect(disciple: &mut Disciple, task: &Task, buildings: &[Building]) -> TaskResult {
     match task.task_type {
         TaskType::Rest => {
             disciple.needs.rest.restore_full();

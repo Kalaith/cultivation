@@ -1,7 +1,11 @@
 use super::*;
 
 impl SectBaseState {
-    pub(super) fn draw_construction_modal(&mut self, data: &GameData, unlocked_techs: &[String]) -> Option<UpdateResult> {
+    pub(super) fn draw_construction_modal(
+        &mut self,
+        data: &GameData,
+        unlocked_techs: &[String],
+    ) -> Option<UpdateResult> {
         let (screen_w, screen_h) = (screen_width(), screen_height());
         draw_rectangle(0.0, 0.0, screen_w, screen_h, Color::new(0.0, 0.0, 0.0, 0.8));
 
@@ -10,9 +14,16 @@ impl SectBaseState {
         let modal_x = (screen_w - modal_w) / 2.0;
         let modal_y = (screen_h - modal_h) / 2.0;
 
-        draw_panel(Rect::new(modal_x, modal_y, modal_w, modal_h), Some("Construction Blueprints"));
+        draw_panel(
+            Rect::new(modal_x, modal_y, modal_w, modal_h),
+            Some("Construction Blueprints"),
+        );
 
-        if draw_button(Rect::new(modal_x + modal_w - 60.0, modal_y + 10.0, 50.0, 30.0), "Close", false) {
+        if draw_button(
+            Rect::new(modal_x + modal_w - 60.0, modal_y + 10.0, 50.0, 30.0),
+            "Close",
+            false,
+        ) {
             self.crafting_modal_open = false;
         }
 
@@ -28,7 +39,11 @@ impl SectBaseState {
             .filter(|def| {
                 let req_tech = def.tech_required.clone().unwrap_or_default();
                 let tech_unlocked = unlocked_techs.contains(&req_tech) || req_tech.is_empty();
-                let already_built = def.unique && data.buildings.iter().any(|b| b.building_type == def.building_type);
+                let already_built = def.unique
+                    && data
+                        .buildings
+                        .iter()
+                        .any(|b| b.building_type == def.building_type);
                 tech_unlocked && !already_built
             })
             .collect();
@@ -39,14 +54,22 @@ impl SectBaseState {
             let wheel = mouse_wheel().1;
             if total_height > content_h {
                 self.construction_scroll -= wheel * 30.0;
-                self.construction_scroll = self.construction_scroll.clamp(0.0, (total_height - content_h).max(0.0));
+                self.construction_scroll = self
+                    .construction_scroll
+                    .clamp(0.0, (total_height - content_h).max(0.0));
             } else {
                 self.construction_scroll = 0.0;
             }
         }
 
         if available_defs.is_empty() {
-            draw_text("No available buildings.", modal_x + 20.0, content_y + 20.0, FONT_BODY_SIZE, TEXT_SECONDARY);
+            draw_text(
+                "No available buildings.",
+                modal_x + 20.0,
+                content_y + 20.0,
+                FONT_BODY_SIZE,
+                TEXT_SECONDARY,
+            );
             return None;
         }
 
@@ -60,7 +83,11 @@ impl SectBaseState {
                 break;
             }
 
-            if draw_button(Rect::new(modal_x + 20.0, b_y, modal_w - 40.0, 40.0), &format!("{} ({} SS)", def.name, def.cost), false) {
+            if draw_button(
+                Rect::new(modal_x + 20.0, b_y, modal_w - 40.0, 40.0),
+                &format!("{} ({} SS)", def.name, def.cost),
+                false,
+            ) {
                 self.crafting_modal_open = false;
                 self.placement_mode = Some(def.building_type.clone());
             }
@@ -72,7 +99,13 @@ impl SectBaseState {
                 } else {
                     def.description.clone()
                 };
-                draw_text(&desc, modal_x + 25.0, desc_y, FONT_SMALL_SIZE, TEXT_SECONDARY);
+                draw_text(
+                    &desc,
+                    modal_x + 25.0,
+                    desc_y,
+                    FONT_SMALL_SIZE,
+                    TEXT_SECONDARY,
+                );
             }
 
             b_y += item_height;
@@ -89,7 +122,13 @@ impl SectBaseState {
             let handle_y = track_y + (self.construction_scroll / max_offset) * (track_h - handle_h);
             draw_rectangle(track_x - 1.0, handle_y, 6.0, handle_h, TEXT_HIGHLIGHT);
 
-            draw_text("Scroll", modal_x + 20.0, modal_y + modal_h - 15.0, FONT_SMALL_SIZE, TEXT_SECONDARY);
+            draw_text(
+                "Scroll",
+                modal_x + 20.0,
+                modal_y + modal_h - 15.0,
+                FONT_SMALL_SIZE,
+                TEXT_SECONDARY,
+            );
         }
         None
     }
@@ -114,15 +153,23 @@ impl SectBaseState {
         let modal_x = (screen_w - modal_w) / 2.0;
         let modal_y = (screen_h - modal_h) / 2.0;
 
-        draw_panel(Rect::new(modal_x, modal_y, modal_w, modal_h), Some("Crafting Menu"));
+        draw_panel(
+            Rect::new(modal_x, modal_y, modal_w, modal_h),
+            Some("Crafting Menu"),
+        );
 
-        if draw_button(Rect::new(modal_x + modal_w - 60.0, modal_y + 10.0, 50.0, 30.0), "Close", false) {
+        if draw_button(
+            Rect::new(modal_x + modal_w - 60.0, modal_y + 10.0, 50.0, 30.0),
+            "Close",
+            false,
+        ) {
             self.crafting_modal_open = false;
         }
 
-        let building = data.buildings.iter().find(|b| {
-            b.building_type == *b_type && b.status == BuildingStatus::Active
-        });
+        let building = data
+            .buildings
+            .iter()
+            .find(|b| b.building_type == *b_type && b.status == BuildingStatus::Active);
         let building_level = building.map(|b| b.level).unwrap_or(1);
         let building_element = building.map(|b| b.element.clone()).unwrap_or_default();
 
@@ -132,20 +179,46 @@ impl SectBaseState {
         let disciple_mind = assigned_disciple.map(|d| d.attributes.mind);
 
         let info_y = modal_y + 45.0;
-        draw_text(&format!("Building Lv.{}", building_level), modal_x + 20.0, info_y, FONT_SMALL_SIZE, TEXT_SECONDARY);
+        draw_text(
+            &format!("Building Lv.{}", building_level),
+            modal_x + 20.0,
+            info_y,
+            FONT_SMALL_SIZE,
+            TEXT_SECONDARY,
+        );
         if let Some(d) = assigned_disciple {
-            draw_text(&format!("Worker: {} (Mind: {})", d.name, d.attributes.mind), modal_x + 150.0, info_y, FONT_SMALL_SIZE, TEXT_SECONDARY);
+            draw_text(
+                &format!("Worker: {} (Mind: {})", d.name, d.attributes.mind),
+                modal_x + 150.0,
+                info_y,
+                FONT_SMALL_SIZE,
+                TEXT_SECONDARY,
+            );
         } else {
-            draw_text("No worker assigned", modal_x + 150.0, info_y, FONT_SMALL_SIZE, TEXT_SECONDARY);
+            draw_text(
+                "No worker assigned",
+                modal_x + 150.0,
+                info_y,
+                FONT_SMALL_SIZE,
+                TEXT_SECONDARY,
+            );
         }
 
         let mut r_y = modal_y + 70.0;
-        let recipes: Vec<_> = data.recipes.iter()
+        let recipes: Vec<_> = data
+            .recipes
+            .iter()
             .filter(|r| r.required_building == *b_type && discovered_recipes.contains(&r.id))
             .collect();
 
         if recipes.is_empty() {
-            draw_text("No discovered recipes for this station.", modal_x + 20.0, r_y, FONT_BODY_SIZE, TEXT_SECONDARY);
+            draw_text(
+                "No discovered recipes for this station.",
+                modal_x + 20.0,
+                r_y,
+                FONT_BODY_SIZE,
+                TEXT_SECONDARY,
+            );
             return None;
         }
 
@@ -161,7 +234,17 @@ impl SectBaseState {
                 break;
             }
 
-            if let Some(res) = self.draw_recipe_entry(recipe, &ctx, modal_x, modal_w, &mut r_y, modal_y + modal_h, spirit_stones, herbs, inventory) {
+            if let Some(res) = self.draw_recipe_entry(
+                recipe,
+                &ctx,
+                modal_x,
+                modal_w,
+                &mut r_y,
+                modal_y + modal_h,
+                spirit_stones,
+                herbs,
+                inventory,
+            ) {
                 return Some(res);
             }
         }
@@ -194,7 +277,9 @@ impl SectBaseState {
                 "herbs" => herbs,
                 _ => *inventory.get(ing).unwrap_or(&0),
             };
-            if has < *amt { can_craft = false; }
+            if has < *amt {
+                can_craft = false;
+            }
             ing_parts.push(format!("{}x {} ({}/{})", amt, ing, has, amt));
         }
 
@@ -208,18 +293,42 @@ impl SectBaseState {
 
         let label = format!("{} [{}%]", recipe.name, success_chance);
 
-        if draw_button(Rect::new(modal_x + 20.0, *r_y, modal_w - 40.0, 35.0), &label, false) {
+        if draw_button(
+            Rect::new(modal_x + 20.0, *r_y, modal_w - 40.0, 35.0),
+            &label,
+            false,
+        ) {
             if can_craft {
                 return Some(UpdateResult::new().with_action(Action::CraftItem(recipe.id.clone())));
             }
         }
 
-        draw_text(&format!("{}%", success_chance), modal_x + modal_w - 70.0, *r_y + 22.0, FONT_SMALL_SIZE, chance_color);
+        draw_text(
+            &format!("{}%", success_chance),
+            modal_x + modal_w - 70.0,
+            *r_y + 22.0,
+            FONT_SMALL_SIZE,
+            chance_color,
+        );
 
         let ing_text = ing_parts.join(", ");
-        let status_text = if can_craft { ing_text } else { format!("MISSING: {}", ing_text) };
-        let status_color = if can_craft { TEXT_SECONDARY } else { Color::new(0.8, 0.3, 0.3, 1.0) };
-        draw_text(&status_text, modal_x + 25.0, *r_y + 50.0, FONT_SMALL_SIZE, status_color);
+        let status_text = if can_craft {
+            ing_text
+        } else {
+            format!("MISSING: {}", ing_text)
+        };
+        let status_color = if can_craft {
+            TEXT_SECONDARY
+        } else {
+            Color::new(0.8, 0.3, 0.3, 1.0)
+        };
+        draw_text(
+            &status_text,
+            modal_x + 25.0,
+            *r_y + 50.0,
+            FONT_SMALL_SIZE,
+            status_color,
+        );
 
         *r_y += 65.0;
 

@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use crate::data::disciples::Disciple;
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub enum TribulationType {
@@ -37,7 +37,8 @@ impl TribulationState {
         let config = match t_type {
             TribulationType::GoldenCore => TribulationConfig {
                 name: "Golden Core Tribulation".to_string(),
-                description: "The separation of mortal and cultivator. Azoth Thunder strikes!".to_string(),
+                description: "The separation of mortal and cultivator. Azoth Thunder strikes!"
+                    .to_string(),
                 total_waves: 3,
                 base_damage: 20,
                 damage_scale_per_wave: 1.5,
@@ -77,35 +78,59 @@ impl TribulationState {
     }
 
     pub fn process_wave(&mut self, disciple: &Disciple) {
-        if self.is_finished { return; }
+        if self.is_finished {
+            return;
+        }
 
         self.current_wave += 1;
-        self.log.push(format!("Wave {}/{} begins!", self.current_wave, self.config.total_waves));
+        self.log.push(format!(
+            "Wave {}/{} begins!",
+            self.current_wave, self.config.total_waves
+        ));
 
         // fast calculation for damage
-        let raw_damage = (self.config.base_damage as f32 * self.config.damage_scale_per_wave.powi(self.current_wave as i32 - 1)) as i32;
-        
+        let raw_damage = (self.config.base_damage as f32
+            * self
+                .config
+                .damage_scale_per_wave
+                .powi(self.current_wave as i32 - 1)) as i32;
+
         // Mitigation
-        let defense = (disciple.attributes.body * 2) as i32; 
+        let defense = (disciple.attributes.body * 2) as i32;
         let mitigated_damage = (raw_damage - defense).max(0);
-        
-        self.log.push(format!("Lightning strikes for {} damage! (Blocked {})", raw_damage, defense));
-        
+
+        self.log.push(format!(
+            "Lightning strikes for {} damage! (Blocked {})",
+            raw_damage, defense
+        ));
+
         if mitigated_damage > 0 {
             self.disciple_hp -= mitigated_damage;
-            self.log.push(format!("{} takes {} damage! HP: {}/{}", disciple.name, mitigated_damage, self.disciple_hp, self.disciple_max_hp));
+            self.log.push(format!(
+                "{} takes {} damage! HP: {}/{}",
+                disciple.name, mitigated_damage, self.disciple_hp, self.disciple_max_hp
+            ));
         } else {
-             self.log.push(format!("{} completely resists the lightning!", disciple.name));
+            self.log.push(format!(
+                "{} completely resists the lightning!",
+                disciple.name
+            ));
         }
 
         if self.disciple_hp <= 0 {
             self.is_finished = true;
             self.survived = false;
-            self.log.push(format!("{} has fallen to the tribulation...", disciple.name));
+            self.log.push(format!(
+                "{} has fallen to the tribulation...",
+                disciple.name
+            ));
         } else if self.current_wave >= self.config.total_waves {
             self.is_finished = true;
             self.survived = true;
-            self.log.push(format!("{} has successfully overcome the tribulation!", disciple.name));
+            self.log.push(format!(
+                "{} has successfully overcome the tribulation!",
+                disciple.name
+            ));
         }
     }
 }

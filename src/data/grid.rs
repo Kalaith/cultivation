@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use crate::data::elements::Element;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -17,7 +17,7 @@ impl Tile {
     pub fn new(x: i32, y: i32) -> Self {
         let mut strengths = HashMap::new();
         strengths.insert(Element::Wood, 1.0); // Default grass
-        
+
         Self {
             x,
             y,
@@ -44,7 +44,7 @@ impl Grid {
                 tiles.push(Tile::new(x, y));
             }
         }
-        
+
         Self {
             width,
             height,

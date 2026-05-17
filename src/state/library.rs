@@ -12,7 +12,12 @@ impl LibraryState {
         Self
     }
 
-    pub fn update(&mut self, _data: &GameData, spirit_stones: u32, deceased: &[DeceasedDisciple]) -> UpdateResult {
+    pub fn update(
+        &mut self,
+        _data: &GameData,
+        spirit_stones: u32,
+        deceased: &[DeceasedDisciple],
+    ) -> UpdateResult {
         if is_key_pressed(KeyCode::Escape) {
             return UpdateResult::new().with_transition(StateTransition::ToSectBase);
         }
@@ -26,7 +31,13 @@ impl LibraryState {
         draw_text("LIBRARY PAVILION", 20.0, 40.0, FONT_TITLE_SIZE, PRIMARY);
         let res_text = format!("Spirit Stones: {}", spirit_stones);
         let res_dims = measure_text(&res_text, None, FONT_HEADER_SIZE as u16, 1.0);
-        draw_text(&res_text, screen_w - res_dims.width - 20.0, 40.0, FONT_HEADER_SIZE, TEXT_HIGHLIGHT);
+        draw_text(
+            &res_text,
+            screen_w - res_dims.width - 20.0,
+            40.0,
+            FONT_HEADER_SIZE,
+            TEXT_HIGHLIGHT,
+        );
 
         // --- Layout ---
         let content_y = header_h + 10.0;
@@ -37,29 +48,53 @@ impl LibraryState {
         // --- Left Panel: Hall of Fallen ---
         let left_rect = Rect::new(10.0, content_y, left_w, content_h);
         draw_panel(left_rect, Some("Hall of Fallen"));
-        
+
         if deceased.is_empty() {
-             draw_text("No disciples have fallen on the path... yet.", left_rect.x + 20.0, left_rect.y + 60.0, FONT_BODY_SIZE, TEXT_SECONDARY);
+            draw_text(
+                "No disciples have fallen on the path... yet.",
+                left_rect.x + 20.0,
+                left_rect.y + 60.0,
+                FONT_BODY_SIZE,
+                TEXT_SECONDARY,
+            );
         } else {
-             let mut y = left_rect.y + 60.0;
-             for (i, d) in deceased.iter().enumerate() {
-                 if y > left_rect.y + left_rect.h - 30.0 { break; } // Clip
-                 
-                 let text = format!("{}. {} ({:?})", i+1, d.name, d.realm_at_death);
-                 draw_text(&text, left_rect.x + 20.0, y, FONT_BODY_SIZE, TEXT_PRIMARY);
-                 draw_text(&format!("Cause: {}", d.cause_of_death), left_rect.x + 30.0, y + 20.0, FONT_SMALL_SIZE, ACCENT);
-                 y += 50.0;
-             }
+            let mut y = left_rect.y + 60.0;
+            for (i, d) in deceased.iter().enumerate() {
+                if y > left_rect.y + left_rect.h - 30.0 {
+                    break;
+                } // Clip
+
+                let text = format!("{}. {} ({:?})", i + 1, d.name, d.realm_at_death);
+                draw_text(&text, left_rect.x + 20.0, y, FONT_BODY_SIZE, TEXT_PRIMARY);
+                draw_text(
+                    &format!("Cause: {}", d.cause_of_death),
+                    left_rect.x + 30.0,
+                    y + 20.0,
+                    FONT_SMALL_SIZE,
+                    ACCENT,
+                );
+                y += 50.0;
+            }
         }
 
         // --- Right Panel: Scriptures (Placeholder) ---
         let right_rect = Rect::new(left_w + 20.0, content_y, right_w, content_h);
         draw_panel(right_rect, Some("Scripture Pavilion"));
-        draw_text("Coming Soon: Ancient Techniques & Doctrines", right_rect.x + 20.0, right_rect.y + 60.0, FONT_BODY_SIZE, TEXT_SECONDARY);
+        draw_text(
+            "Coming Soon: Ancient Techniques & Doctrines",
+            right_rect.x + 20.0,
+            right_rect.y + 60.0,
+            FONT_BODY_SIZE,
+            TEXT_SECONDARY,
+        );
 
         // Back Button
-        if draw_button(Rect::new(screen_w - 120.0, screen_h - 50.0, 100.0, 40.0), "Back", false) {
-             return UpdateResult::new().with_transition(StateTransition::ToSectBase);
+        if draw_button(
+            Rect::new(screen_w - 120.0, screen_h - 50.0, 100.0, 40.0),
+            "Back",
+            false,
+        ) {
+            return UpdateResult::new().with_transition(StateTransition::ToSectBase);
         }
 
         UpdateResult::new()

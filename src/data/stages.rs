@@ -10,7 +10,9 @@ pub struct StatMultipliers {
     pub spirit: f32,
 }
 
-fn default_one() -> f32 { 1.0 }
+fn default_one() -> f32 {
+    1.0
+}
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct SubStage {

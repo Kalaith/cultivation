@@ -3,7 +3,6 @@
 //! This module provides reusable UI components for the herb system,
 //! keeping UI logic separate from game logic.
 
-use macroquad::prelude::*;
 use crate::data::buildings::{Building, BuildingType};
 use crate::data::disciples::{Disciple, DiscipleRank};
 use crate::data::elements::Element;
@@ -12,6 +11,7 @@ use crate::data::loader::GameData;
 use crate::engine::actions::Action;
 use crate::ui::components::*;
 use crate::ui::theme::*;
+use macroquad::prelude::*;
 
 /// Result from herb UI interactions
 pub struct HerbUiResult {
@@ -21,15 +21,24 @@ pub struct HerbUiResult {
 
 impl HerbUiResult {
     pub fn none() -> Self {
-        Self { action: None, close_modal: false }
+        Self {
+            action: None,
+            close_modal: false,
+        }
     }
 
     pub fn with_action(action: Action) -> Self {
-        Self { action: Some(action), close_modal: true }
+        Self {
+            action: Some(action),
+            close_modal: true,
+        }
     }
 
     pub fn close() -> Self {
-        Self { action: None, close_modal: true }
+        Self {
+            action: None,
+            close_modal: true,
+        }
     }
 }
 
@@ -46,17 +55,34 @@ pub fn draw_herb_garden_panel(
     let mut cur_y = y;
 
     // Season display
-    draw_text(&format!("Current Season: {}", current_season), x, cur_y, FONT_BODY_SIZE, SECONDARY);
+    draw_text(
+        &format!("Current Season: {}", current_season),
+        x,
+        cur_y,
+        FONT_BODY_SIZE,
+        SECONDARY,
+    );
     cur_y += 30.0;
 
     // Assigned worker display
-    let worker_name = building.assigned_disciple
+    let worker_name = building
+        .assigned_disciple
         .and_then(|id| disciples.iter().find(|d| d.id == id))
         .map(|d| d.name.as_str())
         .unwrap_or("None");
 
-    let worker_color = if building.assigned_disciple.is_some() { SUCCESS } else { TEXT_SECONDARY };
-    draw_text(&format!("Assigned Worker: {}", worker_name), x, cur_y, FONT_BODY_SIZE, worker_color);
+    let worker_color = if building.assigned_disciple.is_some() {
+        SUCCESS
+    } else {
+        TEXT_SECONDARY
+    };
+    draw_text(
+        &format!("Assigned Worker: {}", worker_name),
+        x,
+        cur_y,
+        FONT_BODY_SIZE,
+        worker_color,
+    );
     cur_y += 35.0;
 
     // Plot display
@@ -70,42 +96,95 @@ pub fn draw_herb_garden_panel(
         }
 
         let plot_rect = Rect::new(x, cur_y, width - 20.0, 60.0);
-        draw_rectangle(plot_rect.x, plot_rect.y, plot_rect.w, plot_rect.h, Color::new(0.1, 0.15, 0.1, 0.8));
-        draw_rectangle_lines(plot_rect.x, plot_rect.y, plot_rect.w, plot_rect.h, 1.0, PANEL_BORDER);
+        draw_rectangle(
+            plot_rect.x,
+            plot_rect.y,
+            plot_rect.w,
+            plot_rect.h,
+            Color::new(0.1, 0.15, 0.1, 0.8),
+        );
+        draw_rectangle_lines(
+            plot_rect.x,
+            plot_rect.y,
+            plot_rect.w,
+            plot_rect.h,
+            1.0,
+            PANEL_BORDER,
+        );
 
         if let Some(ref growing) = plot.growing {
             // Get herb info
-            let herb_name = data.herbs.get(&growing.herb_id)
+            let herb_name = data
+                .herbs
+                .get(&growing.herb_id)
                 .map(|h| h.name.as_str())
                 .unwrap_or(&growing.herb_id);
 
-            let herb_element = data.herbs.get(&growing.herb_id)
+            let herb_element = data
+                .herbs
+                .get(&growing.herb_id)
                 .map(|h| h.element.clone())
                 .unwrap_or(Element::None);
 
             // Draw herb name with element color
-            draw_text(&format!("Plot {}: {}", i + 1, herb_name), x + 10.0, cur_y + 25.0, FONT_BODY_SIZE, herb_element.color());
+            draw_text(
+                &format!("Plot {}: {}", i + 1, herb_name),
+                x + 10.0,
+                cur_y + 25.0,
+                FONT_BODY_SIZE,
+                herb_element.color(),
+            );
 
             if growing.is_mature() {
                 // Ready to harvest
                 if building.assigned_disciple.is_some() {
-                    draw_text("READY - Harvesting...", x + 10.0, cur_y + 50.0, FONT_SMALL_SIZE, SUCCESS);
+                    draw_text(
+                        "READY - Harvesting...",
+                        x + 10.0,
+                        cur_y + 50.0,
+                        FONT_SMALL_SIZE,
+                        SUCCESS,
+                    );
                 } else {
-                    draw_text("MATURE - Needs worker!", x + 10.0, cur_y + 50.0, FONT_SMALL_SIZE, FAILURE);
+                    draw_text(
+                        "MATURE - Needs worker!",
+                        x + 10.0,
+                        cur_y + 50.0,
+                        FONT_SMALL_SIZE,
+                        FAILURE,
+                    );
                 }
             } else {
                 // Show growth progress
-                let total_time = data.herbs.get(&growing.herb_id)
+                let total_time = data
+                    .herbs
+                    .get(&growing.herb_id)
                     .map(|h| h.grow_time_ticks)
                     .unwrap_or(100);
                 let progress = 1.0 - (growing.ticks_remaining as f32 / total_time as f32);
 
-                draw_progress_bar(Rect::new(x + 10.0, cur_y + 40.0, width - 50.0, 15.0), progress, SECONDARY);
-                draw_text(&format!("{:.0}%", progress * 100.0), x + width - 35.0, cur_y + 52.0, FONT_SMALL_SIZE, TEXT_SECONDARY);
+                draw_progress_bar(
+                    Rect::new(x + 10.0, cur_y + 40.0, width - 50.0, 15.0),
+                    progress,
+                    SECONDARY,
+                );
+                draw_text(
+                    &format!("{:.0}%", progress * 100.0),
+                    x + width - 35.0,
+                    cur_y + 52.0,
+                    FONT_SMALL_SIZE,
+                    TEXT_SECONDARY,
+                );
             }
         } else {
             // Empty plot
-            draw_text(&format!("Plot {}: Empty", i + 1), x + 10.0, cur_y + 35.0, FONT_BODY_SIZE, TEXT_SECONDARY);
+            draw_text(
+                &format!("Plot {}: Empty", i + 1),
+                x + 10.0,
+                cur_y + 35.0,
+                FONT_BODY_SIZE,
+                TEXT_SECONDARY,
+            );
         }
 
         cur_y += 65.0;
@@ -113,7 +192,13 @@ pub fn draw_herb_garden_panel(
 
     // Show locked plots
     for i in building.herb_plots.len()..max_plots {
-        draw_text(&format!("Plot {}: (Upgrade to unlock)", i + 1), x, cur_y + 20.0, FONT_SMALL_SIZE, TEXT_SECONDARY);
+        draw_text(
+            &format!("Plot {}: (Upgrade to unlock)", i + 1),
+            x,
+            cur_y + 20.0,
+            FONT_SMALL_SIZE,
+            TEXT_SECONDARY,
+        );
         cur_y += 30.0;
     }
 
@@ -135,16 +220,29 @@ pub fn draw_herb_planting_modal(
     let modal_x = (screen_w - modal_w) / 2.0;
     let modal_y = (screen_h - modal_h) / 2.0;
 
-    draw_panel(Rect::new(modal_x, modal_y, modal_w, modal_h), Some(&format!("Plant in Plot {}", selected_plot + 1)));
+    draw_panel(
+        Rect::new(modal_x, modal_y, modal_w, modal_h),
+        Some(&format!("Plant in Plot {}", selected_plot + 1)),
+    );
 
-    if draw_button(Rect::new(modal_x + modal_w - 60.0, modal_y + 10.0, 50.0, 30.0), "X", false) {
+    if draw_button(
+        Rect::new(modal_x + modal_w - 60.0, modal_y + 10.0, 50.0, 30.0),
+        "X",
+        false,
+    ) {
         return HerbUiResult::close();
     }
 
     let max_tier = building.get_max_herb_tier();
     let mut h_y = modal_y + 55.0;
 
-    draw_text(&format!("Season: {} | Max Tier: {}", current_season, max_tier), modal_x + 20.0, h_y, FONT_SMALL_SIZE, TEXT_SECONDARY);
+    draw_text(
+        &format!("Season: {} | Max Tier: {}", current_season, max_tier),
+        modal_x + 20.0,
+        h_y,
+        FONT_SMALL_SIZE,
+        TEXT_SECONDARY,
+    );
     h_y += 30.0;
 
     // List plantable herbs
@@ -157,8 +255,8 @@ pub fn draw_herb_planting_modal(
 
         // Check season (greenhouse with infusion can bypass)
         let in_season = herb.grow_seasons.contains(current_season);
-        let has_infusion = building.building_type == BuildingType::Greenhouse &&
-            building.infused_element.as_ref() == Some(&herb.element);
+        let has_infusion = building.building_type == BuildingType::Greenhouse
+            && building.infused_element.as_ref() == Some(&herb.element);
 
         let can_plant = in_season || has_infusion;
 
@@ -170,14 +268,32 @@ pub fn draw_herb_planting_modal(
         };
 
         let label = format!("{} [{}] T{}{}", herb.name, herb.element, herb.tier, status);
-        let text_color = if can_plant { herb.element.color() } else { TEXT_SECONDARY };
+        let text_color = if can_plant {
+            herb.element.color()
+        } else {
+            TEXT_SECONDARY
+        };
 
-        draw_text(&label, modal_x + 20.0, h_y + 18.0, FONT_BODY_SIZE, text_color);
+        draw_text(
+            &label,
+            modal_x + 20.0,
+            h_y + 18.0,
+            FONT_BODY_SIZE,
+            text_color,
+        );
 
         if can_plant {
             found_any = true;
-            if draw_button(Rect::new(modal_x + modal_w - 100.0, h_y, 80.0, 30.0), "Plant", false) {
-                return HerbUiResult::with_action(Action::PlantHerb(building.id, selected_plot, herb.id.clone()));
+            if draw_button(
+                Rect::new(modal_x + modal_w - 100.0, h_y, 80.0, 30.0),
+                "Plant",
+                false,
+            ) {
+                return HerbUiResult::with_action(Action::PlantHerb(
+                    building.id,
+                    selected_plot,
+                    herb.id.clone(),
+                ));
             }
         }
 
@@ -201,7 +317,13 @@ pub fn draw_herb_planting_modal(
     }
 
     if !found_any {
-        draw_text("No herbs available to plant this season.", modal_x + 20.0, h_y, FONT_BODY_SIZE, TEXT_SECONDARY);
+        draw_text(
+            "No herbs available to plant this season.",
+            modal_x + 20.0,
+            h_y,
+            FONT_BODY_SIZE,
+            TEXT_SECONDARY,
+        );
     }
 
     HerbUiResult::none()
@@ -221,9 +343,16 @@ pub fn draw_disciple_assignment_modal(
     let modal_x = (screen_w - modal_w) / 2.0;
     let modal_y = (screen_h - modal_h) / 2.0;
 
-    draw_panel(Rect::new(modal_x, modal_y, modal_w, modal_h), Some("Assign Worker"));
+    draw_panel(
+        Rect::new(modal_x, modal_y, modal_w, modal_h),
+        Some("Assign Worker"),
+    );
 
-    if draw_button(Rect::new(modal_x + modal_w - 60.0, modal_y + 10.0, 50.0, 30.0), "X", false) {
+    if draw_button(
+        Rect::new(modal_x + modal_w - 60.0, modal_y + 10.0, 50.0, 30.0),
+        "X",
+        false,
+    ) {
         return HerbUiResult::close();
     }
 
@@ -231,27 +360,44 @@ pub fn draw_disciple_assignment_modal(
 
     // Unassign option
     if building.assigned_disciple.is_some() {
-        if draw_button(Rect::new(modal_x + 20.0, d_y, modal_w - 40.0, 35.0), "Remove Assignment", false) {
+        if draw_button(
+            Rect::new(modal_x + 20.0, d_y, modal_w - 40.0, 35.0),
+            "Remove Assignment",
+            false,
+        ) {
             return HerbUiResult::with_action(Action::AssignDiscipleToBuilding(building.id, None));
         }
         d_y += 45.0;
     }
 
-    draw_text("Available Outer Disciples:", modal_x + 20.0, d_y, FONT_BODY_SIZE, TEXT_HIGHLIGHT);
+    draw_text(
+        "Available Outer Disciples:",
+        modal_x + 20.0,
+        d_y,
+        FONT_BODY_SIZE,
+        TEXT_HIGHLIGHT,
+    );
     d_y += 30.0;
 
     // Get IDs of disciples already assigned to buildings
-    let assigned_ids: std::collections::HashSet<u64> = all_buildings.iter()
+    let assigned_ids: std::collections::HashSet<u64> = all_buildings
+        .iter()
         .filter_map(|b| b.assigned_disciple)
         .collect();
 
     let mut found_any = false;
     for disciple in disciples.iter().filter(|d| d.rank == DiscipleRank::Outer) {
-        let is_assigned_elsewhere = assigned_ids.contains(&disciple.id) &&
-            building.assigned_disciple != Some(disciple.id);
+        let is_assigned_elsewhere =
+            assigned_ids.contains(&disciple.id) && building.assigned_disciple != Some(disciple.id);
 
         if is_assigned_elsewhere {
-            draw_text(&format!("{} (Assigned elsewhere)", disciple.name), modal_x + 20.0, d_y + 18.0, FONT_SMALL_SIZE, TEXT_SECONDARY);
+            draw_text(
+                &format!("{} (Assigned elsewhere)", disciple.name),
+                modal_x + 20.0,
+                d_y + 18.0,
+                FONT_SMALL_SIZE,
+                TEXT_SECONDARY,
+            );
             d_y += 30.0;
             continue;
         }
@@ -259,14 +405,24 @@ pub fn draw_disciple_assignment_modal(
         found_any = true;
         let is_current = building.assigned_disciple == Some(disciple.id);
         let label = if is_current {
-            format!("{} (Current) - Spirit: {}", disciple.name, disciple.attributes.spirit)
+            format!(
+                "{} (Current) - Spirit: {}",
+                disciple.name, disciple.attributes.spirit
+            )
         } else {
             format!("{} - Spirit: {}", disciple.name, disciple.attributes.spirit)
         };
 
-        if draw_button(Rect::new(modal_x + 20.0, d_y, modal_w - 40.0, 35.0), &label, is_current) {
+        if draw_button(
+            Rect::new(modal_x + 20.0, d_y, modal_w - 40.0, 35.0),
+            &label,
+            is_current,
+        ) {
             if !is_current {
-                return HerbUiResult::with_action(Action::AssignDiscipleToBuilding(building.id, Some(disciple.id)));
+                return HerbUiResult::with_action(Action::AssignDiscipleToBuilding(
+                    building.id,
+                    Some(disciple.id),
+                ));
             }
         }
         d_y += 40.0;
@@ -277,9 +433,21 @@ pub fn draw_disciple_assignment_modal(
     }
 
     if !found_any {
-        draw_text("No Outer Disciples available.", modal_x + 20.0, d_y, FONT_BODY_SIZE, TEXT_SECONDARY);
+        draw_text(
+            "No Outer Disciples available.",
+            modal_x + 20.0,
+            d_y,
+            FONT_BODY_SIZE,
+            TEXT_SECONDARY,
+        );
         d_y += 25.0;
-        draw_text("Recruit more disciples at the Sect Hall.", modal_x + 20.0, d_y, FONT_SMALL_SIZE, TEXT_SECONDARY);
+        draw_text(
+            "Recruit more disciples at the Sect Hall.",
+            modal_x + 20.0,
+            d_y,
+            FONT_SMALL_SIZE,
+            TEXT_SECONDARY,
+        );
     }
 
     HerbUiResult::none()
@@ -299,10 +467,26 @@ pub fn draw_drying_pavilion_panel(
     let loss_rate = building.get_drying_loss_rate();
     let output_per_5 = ((5.0 * (1.0 - loss_rate)).ceil() as u32).max(1);
 
-    draw_text(&format!("Efficiency: 5 raw -> {} dried ({:.0}% loss)", output_per_5, loss_rate * 100.0), x, cur_y, FONT_BODY_SIZE, TEXT_SECONDARY);
+    draw_text(
+        &format!(
+            "Efficiency: 5 raw -> {} dried ({:.0}% loss)",
+            output_per_5,
+            loss_rate * 100.0
+        ),
+        x,
+        cur_y,
+        FONT_BODY_SIZE,
+        TEXT_SECONDARY,
+    );
     cur_y += 35.0;
 
-    draw_text("Available to Dry:", x, cur_y, FONT_HEADER_SIZE, TEXT_HIGHLIGHT);
+    draw_text(
+        "Available to Dry:",
+        x,
+        cur_y,
+        FONT_HEADER_SIZE,
+        TEXT_HIGHLIGHT,
+    );
     cur_y += 30.0;
 
     let mut action: Option<Action> = None;
@@ -324,7 +508,13 @@ pub fn draw_drying_pavilion_panel(
             }
             cur_y += 40.0;
         } else if count > 0 {
-            draw_text(&format!("{}: {} (Need 5)", herb.name, count), x, cur_y + 20.0, FONT_SMALL_SIZE, TEXT_SECONDARY);
+            draw_text(
+                &format!("{}: {} (Need 5)", herb.name, count),
+                x,
+                cur_y + 20.0,
+                FONT_SMALL_SIZE,
+                TEXT_SECONDARY,
+            );
             cur_y += 30.0;
         }
     }
@@ -345,20 +535,36 @@ pub fn draw_greenhouse_panel(
     let mut cur_y = y;
 
     // Current infusion
-    let infusion_text = building.infused_element.as_ref()
+    let infusion_text = building
+        .infused_element
+        .as_ref()
         .map(|e| format!("{}", e))
         .unwrap_or_else(|| "None".to_string());
 
-    let infusion_color = building.infused_element.as_ref()
+    let infusion_color = building
+        .infused_element
+        .as_ref()
         .map(|e| e.color())
         .unwrap_or(TEXT_SECONDARY);
 
     draw_text("Element Infusion:", x, cur_y, FONT_BODY_SIZE, TEXT_PRIMARY);
-    draw_text(&infusion_text, x + 150.0, cur_y, FONT_BODY_SIZE, infusion_color);
+    draw_text(
+        &infusion_text,
+        x + 150.0,
+        cur_y,
+        FONT_BODY_SIZE,
+        infusion_color,
+    );
     cur_y += 30.0;
 
     if building.infused_element.is_some() {
-        draw_text("Allows growing herbs of this element in any season.", x, cur_y, FONT_SMALL_SIZE, TEXT_SECONDARY);
+        draw_text(
+            "Allows growing herbs of this element in any season.",
+            x,
+            cur_y,
+            FONT_SMALL_SIZE,
+            TEXT_SECONDARY,
+        );
         cur_y += 25.0;
     }
 
@@ -380,9 +586,16 @@ pub fn draw_infusion_modal(building: &Building) -> HerbUiResult {
     let modal_x = (screen_w - modal_w) / 2.0;
     let modal_y = (screen_h - modal_h) / 2.0;
 
-    draw_panel(Rect::new(modal_x, modal_y, modal_w, modal_h), Some("Set Element Infusion"));
+    draw_panel(
+        Rect::new(modal_x, modal_y, modal_w, modal_h),
+        Some("Set Element Infusion"),
+    );
 
-    if draw_button(Rect::new(modal_x + modal_w - 60.0, modal_y + 10.0, 50.0, 30.0), "X", false) {
+    if draw_button(
+        Rect::new(modal_x + modal_w - 60.0, modal_y + 10.0, 50.0, 30.0),
+        "X",
+        false,
+    ) {
         return HerbUiResult::close();
     }
 
@@ -390,16 +603,32 @@ pub fn draw_infusion_modal(building: &Building) -> HerbUiResult {
 
     // Clear infusion option
     if building.infused_element.is_some() {
-        if draw_button(Rect::new(modal_x + 20.0, e_y, modal_w - 40.0, 35.0), "Clear Infusion", false) {
+        if draw_button(
+            Rect::new(modal_x + 20.0, e_y, modal_w - 40.0, 35.0),
+            "Clear Infusion",
+            false,
+        ) {
             return HerbUiResult::with_action(Action::SetGreenhouseInfusion(building.id, None));
         }
         e_y += 45.0;
     }
 
-    draw_text("Select Element:", modal_x + 20.0, e_y, FONT_BODY_SIZE, TEXT_HIGHLIGHT);
+    draw_text(
+        "Select Element:",
+        modal_x + 20.0,
+        e_y,
+        FONT_BODY_SIZE,
+        TEXT_HIGHLIGHT,
+    );
     e_y += 30.0;
 
-    let elements = [Element::Wood, Element::Fire, Element::Water, Element::Metal, Element::Earth];
+    let elements = [
+        Element::Wood,
+        Element::Fire,
+        Element::Water,
+        Element::Metal,
+        Element::Earth,
+    ];
 
     for elem in elements {
         let is_current = building.infused_element.as_ref() == Some(&elem);
@@ -408,9 +637,16 @@ pub fn draw_infusion_modal(building: &Building) -> HerbUiResult {
         // Draw colored indicator
         draw_rectangle(modal_x + 20.0, e_y + 5.0, 20.0, 25.0, btn_color);
 
-        if draw_button(Rect::new(modal_x + 50.0, e_y, modal_w - 70.0, 35.0), &format!("{}", elem), is_current) {
+        if draw_button(
+            Rect::new(modal_x + 50.0, e_y, modal_w - 70.0, 35.0),
+            &format!("{}", elem),
+            is_current,
+        ) {
             if !is_current {
-                return HerbUiResult::with_action(Action::SetGreenhouseInfusion(building.id, Some(elem)));
+                return HerbUiResult::with_action(Action::SetGreenhouseInfusion(
+                    building.id,
+                    Some(elem),
+                ));
             }
         }
         e_y += 45.0;
@@ -431,12 +667,24 @@ pub fn draw_herb_storage_panel(
     let mut cur_y = y;
 
     let decay_reduction = building.get_decay_reduction();
-    draw_text(&format!("Decay Reduction: {:.0}%", decay_reduction * 100.0), x, cur_y, FONT_BODY_SIZE, SUCCESS);
+    draw_text(
+        &format!("Decay Reduction: {:.0}%", decay_reduction * 100.0),
+        x,
+        cur_y,
+        FONT_BODY_SIZE,
+        SUCCESS,
+    );
     cur_y += 30.0;
 
     let base_decay = 10.0;
     let effective_decay = base_decay * (1.0 - decay_reduction);
-    draw_text(&format!("Effective Decay Rate: {:.1}% per season", effective_decay), x, cur_y, FONT_SMALL_SIZE, TEXT_SECONDARY);
+    draw_text(
+        &format!("Effective Decay Rate: {:.1}% per season", effective_decay),
+        x,
+        cur_y,
+        FONT_SMALL_SIZE,
+        TEXT_SECONDARY,
+    );
     cur_y += 35.0;
 
     draw_text("Stored Herbs:", x, cur_y, FONT_HEADER_SIZE, TEXT_HIGHLIGHT);
@@ -454,20 +702,38 @@ pub fn draw_herb_storage_panel(
 
             if raw_count > 0 {
                 draw_rectangle(x, cur_y, 8.0, 18.0, herb.element.color());
-                draw_text(&format!("{}: {}", herb.name, raw_count), x + 15.0, cur_y + 15.0, FONT_BODY_SIZE, TEXT_PRIMARY);
+                draw_text(
+                    &format!("{}: {}", herb.name, raw_count),
+                    x + 15.0,
+                    cur_y + 15.0,
+                    FONT_BODY_SIZE,
+                    TEXT_PRIMARY,
+                );
                 cur_y += 25.0;
             }
 
             if dried_count > 0 {
                 draw_rectangle(x, cur_y, 8.0, 18.0, herb.element.color());
-                draw_text(&format!("Dried {}: {}", herb.name, dried_count), x + 15.0, cur_y + 15.0, FONT_BODY_SIZE, SECONDARY);
+                draw_text(
+                    &format!("Dried {}: {}", herb.name, dried_count),
+                    x + 15.0,
+                    cur_y + 15.0,
+                    FONT_BODY_SIZE,
+                    SECONDARY,
+                );
                 cur_y += 25.0;
             }
         }
     }
 
     if !found_any {
-        draw_text("No herbs in storage.", x, cur_y, FONT_BODY_SIZE, TEXT_SECONDARY);
+        draw_text(
+            "No herbs in storage.",
+            x,
+            cur_y,
+            FONT_BODY_SIZE,
+            TEXT_SECONDARY,
+        );
         cur_y += 25.0;
     }
 
@@ -483,9 +749,19 @@ pub fn draw_season_indicator(x: f32, y: f32, current_season: &Season, ticks_rema
         Season::Winter => Color::new(0.7, 0.8, 0.95, 1.0), // Ice blue
     };
 
-    draw_text(&format!("{}", current_season), x, y, FONT_BODY_SIZE, season_color);
+    draw_text(
+        &format!("{}", current_season),
+        x,
+        y,
+        FONT_BODY_SIZE,
+        season_color,
+    );
 
     // Progress to next season
     let progress = 1.0 - (ticks_remaining as f32 / 3600.0);
-    draw_progress_bar(Rect::new(x + 70.0, y - 12.0, 80.0, 10.0), progress, season_color);
+    draw_progress_bar(
+        Rect::new(x + 70.0, y - 12.0, 80.0, 10.0),
+        progress,
+        season_color,
+    );
 }

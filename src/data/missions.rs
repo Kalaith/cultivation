@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use crate::data::disciples::FateTrait;
+use serde::{Deserialize, Serialize};
 
 /// The type of mission, which determines the relevant stat and trait modifiers.
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -34,7 +34,9 @@ impl MissionType {
         match self {
             MissionType::MonsterSuppression | MissionType::RuinDelve => trait_.combat_modifier,
             MissionType::Diplomacy => trait_.diplomacy_modifier,
-            MissionType::Exploration | MissionType::ResourceGathering => trait_.exploration_modifier,
+            MissionType::Exploration | MissionType::ResourceGathering => {
+                trait_.exploration_modifier
+            }
         }
     }
 }

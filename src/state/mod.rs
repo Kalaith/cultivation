@@ -13,13 +13,10 @@ pub mod tribulation;
 pub mod world_map;
 
 use self::{
-    faction_screen::FactionScreenState,
-    library::LibraryState, main_menu::MainMenuState,
-    mission_assignment::MissionAssignmentState,
-    mission_resolution::MissionResolutionState, roster::DiscipleRosterState,
-    sect_base::SectBaseState, sect_creation::SectCreationState,
-    trade_screen::TradeScreenState,
-    tribulation::TribulationEncounterState,
+    faction_screen::FactionScreenState, library::LibraryState, main_menu::MainMenuState,
+    mission_assignment::MissionAssignmentState, mission_resolution::MissionResolutionState,
+    roster::DiscipleRosterState, sect_base::SectBaseState, sect_creation::SectCreationState,
+    trade_screen::TradeScreenState, tribulation::TribulationEncounterState,
     world_map::WorldMapState,
 };
 
@@ -60,7 +57,11 @@ pub struct TutorialState {
 
 impl TutorialState {
     pub fn new() -> Self {
-        Self { active: true, step: 0, hidden: false }
+        Self {
+            active: true,
+            step: 0,
+            hidden: false,
+        }
     }
 }
 

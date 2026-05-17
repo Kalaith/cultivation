@@ -7,8 +7,10 @@ impl Game {
     pub(super) fn handle_world_sim_result(&mut self, result: WorldSimResult) {
         match result {
             WorldSimResult::EventTriggered(event) => {
-                self.event_log
-                    .push(format!("[World Event] {}: {}", event.name, event.description));
+                self.event_log.push(format!(
+                    "[World Event] {}: {}",
+                    event.name, event.description
+                ));
                 // Apply immediate effects if no choices required
                 if !event.requires_choice() {
                     for effect in &event.effects {
@@ -16,18 +18,26 @@ impl Game {
                     }
                 }
             }
-            WorldSimResult::EventResolved { event_id: _, effects } => {
+            WorldSimResult::EventResolved {
+                event_id: _,
+                effects,
+            } => {
                 for effect in effects {
                     self.apply_event_effect(&effect);
                 }
             }
             WorldSimResult::FactionAction { faction_id, action } => {
                 if let Some(faction) = self.world_sim.get_faction(&faction_id) {
-                    self.event_log
-                        .push(format!("[Faction] {} took action: {:?}", faction.name, action));
+                    self.event_log.push(format!(
+                        "[Faction] {} took action: {:?}",
+                        faction.name, action
+                    ));
                 }
             }
-            WorldSimResult::WarDeclared { aggressor, defender } => {
+            WorldSimResult::WarDeclared {
+                aggressor,
+                defender,
+            } => {
                 let aggressor_name = self
                     .world_sim
                     .get_faction(&aggressor)
@@ -43,7 +53,11 @@ impl Game {
                     aggressor_name, defender_name
                 ));
             }
-            WorldSimResult::WarEnded { faction_a, faction_b, victor } => {
+            WorldSimResult::WarEnded {
+                faction_a,
+                faction_b,
+                victor,
+            } => {
                 let a_name = self
                     .world_sim
                     .get_faction(&faction_a)
@@ -71,13 +85,21 @@ impl Game {
                     ));
                 }
             }
-            WorldSimResult::TerritoryChanged { node_id, old_faction, new_faction } => {
+            WorldSimResult::TerritoryChanged {
+                node_id,
+                old_faction,
+                new_faction,
+            } => {
                 self.event_log.push(format!(
                     "[Territory] {} has changed hands from {} to {}.",
                     node_id, old_faction, new_faction
                 ));
             }
-            WorldSimResult::PriceChanged { item_id, old_price, new_price } => {
+            WorldSimResult::PriceChanged {
+                item_id,
+                old_price,
+                new_price,
+            } => {
                 // Silent unless significant change
                 if (new_price as i32 - old_price as i32).abs() > 10 {
                     self.event_log.push(format!(
@@ -104,7 +126,11 @@ impl Game {
                     relation.modify_reputation(*delta);
                 }
             }
-            EventEffect::ModifyPrices { item_id, modifier, duration_ticks } => {
+            EventEffect::ModifyPrices {
+                item_id,
+                modifier,
+                duration_ticks,
+            } => {
                 let price_mod = crate::data::economy::PriceModifier::new(
                     item_id.clone(),
                     *modifier,
@@ -115,7 +141,8 @@ impl Game {
                 self.world_sim.economy.add_price_modifier(price_mod);
             }
             EventEffect::SpawnMission { mission_id } => {
-                self.event_log.push(format!("New mission available: {}", mission_id));
+                self.event_log
+                    .push(format!("New mission available: {}", mission_id));
             }
             EventEffect::ModifyResource { resource, delta } => match resource {
                 crate::data::world_events::ResourceType::SpiritStones => {
@@ -140,14 +167,20 @@ impl Game {
                     }
                 }
             },
-            EventEffect::TriggerCombat { enemy_power, description } => {
-                self.event_log
-                    .push(format!("Combat triggered: {} (Power: {})", description, enemy_power));
+            EventEffect::TriggerCombat {
+                enemy_power,
+                description,
+            } => {
+                self.event_log.push(format!(
+                    "Combat triggered: {} (Power: {})",
+                    description, enemy_power
+                ));
             }
             EventEffect::UnlockTech { tech_id } => {
                 if !self.unlocked_techs.contains(tech_id) {
                     self.unlocked_techs.push(tech_id.clone());
-                    self.event_log.push(format!("Technology unlocked: {}", tech_id));
+                    self.event_log
+                        .push(format!("Technology unlocked: {}", tech_id));
                 }
             }
             EventEffect::ModifyCorruption { node_id, delta } => {
@@ -159,8 +192,17 @@ impl Game {
                     }
                 }
             }
-            EventEffect::ChangeFactionTerritory { faction_id, node_id, gain } => {
-                if let Some(faction) = self.world_sim.factions.iter_mut().find(|f| f.id == *faction_id) {
+            EventEffect::ChangeFactionTerritory {
+                faction_id,
+                node_id,
+                gain,
+            } => {
+                if let Some(faction) = self
+                    .world_sim
+                    .factions
+                    .iter_mut()
+                    .find(|f| f.id == *faction_id)
+                {
                     if *gain {
                         if !faction.territory_nodes.contains(node_id) {
                             faction.territory_nodes.push(node_id.clone());
@@ -172,15 +214,22 @@ impl Game {
             }
             EventEffect::GiveItem { item_id, amount } => {
                 *self.inventory.entry(item_id.clone()).or_insert(0) += amount;
-                self.event_log.push(format!("Received {}x {}", amount, item_id));
+                self.event_log
+                    .push(format!("Received {}x {}", amount, item_id));
             }
-            EventEffect::ModifyCultivationSpeed { modifier, duration_ticks } => {
+            EventEffect::ModifyCultivationSpeed {
+                modifier,
+                duration_ticks,
+            } => {
                 self.event_log.push(format!(
                     "Cultivation speed modified by {}x for {} ticks",
                     modifier, duration_ticks
                 ));
             }
-            EventEffect::ChainEvent { event_id, delay_ticks } => {
+            EventEffect::ChainEvent {
+                event_id,
+                delay_ticks,
+            } => {
                 self.world_sim.queue_event(event_id.clone(), *delay_ticks);
             }
         }

@@ -108,7 +108,13 @@ pub struct PriceModifier {
 }
 
 impl PriceModifier {
-    pub fn new(item_id: String, modifier: f32, reason: String, duration: Option<u32>, current_tick: u64) -> Self {
+    pub fn new(
+        item_id: String,
+        modifier: f32,
+        reason: String,
+        duration: Option<u32>,
+        current_tick: u64,
+    ) -> Self {
         Self {
             item_id,
             modifier,
@@ -118,7 +124,9 @@ impl PriceModifier {
     }
 
     pub fn is_expired(&self, current_tick: u64) -> bool {
-        self.expires_tick.map(|t| current_tick >= t).unwrap_or(false)
+        self.expires_tick
+            .map(|t| current_tick >= t)
+            .unwrap_or(false)
     }
 }
 
@@ -197,7 +205,10 @@ impl EconomyState {
 
     /// Get all routes from a node
     pub fn get_routes_from(&self, node_id: &str) -> Vec<&TradeRoute> {
-        self.routes.iter().filter(|r| r.from_node == node_id && r.active).collect()
+        self.routes
+            .iter()
+            .filter(|r| r.from_node == node_id && r.active)
+            .collect()
     }
 
     /// Add a price modifier
@@ -211,12 +222,18 @@ impl EconomyState {
     }
 
     /// Get effective price for an item at a node
-    pub fn get_effective_price(&self, node_id: &str, item_id: &str, elasticity: f32) -> Option<u32> {
+    pub fn get_effective_price(
+        &self,
+        node_id: &str,
+        item_id: &str,
+        elasticity: f32,
+    ) -> Option<u32> {
         let node = self.get_node(node_id)?;
         let base_price = node.get_price(item_id, elasticity)?;
 
         // Apply all active price modifiers
-        let modifier: f32 = self.price_modifiers
+        let modifier: f32 = self
+            .price_modifiers
             .iter()
             .filter(|m| m.item_id == item_id)
             .map(|m| m.modifier)
@@ -243,7 +260,8 @@ impl EconomyState {
 
     /// Get arrived caravans and remove them
     pub fn collect_arrived_caravans(&mut self) -> Vec<TradeCaravan> {
-        let (arrived, still_traveling): (Vec<_>, Vec<_>) = self.active_caravans
+        let (arrived, still_traveling): (Vec<_>, Vec<_>) = self
+            .active_caravans
             .drain(..)
             .partition(|c| c.has_arrived());
         self.active_caravans = still_traveling;

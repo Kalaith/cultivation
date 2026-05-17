@@ -1,5 +1,5 @@
-pub mod bloodlines;
 pub mod ai;
+pub mod bloodlines;
 pub mod buildings;
 pub mod disciples;
 pub mod economy;
@@ -14,7 +14,7 @@ pub mod loader;
 pub mod missions;
 pub mod relations;
 pub mod resources;
-pub mod stages;
 pub mod spirit_beasts;
+pub mod stages;
 pub mod tech;
 pub mod world_events;

@@ -176,11 +176,14 @@ impl FactionAI {
             .unwrap_or_default();
 
         // Power comparison ratios
-        let stronger_than_weakest = weakest_power > 0 && own_power as f32 / weakest_power as f32 > 1.3;
-        let weaker_than_strongest = strongest_power > 0 && (own_power as f32 / strongest_power as f32) < 0.7;
+        let stronger_than_weakest =
+            weakest_power > 0 && own_power as f32 / weakest_power as f32 > 1.3;
+        let weaker_than_strongest =
+            strongest_power > 0 && (own_power as f32 / strongest_power as f32) < 0.7;
 
         // Decision logic based on goals and power
-        if self.goals.contains(&FactionGoal::War) && stronger_than_weakest && self.aggression > 0.5 {
+        if self.goals.contains(&FactionGoal::War) && stronger_than_weakest && self.aggression > 0.5
+        {
             return Some(FactionAction::DeclareWar { target: weakest_id });
         }
 
@@ -190,7 +193,9 @@ impl FactionAI {
         }
 
         if weaker_than_strongest && !self.alliances.contains(&strongest_id) {
-            return Some(FactionAction::ProposeAlliance { target: strongest_id });
+            return Some(FactionAction::ProposeAlliance {
+                target: strongest_id,
+            });
         }
 
         if self.goals.contains(&FactionGoal::Trade) {

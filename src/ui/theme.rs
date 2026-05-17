@@ -22,9 +22,9 @@ pub const FONT_BODY_SIZE: f32 = 20.0;
 pub const FONT_SMALL_SIZE: f32 = 16.0;
 
 // Feng Shui Feedback Colors
-pub const FENG_SHUI_POSITIVE: Color = Color::new(0.3, 0.9, 0.4, 1.0);   // Bright green
-pub const FENG_SHUI_NEGATIVE: Color = Color::new(0.9, 0.2, 0.2, 1.0);   // Bright red
-pub const FENG_SHUI_NEUTRAL: Color = Color::new(0.5, 0.5, 0.55, 1.0);   // Gray
+pub const FENG_SHUI_POSITIVE: Color = Color::new(0.3, 0.9, 0.4, 1.0); // Bright green
+pub const FENG_SHUI_NEGATIVE: Color = Color::new(0.9, 0.2, 0.2, 1.0); // Bright red
+pub const FENG_SHUI_NEUTRAL: Color = Color::new(0.5, 0.5, 0.55, 1.0); // Gray
 pub const FENG_SHUI_EXCELLENT: Color = Color::new(1.0, 0.85, 0.2, 1.0); // Gold
 
 // Panel colors (aliases and variants)
