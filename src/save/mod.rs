@@ -153,67 +153,25 @@ impl SaveData {
 /// Platform-agnostic save operations
 pub mod storage {
     use super::SaveData;
-
-    #[cfg(not(target_arch = "wasm32"))]
-    use std::fs;
-
-    #[cfg(target_arch = "wasm32")]
-    use quad_storage::LocalStorage;
+    use macroquad_toolkit::persistence::{json_key_exists, load_json_key, save_json_key};
 
     const SAVE_FILE: &str = "savegame.json";
-    #[cfg(target_arch = "wasm32")]
-    const SAVE_KEY: &str = "cultivation_save";
+    const GAME_NAME: &str = "cultivation";
 
     /// Save game data to persistent storage
     pub fn save(data: &SaveData) -> Result<(), String> {
-        let json = serde_json::to_string_pretty(data)
-            .map_err(|e| format!("Serialization error: {}", e))?;
-
-        #[cfg(not(target_arch = "wasm32"))]
-        {
-            fs::write(SAVE_FILE, &json).map_err(|e| format!("File write error: {}", e))?;
-        }
-
-        #[cfg(target_arch = "wasm32")]
-        {
-            LocalStorage::set(SAVE_KEY, &json);
-        }
-
-        Ok(())
+        save_json_key(GAME_NAME, SAVE_FILE, data)
     }
 
     /// Load game data from persistent storage
     pub fn load() -> Result<SaveData, String> {
-        let json = {
-            #[cfg(not(target_arch = "wasm32"))]
-            {
-                fs::read_to_string(SAVE_FILE).map_err(|e| format!("File read error: {}", e))?
-            }
-
-            #[cfg(target_arch = "wasm32")]
-            {
-                LocalStorage::get(SAVE_KEY).ok_or_else(|| "No save found".to_string())?
-            }
-        };
-
-        let save_data: SaveData =
-            serde_json::from_str(&json).map_err(|e| format!("Deserialization error: {}", e))?;
-
-        // Apply migrations if needed
+        let save_data: SaveData = load_json_key(GAME_NAME, SAVE_FILE)?;
         Ok(save_data.migrate())
     }
 
     /// Check if a save exists
     pub fn exists() -> bool {
-        #[cfg(not(target_arch = "wasm32"))]
-        {
-            std::path::Path::new(SAVE_FILE).exists()
-        }
-
-        #[cfg(target_arch = "wasm32")]
-        {
-            LocalStorage::get(SAVE_KEY).is_some()
-        }
+        json_key_exists(GAME_NAME, SAVE_FILE)
     }
 
     // The delete function has been removed as it was unused.
