@@ -1,16 +1,22 @@
 use macroquad::prelude::*;
+use macroquad_toolkit::assets::AssetManager;
 use std::collections::HashMap;
+
+const GENERATED_ASSET_PACK: &str = "assets/generated.zip";
 
 /// Manages all game textures with lazy loading and caching
 pub struct TextureManager {
-    textures: HashMap<String, Texture2D>,
+    assets: AssetManager,
     load_errors: Vec<String>,
 }
 
 impl TextureManager {
     pub fn new() -> Self {
+        let mut assets = AssetManager::new();
+        assets.set_default_filter(FilterMode::Linear);
+
         Self {
-            textures: HashMap::new(),
+            assets,
             load_errors: Vec::new(),
         }
     }
@@ -18,6 +24,8 @@ impl TextureManager {
     /// Load all game textures asynchronously
     pub async fn load_all(&mut self) {
         use macroquad_toolkit::data_loader::load_data;
+
+        self.assets.load_asset_pack(GENERATED_ASSET_PACK).await.ok();
 
         // Load texture configuration from JSON using toolkit
         match load_data::<HashMap<String, HashMap<String, String>>>("textures").await {
@@ -37,7 +45,7 @@ impl TextureManager {
 
         println!(
             "Texture loading complete: {} loaded, {} errors",
-            self.textures.len(),
+            self.assets.len(),
             self.load_errors.len()
         );
 
@@ -51,20 +59,18 @@ impl TextureManager {
 
     /// Load a single texture
     async fn load_texture(&mut self, name: &str, path: &str) {
-        match load_texture(path).await {
-            Ok(texture) => {
-                texture.set_filter(FilterMode::Linear);
-                self.textures.insert(name.to_string(), texture);
-            }
-            Err(e) => {
-                self.load_errors.push(format!("{}: {}", path, e));
-            }
+        if let Err(e) = self
+            .assets
+            .load_texture_with_filter(name, path, FilterMode::Linear)
+            .await
+        {
+            self.load_errors.push(format!("{}: {}", path, e));
         }
     }
 
     /// Get a texture by name
     pub fn get(&self, name: &str) -> Option<&Texture2D> {
-        self.textures.get(name)
+        self.assets.get_texture(name)
     }
 
     /// Draw a background texture scaled to fill the screen
@@ -108,7 +114,7 @@ impl TextureManager {
 
     /// Get the number of loaded textures
     pub fn texture_count(&self) -> usize {
-        self.textures.len()
+        self.assets.len()
     }
 
     /// Get loading error count
