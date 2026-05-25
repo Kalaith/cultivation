@@ -1,37 +1,27 @@
-# Heavenly Mandate: Disciples of the Outer World
+# Heavenly Mandate
 
-Cultivation/base‑management RPG built in Rust with Macroquad. You guide a fallen sect’s survivors, build facilities, raise disciples, and navigate a living world of factions and events.
+Heavenly Mandate is a cultivation sect strategy game about rebuilding a fallen school, training disciples, and sending them into a dangerous world of factions and consequences.
 
-## Features
-- Base building with Feng Shui considerations
-- Outer/Inner disciple stratification
-- Cultivation laws and breakthroughs
-- World map missions and outcomes
-- Faction/world simulation framework
-- Data‑driven content via JSON in assets/data
-- AI scheduling with needs, cooldowns, and debug overlay
+You guide the sect from survival toward influence by choosing facilities, managing disciples, and deciding which risks are worth taking.
 
-## Requirements
-- Rust (stable toolchain)
-- Cargo
+## Gameplay
 
-## Quick Start
-- Build and run:
-  - `cargo run`
+- Build and improve sect facilities.
+- Train disciples and guide their cultivation growth.
+- Send followers on missions across the world map.
+- Respond to faction pressure and events.
+- Balance resources, needs, schedules, and long-term progress.
+
+## Goal
+
+Restore the sect's strength while keeping disciples alive, useful, and advancing toward higher stages of cultivation.
 
 ## Controls
-- F9: Toggle AI debug overlay
 
-## Project Structure
-- src/: Game code
-- assets/data/: JSON content (buildings, laws, missions, tuning, etc.)
-- assets/images/: Artwork
+- Mouse: interact with menus and world elements.
+- WASD: pan the camera.
+- Space: pause.
 
-## Save/Load
-- Desktop builds save to savegame.json in the project directory.
+## Current Scope
 
-## Data Tuning
-- AI scheduling parameters live in assets/data/ai_scheduler.json.
-
-## Status
-Actively in development. See design notes in gdd.md and GAME_DEVELOPMENT_GUIDE.md.
+Playable sect-management foundation with base building, disciple growth, world missions, events, and faction simulation systems.
