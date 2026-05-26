@@ -7,6 +7,7 @@ mod missions;
 
 use super::Game;
 use crate::engine::actions::Action;
+use crate::engine::random;
 use crate::engine::world_sim::WorldSim;
 use crate::state::StateTransition;
 
@@ -129,7 +130,7 @@ impl Game {
         self.data.buildings.clear();
 
         let mut sect_hall = crate::data::buildings::Building::new(BuildingType::SectHall);
-        sect_hall.id = rand::random();
+        sect_hall.id = random::next_u64();
         sect_hall.x = 2048;
         sect_hall.y = 2048;
         sect_hall.element = self

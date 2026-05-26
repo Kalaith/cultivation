@@ -1,4 +1,5 @@
 use super::super::Game;
+use macroquad_toolkit::rng as game_rng;
 
 impl Game {
     pub(in crate::game) fn handle_craft_item(&mut self, recipe_id: String) {
@@ -39,7 +40,7 @@ impl Game {
             disciple_mind,
         };
 
-        let roll = (rand::random::<u32>()) % 100;
+        let roll = game_rng::gen_range(0, 100u32);
         let result = crafting::calculate_craft(&recipe, &ctx, roll);
 
         if result.success {

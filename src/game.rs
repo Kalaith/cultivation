@@ -71,7 +71,9 @@ pub struct Game {
 
 impl Game {
     pub async fn new() -> Self {
-        let mut data = GameData::load().expect("Failed to load game data");
+        let mut data = GameData::load_async()
+            .await
+            .expect("Failed to load game data");
         data.buildings.clear(); // User requested blank map
 
         // Scenario: Survivors of the Fallen Sect

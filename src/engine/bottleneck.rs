@@ -2,7 +2,6 @@ use crate::data::disciples::{Bottleneck, Disciple};
 use crate::data::items::{EquipmentSlot, ItemType};
 use crate::data::loader::GameData;
 use macroquad_toolkit::rng as game_rng;
-use rand::prelude::*;
 
 /// Generate a bottleneck for a disciple reaching breakthrough readiness.
 /// Returns `Some(bottleneck)` with increasing probability at higher realms.
@@ -16,13 +15,12 @@ pub fn generate_bottleneck(
         return None;
     }
 
-    let mut rng = thread_rng();
-    let variant = rng.gen_range(0..5u32);
+    let variant = game_rng::gen_range(0, 5u32);
     match variant {
         0 => {
             // CompleteMission — pick a random mission type name
             let types = ["Exploration", "ResourceGathering", "MonsterSuppression"];
-            let idx = rng.gen_range(0..types.len());
+            let idx = game_rng::gen_range(0, types.len());
             Some(Bottleneck::CompleteMission(types[idx].to_string()))
         }
         1 => {
@@ -32,14 +30,14 @@ pub fn generate_bottleneck(
             if easy_recipes.is_empty() {
                 Some(Bottleneck::EquipSlot(EquipmentSlot::Weapon))
             } else {
-                let idx = rng.gen_range(0..easy_recipes.len());
+                let idx = game_rng::gen_range(0, easy_recipes.len());
                 Some(Bottleneck::CraftItem(easy_recipes[idx].id.clone()))
             }
         }
         2 => {
             // ReachStat — random stat, threshold = current + 10 + realm_index * 5
             let stats = ["Body", "Mind", "Spirit"];
-            let idx = rng.gen_range(0..3usize);
+            let idx = game_rng::gen_range(0, 3usize);
             let stat_name = stats[idx];
             let current = match stat_name {
                 "Body" => disciple.attributes.body,
@@ -63,7 +61,7 @@ pub fn generate_bottleneck(
             if consumables.is_empty() {
                 Some(Bottleneck::EquipSlot(EquipmentSlot::Weapon))
             } else {
-                let idx = rng.gen_range(0..consumables.len());
+                let idx = game_rng::gen_range(0, consumables.len());
                 Some(Bottleneck::UseItem(consumables[idx].to_string()))
             }
         }
@@ -76,7 +74,7 @@ pub fn generate_bottleneck(
                 EquipmentSlot::Arms,
                 EquipmentSlot::Legs,
             ];
-            let idx = rng.gen_range(0..slots.len());
+            let idx = game_rng::gen_range(0, slots.len());
             Some(Bottleneck::EquipSlot(slots[idx].clone()))
         }
     }

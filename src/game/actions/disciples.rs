@@ -3,6 +3,7 @@ use crate::data::disciples::DiscipleRank;
 use crate::data::history::DeceasedDisciple;
 use crate::data::spirit_beasts::SpiritBeast;
 use crate::engine::proc_gen::generate_disciple;
+use crate::engine::random;
 use crate::engine::tribulation::TribulationState;
 use crate::state::StateTransition;
 
@@ -118,7 +119,7 @@ impl Game {
         };
 
         let mut beast = SpiritBeast::new_from_definition(def);
-        beast.id = rand::random();
+        beast.id = random::next_u64();
         self.event_log
             .push(format!("Recruited Spirit Beast: {}", def.name));
         self.spirit_beasts.push(beast);

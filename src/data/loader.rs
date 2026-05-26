@@ -12,6 +12,8 @@ use crate::data::{
     world_events::WorldEvent,
 };
 use crate::engine::world_sim::WorldSimBalance;
+#[cfg(target_arch = "wasm32")]
+use serde::de::DeserializeOwned;
 
 #[derive(Clone)]
 pub struct GameData {
@@ -197,5 +199,140 @@ impl GameData {
             spirit_beast_definitions,
             beast_equipment_definitions,
         })
+    }
+
+    pub async fn load_async() -> Result<Self, Box<dyn std::error::Error>> {
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            Self::load()
+        }
+
+        #[cfg(target_arch = "wasm32")]
+        {
+            // Buildings list starts empty - populated at runtime when player constructs.
+            let buildings: Vec<Building> = Vec::new();
+
+            let defs_list: Vec<BuildingDefinition> =
+                load_required_json("assets/data/buildings.json").await?;
+            let building_definitions = defs_list
+                .into_iter()
+                .map(|d| (d.building_type.clone(), d))
+                .collect();
+
+            let fate_traits: Vec<FateTrait> =
+                load_required_json("assets/data/fatetraits.json").await?;
+            let map_nodes: Vec<MapNode> = load_required_json("assets/data/map_nodes.json").await?;
+            let missions: Vec<Mission> = load_required_json("assets/data/missions.json").await?;
+
+            let laws_list: Vec<crate::data::laws::CultivationLaw> =
+                load_optional_json("assets/data/laws.json", "[]").await?;
+            let laws = laws_list.into_iter().map(|l| (l.id.clone(), l)).collect();
+
+            let items_list: Vec<crate::data::items::Item> =
+                load_optional_json("assets/data/items.json", "[]").await?;
+            let items = items_list.into_iter().map(|i| (i.id.clone(), i)).collect();
+
+            let recipes: Vec<crate::data::items::Recipe> =
+                load_optional_json("assets/data/recipes.json", "[]").await?;
+
+            let techs_list: Vec<crate::data::tech::Technology> =
+                load_optional_json("assets/data/tech.json", "[]").await?;
+            let techs = techs_list.into_iter().map(|t| (t.id.clone(), t)).collect();
+
+            let stages_list: Vec<StageDefinition> =
+                load_optional_json("assets/data/stages.json", "[]").await?;
+            let stages_order: Vec<String> = stages_list.iter().map(|s| s.id.clone()).collect();
+            let stages = stages_list.into_iter().map(|s| (s.id.clone(), s)).collect();
+
+            let bloodlines_list: Vec<Bloodline> =
+                load_optional_json("assets/data/bloodlines.json", "[]").await?;
+            let bloodlines = bloodlines_list
+                .into_iter()
+                .map(|b| (b.id.clone(), b))
+                .collect();
+
+            let herbs_list: Vec<Herb> =
+                load_optional_json("assets/data/herbs.json", "[]").await?;
+            let herbs = herbs_list.into_iter().map(|h| (h.id.clone(), h)).collect();
+
+            let factions: Vec<Faction> =
+                load_optional_json("assets/data/factions.json", "[]").await?;
+
+            let economy_data: EconomyData =
+                load_optional_json("assets/data/economy.json", r#"{"nodes":[],"routes":[]}"#)
+                    .await?;
+
+            let world_events: Vec<WorldEvent> =
+                load_optional_json("assets/data/world_events.json", "[]").await?;
+
+            let balance: WorldSimBalance =
+                load_optional_json("assets/data/balance.json", "{}")
+                    .await
+                    .unwrap_or_default();
+            let ai_scheduler: AiSchedulerTuning =
+                load_optional_json("assets/data/ai_scheduler.json", "{}")
+                    .await
+                    .unwrap_or_default();
+
+            let beasts_list: Vec<SpiritBeastDefinition> =
+                load_optional_json("assets/data/spirit_beasts.json", "[]").await?;
+            let spirit_beast_definitions =
+                beasts_list.into_iter().map(|b| (b.id.clone(), b)).collect();
+
+            let beast_equipment_list: Vec<BeastEquipmentItem> =
+                load_optional_json("assets/data/beast_equipment.json", "[]").await?;
+            let beast_equipment_definitions = beast_equipment_list
+                .into_iter()
+                .map(|b| (b.id.clone(), b))
+                .collect();
+
+            Ok(GameData {
+                buildings,
+                building_definitions,
+                bloodlines,
+                fate_traits,
+                map_nodes,
+                missions,
+                laws,
+                items,
+                recipes,
+                techs,
+                stages,
+                stages_order,
+                herbs,
+                factions,
+                economy_nodes: economy_data.nodes,
+                trade_routes: economy_data.routes,
+                world_events,
+                balance,
+                ai_scheduler,
+                spirit_beast_definitions,
+                beast_equipment_definitions,
+            })
+        }
+    }
+}
+
+#[cfg(target_arch = "wasm32")]
+async fn load_required_json<T>(path: &str) -> Result<T, Box<dyn std::error::Error>>
+where
+    T: DeserializeOwned,
+{
+    macroquad_toolkit::data_loader::load_json_file(path)
+        .await
+        .map_err(|error| std::io::Error::new(std::io::ErrorKind::Other, error).into())
+}
+
+#[cfg(target_arch = "wasm32")]
+async fn load_optional_json<T>(
+    path: &str,
+    fallback_json: &str,
+) -> Result<T, Box<dyn std::error::Error>>
+where
+    T: DeserializeOwned,
+{
+    match macroquad_toolkit::data_loader::load_json_file(path).await {
+        Ok(value) => Ok(value),
+        Err(_) => serde_json::from_str(fallback_json).map_err(Into::into),
     }
 }

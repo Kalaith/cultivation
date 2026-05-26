@@ -1,16 +1,14 @@
 use crate::data::bloodlines::{BloodlineRarity, DiscipleBloodline};
 use crate::data::disciples::{Attributes, Disciple, DiscipleNeeds, DiscipleRank, Talent};
 use crate::data::loader::GameData;
-use rand::prelude::*;
+use macroquad_toolkit::rng as game_rng;
 
 const NAMES: &[&str] = &["Chen", "Wang", "Zhang", "Liu", "Zhao", "Jia", "Shen"];
 
 pub fn generate_disciple(game_data: &GameData) -> Disciple {
-    let mut rng = thread_rng();
+    let name = game_rng::choose(NAMES).unwrap_or(&"Unnamed").to_string();
 
-    let name = NAMES.choose(&mut rng).unwrap_or(&"Unnamed").to_string();
-
-    let talent = match rng.gen_range(0..=99) {
+    let talent = match game_rng::gen_range(0, 100) {
         0..=49 => Talent::Low,     // 50%
         50..=79 => Talent::Medium, // 30%
         80..=94 => Talent::High,   // 15%
@@ -19,23 +17,25 @@ pub fn generate_disciple(game_data: &GameData) -> Disciple {
     };
 
     let attributes = Attributes {
-        body: rng.gen_range(5..=15),
-        mind: rng.gen_range(5..=15),
-        spirit: rng.gen_range(5..=15),
+        body: game_rng::gen_range(5, 16),
+        mind: game_rng::gen_range(5, 16),
+        spirit: game_rng::gen_range(5, 16),
     };
 
-    let num_traits = rng.gen_range(1..=2);
-    let fate_traits = game_data
-        .fate_traits
-        .choose_multiple(&mut rng, num_traits)
-        .cloned()
+    let num_traits = game_rng::gen_range(1usize, 3).min(game_data.fate_traits.len());
+    let mut fate_trait_indices = (0..game_data.fate_traits.len()).collect::<Vec<_>>();
+    game_rng::shuffle(&mut fate_trait_indices);
+    let fate_traits = fate_trait_indices
+        .into_iter()
+        .take(num_traits)
+        .map(|index| game_data.fate_traits[index].clone())
         .collect();
 
     // Generate bloodline based on rarity chances
-    let bloodline = generate_bloodline(game_data, &mut rng);
+    let bloodline = generate_bloodline(game_data);
 
     Disciple {
-        id: rng.gen(), // Generate random unique ID
+        id: crate::engine::random::next_u64(),
         name,
         rank: DiscipleRank::Outer,
         realm: "Mortal".to_string(),
@@ -59,9 +59,9 @@ pub fn generate_disciple(game_data: &GameData) -> Disciple {
 }
 
 /// Generate a random bloodline for a disciple based on rarity chances
-fn generate_bloodline(game_data: &GameData, rng: &mut ThreadRng) -> DiscipleBloodline {
+fn generate_bloodline(game_data: &GameData) -> DiscipleBloodline {
     // Roll for whether disciple has a bloodline at all
-    let bloodline_roll = rng.gen_range(0..=99);
+    let bloodline_roll = game_rng::gen_range(0, 100);
 
     // 60% no bloodline, 25% Mortal, 10% Spirit, 4% Ancient, 0.9% Primordial, 0.1% Mythic
     let target_rarity = match bloodline_roll {
@@ -71,7 +71,7 @@ fn generate_bloodline(game_data: &GameData, rng: &mut ThreadRng) -> DiscipleBloo
         95..=98 => BloodlineRarity::Ancient,        // 4%
         99 => {
             // 1% chance, split between Primordial (0.9%) and Mythic (0.1%)
-            if rng.gen_range(0..10) == 0 {
+            if game_rng::gen_range(0, 10) == 0 {
                 BloodlineRarity::Mythic
             } else {
                 BloodlineRarity::Primordial
@@ -87,7 +87,7 @@ fn generate_bloodline(game_data: &GameData, rng: &mut ThreadRng) -> DiscipleBloo
         .filter(|b| b.rarity == target_rarity)
         .collect();
 
-    if let Some(bloodline) = matching_bloodlines.choose(rng) {
+    if let Some(bloodline) = game_rng::choose(&matching_bloodlines) {
         DiscipleBloodline::new(bloodline.id.clone())
     } else {
         DiscipleBloodline::none()

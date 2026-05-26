@@ -1,6 +1,7 @@
 use super::super::Game;
 use crate::data::buildings::BuildingType;
 use crate::data::disciples::DiscipleRank;
+use crate::engine::random;
 
 impl Game {
     pub(in crate::game) fn handle_upgrade_building(&mut self, building_type: BuildingType) {
@@ -88,7 +89,7 @@ impl Game {
 
         self.spirit_stones -= cost;
         let mut new_b = crate::data::buildings::Building::new(b_type.clone());
-        new_b.id = rand::random();
+        new_b.id = random::next_u64();
         new_b.x = x;
         new_b.y = y;
         new_b.element = element;
