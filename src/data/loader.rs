@@ -251,8 +251,7 @@ impl GameData {
                 .map(|b| (b.id.clone(), b))
                 .collect();
 
-            let herbs_list: Vec<Herb> =
-                load_optional_json("assets/data/herbs.json", "[]").await?;
+            let herbs_list: Vec<Herb> = load_optional_json("assets/data/herbs.json", "[]").await?;
             let herbs = herbs_list.into_iter().map(|h| (h.id.clone(), h)).collect();
 
             let factions: Vec<Faction> =
@@ -265,10 +264,9 @@ impl GameData {
             let world_events: Vec<WorldEvent> =
                 load_optional_json("assets/data/world_events.json", "[]").await?;
 
-            let balance: WorldSimBalance =
-                load_optional_json("assets/data/balance.json", "{}")
-                    .await
-                    .unwrap_or_default();
+            let balance: WorldSimBalance = load_optional_json("assets/data/balance.json", "{}")
+                .await
+                .unwrap_or_default();
             let ai_scheduler: AiSchedulerTuning =
                 load_optional_json("assets/data/ai_scheduler.json", "{}")
                     .await
