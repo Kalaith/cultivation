@@ -54,6 +54,7 @@ impl Game {
         }
 
         self.dispatch_state_update();
+        self.update_moment_timer();
     }
 
     fn collect_disciples_on_mission(&self) -> HashSet<usize> {
@@ -419,6 +420,8 @@ impl Game {
         if self.show_ai_debug {
             self.draw_ai_debug();
         }
+
+        self.draw_active_moment();
     }
 
     fn draw_ai_debug(&self) {

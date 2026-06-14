@@ -9,6 +9,7 @@ use super::Game;
 use crate::engine::actions::Action;
 use crate::engine::random;
 use crate::engine::world_sim::WorldSim;
+use crate::game::moments::MomentKind;
 use crate::state::StateTransition;
 
 impl Game {
@@ -77,6 +78,7 @@ impl Game {
             game.data.buildings = loaded_buildings;
             *self = game;
             self.event_log.push("Game loaded successfully.".to_string());
+            self.active_moment = None;
         }
     }
 
@@ -146,5 +148,14 @@ impl Game {
         self.data.buildings.push(sect_hall);
 
         self.transition(StateTransition::ToSectBase);
+        self.show_moment(
+            MomentKind::Founding,
+            "A Fallen Sect Endures",
+            "The patriarch returns to the mountain",
+            format!(
+                "{} begins again with one ruined hall, a handful of stones, and an immortal ambition.",
+                self.sect_name
+            ),
+        );
     }
 }

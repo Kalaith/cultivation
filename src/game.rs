@@ -17,9 +17,12 @@ mod breakthrough;
 mod herbs;
 mod items;
 mod missions;
+mod moments;
 mod save;
 mod update;
 mod world;
+
+use self::moments::MomentOverlay;
 
 const FOUNDATION_TRIAL_MISSION: &str = "Foundation Trial (Solo)";
 
@@ -67,6 +70,8 @@ pub struct Game {
     pub textures: TextureManager,
     /// Font manager for custom fonts
     pub fonts: FontManager,
+    /// Short-lived dramatic presentation for major sect moments
+    pub(in crate::game) active_moment: Option<MomentOverlay>,
 }
 
 impl Game {
@@ -150,6 +155,7 @@ impl Game {
             show_ai_debug: false,
             textures,
             fonts,
+            active_moment: None,
         }
     }
 

@@ -1,4 +1,5 @@
 use super::super::Game;
+use crate::game::moments::MomentKind;
 use macroquad_toolkit::rng as game_rng;
 
 impl Game {
@@ -49,6 +50,15 @@ impl Game {
                 .inventory
                 .entry(recipe.output_item_id.clone())
                 .or_insert(0) += result.output_amount;
+            self.show_moment(
+                MomentKind::Discovery,
+                "Refinement Succeeds",
+                "Pill flame steadies",
+                format!(
+                    "{} has produced {}x {}, strengthening the sect stores.",
+                    recipe.name, result.output_amount, recipe.output_item_id
+                ),
+            );
 
             for disciple in &mut self.disciples {
                 if let Some(crate::data::disciples::Bottleneck::CraftItem(ref bn_recipe)) =
@@ -129,6 +139,16 @@ impl Game {
 
         self.spirit_stones -= tech.cost_spirit_stones;
         self.unlocked_techs.push(tech_id.clone());
-        self.event_log.push(format!("Researched: {}", tech.name));
+        let tech_name = tech.name.clone();
+        self.event_log.push(format!("Researched: {}", tech_name));
+        self.show_moment(
+            MomentKind::Discovery,
+            "A Jade Slip Opens",
+            "Sect knowledge deepens",
+            format!(
+                "{} has been understood and entered into the patriarch's archive.",
+                tech_name
+            ),
+        );
     }
 }

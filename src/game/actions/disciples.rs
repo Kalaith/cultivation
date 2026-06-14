@@ -5,6 +5,7 @@ use crate::data::spirit_beasts::SpiritBeast;
 use crate::engine::proc_gen::generate_disciple;
 use crate::engine::random;
 use crate::engine::tribulation::TribulationState;
+use crate::game::moments::MomentKind;
 use crate::state::StateTransition;
 
 impl Game {
@@ -18,9 +19,19 @@ impl Game {
         }
 
         let new_disciple = generate_disciple(&self.data);
+        let recruit_name = new_disciple.name.clone();
         self.event_log
             .push(format!("Recruited: {}", new_disciple.name));
         self.disciples.push(new_disciple);
+        self.show_moment(
+            MomentKind::Recruitment,
+            "A Young Cultivator Kneels",
+            "New disciple admitted",
+            format!(
+                "{} has entered the mountain gate and entrusted their fate to the sect.",
+                recruit_name
+            ),
+        );
     }
 
     pub(in crate::game) fn handle_promote_disciple(&mut self, idx: usize) {
@@ -74,10 +85,22 @@ impl Game {
         }
 
         let mut disciple = disciple;
+        let disciple_name = disciple.name.clone();
+        let previous_realm = disciple.realm.clone();
+        let previous_sub_stage = disciple.sub_stage;
         let result = self.attempt_breakthrough(&mut disciple, idx);
 
         match result {
             BreakthroughResult::Failure => {
+                self.show_moment(
+                    MomentKind::Tragedy,
+                    "A Soul Scatters",
+                    "Breakthrough calamity",
+                    format!(
+                        "{} perished while forcing open the gate beyond {}.",
+                        disciple.name, disciple.realm
+                    ),
+                );
                 self.deceased_disciples.push(DeceasedDisciple::new(
                     disciple.name.clone(),
                     disciple.realm.clone(),
@@ -88,11 +111,27 @@ impl Game {
             }
             BreakthroughResult::Tribulation(t_type) => {
                 self.disciples[idx] = disciple.clone();
+                self.show_moment(
+                    MomentKind::Breakthrough,
+                    "Tribulation Clouds Gather",
+                    "Heaven tests the ambitious",
+                    format!(
+                        "{} has touched the threshold. Thunder gathers above the sect.",
+                        disciple.name
+                    ),
+                );
                 let trib_state = TribulationState::new(t_type, &disciple);
                 self.transition(StateTransition::ToTribulation(trib_state, idx));
             }
             BreakthroughResult::Blocked => {}
             _ => {
+                self.show_breakthrough_result_moment(
+                    &disciple_name,
+                    &previous_realm,
+                    previous_sub_stage,
+                    &disciple,
+                    result,
+                );
                 disciple.breakthrough_readiness = 0.0;
                 self.disciples[idx] = disciple;
             }
@@ -122,6 +161,63 @@ impl Game {
         beast.id = random::next_u64();
         self.event_log
             .push(format!("Recruited Spirit Beast: {}", def.name));
+        self.show_moment(
+            MomentKind::SpiritBeast,
+            "A Spirit Beast Answers",
+            "Ancient pact renewed",
+            format!(
+                "{} has accepted the sect's aura and now guards the mountain paths.",
+                def.name
+            ),
+        );
         self.spirit_beasts.push(beast);
+    }
+
+    fn show_breakthrough_result_moment(
+        &mut self,
+        disciple_name: &str,
+        previous_realm: &str,
+        previous_sub_stage: usize,
+        disciple: &crate::data::disciples::Disciple,
+        result: BreakthroughResult,
+    ) {
+        match result {
+            BreakthroughResult::Success => {
+                let changed_realm = disciple.realm != previous_realm;
+                let changed_stage = disciple.sub_stage != previous_sub_stage;
+                if changed_realm || changed_stage {
+                    self.show_moment(
+                        MomentKind::Breakthrough,
+                        "Heaven and Earth Qi Gathers",
+                        "Breakthrough achieved",
+                        format!(
+                            "{} advances on the immortal road. The sect annals record a new step in {}.",
+                            disciple_name,
+                            self.realm_display_name(&disciple.realm)
+                        ),
+                    );
+                }
+            }
+            BreakthroughResult::Injured => {
+                self.show_moment(
+                    MomentKind::Tragedy,
+                    "Meridians Burn Like Fire",
+                    "Breakthrough failed",
+                    format!(
+                        "{} survived the backlash, but the path to immortality has demanded blood.",
+                        disciple_name
+                    ),
+                );
+            }
+            _ => {}
+        }
+    }
+
+    fn realm_display_name(&self, realm_id: &str) -> String {
+        self.data
+            .stages
+            .get(realm_id)
+            .map(|stage| stage.name.clone())
+            .unwrap_or_else(|| realm_id.to_string())
     }
 }

@@ -93,6 +93,7 @@ impl Game {
                     show_ai_debug: false,
                     textures,
                     fonts,
+                    active_moment: None,
                 };
 
                 // Restore building states

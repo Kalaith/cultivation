@@ -1,5 +1,6 @@
 use super::super::Game;
 use crate::data::missions::{MissionOutcome, OngoingMission};
+use crate::game::moments::MomentKind;
 use crate::state::StateTransition;
 
 impl Game {
@@ -52,8 +53,18 @@ impl Game {
             if !self.discovered_recipes.contains(recipe_id) {
                 self.discovered_recipes.push(recipe_id.clone());
                 if let Some(recipe) = self.data.recipes.iter().find(|r| r.id == *recipe_id) {
+                    let recipe_name = recipe.name.clone();
                     self.event_log
-                        .push(format!("Discovered recipe: {}!", recipe.name));
+                        .push(format!("Discovered recipe: {}!", recipe_name));
+                    self.show_moment(
+                        MomentKind::Discovery,
+                        "A Forgotten Technique Has Been Found",
+                        "Archive expanded",
+                        format!(
+                            "{} has been returned from the outside world and entered into the sect records.",
+                            recipe_name
+                        ),
+                    );
                 }
             }
         }
@@ -98,11 +109,21 @@ impl Game {
             });
 
             if mission_matches {
+                let disciple_name = disciple.name.clone();
                 self.event_log.push(format!(
                     "{} overcame their bottleneck: Complete a {} mission!",
-                    disciple.name, mt
+                    disciple_name, mt
                 ));
                 disciple.breakthrough_bottleneck = None;
+                self.show_moment(
+                    MomentKind::Breakthrough,
+                    "A Bottleneck Cracks",
+                    "The Dao path opens",
+                    format!(
+                        "{} has resolved the trial demanded by fate. Their next breakthrough is within reach.",
+                        disciple_name
+                    ),
+                );
             }
         }
     }

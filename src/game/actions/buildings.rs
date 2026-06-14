@@ -2,6 +2,7 @@ use super::super::Game;
 use crate::data::buildings::BuildingType;
 use crate::data::disciples::DiscipleRank;
 use crate::engine::random;
+use crate::game::moments::MomentKind;
 
 impl Game {
     pub(in crate::game) fn handle_upgrade_building(&mut self, building_type: BuildingType) {
@@ -53,9 +54,19 @@ impl Game {
         }
 
         self.spirit_stones -= cost;
+        let building_type = building.building_type.clone();
         building.status = crate::data::buildings::BuildingStatus::Active;
         self.event_log
             .push(format!("Repaired {}!", building.building_type));
+        self.show_moment(
+            MomentKind::Founding,
+            "A Hall Rises From Ruin",
+            "Sect grounds restored",
+            format!(
+                "{} has been restored. Incense smoke climbs again from the fallen mountain.",
+                building_type
+            ),
+        );
     }
 
     pub(in crate::game) fn handle_construct_building(
@@ -100,6 +111,15 @@ impl Game {
         self.data.buildings.push(new_b);
         self.event_log
             .push(format!("Constructed {} at {},{}", b_type, x, y));
+        self.show_moment(
+            MomentKind::Founding,
+            "New Hall Raised",
+            "The mountain grows stronger",
+            format!(
+                "{} now stands among the sect grounds, a promise carved into stone and jade.",
+                b_type
+            ),
+        );
 
         let new_recipes: Vec<String> = self
             .data
@@ -110,8 +130,18 @@ impl Game {
             .collect();
         for recipe_id in &new_recipes {
             if let Some(recipe) = self.data.recipes.iter().find(|r| r.id == *recipe_id) {
+                let recipe_name = recipe.name.clone();
                 self.event_log
-                    .push(format!("Discovered recipe: {}!", recipe.name));
+                    .push(format!("Discovered recipe: {}!", recipe_name));
+                self.show_moment(
+                    MomentKind::Discovery,
+                    "A Forgotten Method Surfaces",
+                    "Recipe discovered",
+                    format!(
+                        "{} has been copied into the sect archive for future refinement.",
+                        recipe_name
+                    ),
+                );
             }
             self.discovered_recipes.push(recipe_id.clone());
         }

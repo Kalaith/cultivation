@@ -52,6 +52,182 @@ pub fn draw_screen_title(title: &str, subtitle: &str, x: f32, y: f32) {
     }
 }
 
+pub fn draw_mountain_sect_backdrop() {
+    let sw = screen_width();
+    let sh = screen_height();
+
+    for i in 0..10 {
+        let t = i as f32 / 10.0;
+        draw_rectangle(
+            0.0,
+            sh * t,
+            sw,
+            sh / 10.0 + 1.0,
+            Color::new(0.16 - t * 0.07, 0.22 - t * 0.09, 0.24 - t * 0.10, 1.0),
+        );
+    }
+
+    draw_circle(
+        sw * 0.72,
+        sh * 0.20,
+        78.0,
+        Color::new(PRIMARY.r, PRIMARY.g, PRIMARY.b, 0.12),
+    );
+    draw_circle_lines(
+        sw * 0.72,
+        sh * 0.20,
+        98.0,
+        2.0,
+        Color::new(PRIMARY.r, PRIMARY.g, PRIMARY.b, 0.10),
+    );
+
+    draw_backdrop_mountains(
+        sh * 0.66,
+        Color::new(0.31, 0.42, 0.43, 0.42),
+        Color::new(0.14, 0.20, 0.21, 0.36),
+        0.03,
+    );
+    draw_backdrop_mountains(
+        sh * 0.78,
+        Color::new(0.14, 0.18, 0.18, 0.74),
+        Color::new(0.07, 0.09, 0.09, 0.70),
+        -0.02,
+    );
+    draw_backdrop_sect(sw * 0.54, sh * 0.58, sw.min(sh) * 0.22);
+    draw_backdrop_waterfall(sw * 0.58, sh * 0.34, sh * 0.54);
+    draw_backdrop_clouds(sh * 0.35, 0.22);
+    draw_backdrop_clouds(sh * 0.76, 0.28);
+
+    draw_rectangle(0.0, 0.0, sw, sh, Color::new(0.02, 0.015, 0.01, 0.30));
+    draw_rectangle(0.0, 0.0, sw * 0.40, sh, Color::new(0.02, 0.015, 0.01, 0.22));
+    draw_rectangle(
+        0.0,
+        sh * 0.82,
+        sw,
+        sh * 0.18,
+        Color::new(0.02, 0.015, 0.01, 0.28),
+    );
+}
+
+fn draw_backdrop_mountains(base_y: f32, ridge: Color, shade: Color, offset: f32) {
+    let sw = screen_width();
+    let sh = screen_height();
+    let peaks: [(f32, f32); 8] = [
+        (-0.08 + offset, 0.28),
+        (0.06 + offset, 0.12),
+        (0.20 + offset, 0.32),
+        (0.34 + offset, 0.08),
+        (0.49 + offset, 0.30),
+        (0.66 + offset, 0.10),
+        (0.84 + offset, 0.36),
+        (1.08 + offset, 0.16),
+    ];
+
+    for window in peaks.windows(2) {
+        let (left, lh) = window[0];
+        let (right, rh) = window[1];
+        let peak_x = sw * ((left + right) * 0.5);
+        let peak_y = sh * (0.13 + lh.min(rh) * 0.36);
+        draw_triangle(
+            vec2(sw * left, base_y),
+            vec2(peak_x, peak_y),
+            vec2(sw * right, base_y),
+            ridge,
+        );
+        draw_triangle(
+            vec2(peak_x, peak_y),
+            vec2(sw * right, base_y),
+            vec2(peak_x + sw * 0.04, base_y),
+            shade,
+        );
+    }
+}
+
+fn draw_backdrop_sect(center_x: f32, base_y: f32, scale: f32) {
+    let roof = Color::new(0.10, 0.07, 0.05, 0.86);
+    let wall = Color::new(0.40, 0.30, 0.20, 0.38);
+    let trim = Color::new(PRIMARY.r, PRIMARY.g, PRIMARY.b, 0.32);
+    let tier_w = scale;
+    let tier_h = scale * 0.26;
+
+    for i in 0..3 {
+        let y = base_y - i as f32 * tier_h * 0.90;
+        let w = tier_w * (1.0 - i as f32 * 0.20);
+        let x = center_x - w * 0.5;
+        draw_rectangle(
+            x + w * 0.12,
+            y - tier_h * 0.55,
+            w * 0.76,
+            tier_h * 0.55,
+            wall,
+        );
+        draw_triangle(
+            vec2(x, y - tier_h * 0.42),
+            vec2(center_x, y - tier_h),
+            vec2(x + w, y - tier_h * 0.42),
+            roof,
+        );
+        draw_line(
+            x + 7.0,
+            y - tier_h * 0.43,
+            x + w - 7.0,
+            y - tier_h * 0.43,
+            2.0,
+            trim,
+        );
+    }
+
+    draw_rectangle(
+        center_x - tier_w * 0.38,
+        base_y,
+        tier_w * 0.76,
+        tier_h * 0.15,
+        Color::new(0.05, 0.04, 0.03, 0.70),
+    );
+}
+
+fn draw_backdrop_waterfall(x: f32, y: f32, height: f32) {
+    for i in 0..5 {
+        let offset = (i as f32 - 2.0) * 7.0;
+        draw_line(
+            x + offset,
+            y,
+            x - 36.0 + offset * 0.6,
+            y + height,
+            8.0 - i as f32,
+            Color::new(0.64, 0.90, 0.96, 0.040 + i as f32 * 0.010),
+        );
+    }
+}
+
+fn draw_backdrop_clouds(y: f32, alpha: f32) {
+    let sw = screen_width();
+    let clouds = [
+        (0.08, 38.0),
+        (0.18, 52.0),
+        (0.32, 35.0),
+        (0.64, 46.0),
+        (0.78, 58.0),
+        (0.92, 42.0),
+    ];
+
+    for (x_factor, radius) in clouds {
+        let x = sw * x_factor;
+        draw_circle(
+            x,
+            y + (x_factor * 31.0).sin() * 15.0,
+            radius,
+            Color::new(0.86, 0.84, 0.72, alpha * 0.26),
+        );
+        draw_circle(
+            x + radius * 0.55,
+            y + 18.0,
+            radius * 0.72,
+            Color::new(0.86, 0.84, 0.72, alpha * 0.18),
+        );
+    }
+}
+
 pub fn draw_ink_divider(x: f32, y: f32, width: f32) {
     draw_line(
         x,
