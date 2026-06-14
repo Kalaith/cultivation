@@ -12,14 +12,13 @@ impl FontManager {
 
     /// Load all game fonts asynchronously
     pub async fn load_all(&mut self) {
-        // Try to load brush-style font for buttons
-        match load_ttf_font("assets/fonts/brush.ttf").await {
+        match macroquad_toolkit::ui::load_builtin_rajdhani_semibold_font() {
             Ok(font) => {
                 self.brush_font = Some(font);
-                println!("Loaded brush font");
+                let _ = macroquad_toolkit::ui::ensure_default_ui_font();
             }
             Err(e) => {
-                eprintln!("Could not load brush font: {} - using default", e);
+                eprintln!("Could not load toolkit UI font: {} - using default", e);
             }
         }
     }

@@ -12,9 +12,10 @@ use crate::state::{
 use crate::ui::components::{draw_panel, draw_progress_bar};
 use crate::ui::theme::*;
 use macroquad::prelude::{
-    draw_rectangle, draw_text, is_key_pressed, screen_height, screen_width, Color, KeyCode, Rect,
+    draw_rectangle, is_key_pressed, screen_height, screen_width, Color, KeyCode, Rect,
 };
 use macroquad_toolkit::rng as game_rng;
+use macroquad_toolkit::ui::draw_ui_text;
 use std::collections::HashSet;
 
 impl Game {
@@ -326,6 +327,7 @@ impl Game {
                 self.herbs,
                 self.influence,
                 self.relics,
+                &self.sect_name,
                 &self.inventory,
                 &self.unlocked_techs,
                 &self.event_log,
@@ -431,7 +433,7 @@ impl Game {
         );
 
         let mut y = panel_y + 55.0;
-        draw_text(
+        draw_ui_text(
             &format!(
                 "Assignments: {}  Reservations: {}",
                 self.scheduler.assignment_count(),
@@ -455,7 +457,7 @@ impl Game {
                 .map(|a| format!("{} ({}t)", a.task.task_type, a.ticks_remaining))
                 .unwrap_or_else(|| "Idle".to_string());
 
-            draw_text(
+            draw_ui_text(
                 &format!("{} [{}]", disciple.name, task_label),
                 panel_x + 15.0,
                 y,
@@ -467,7 +469,7 @@ impl Game {
             let bar_w = panel_w - 30.0;
             let bar_h = 10.0;
 
-            draw_text(
+            draw_ui_text(
                 "Hunger",
                 panel_x + 15.0,
                 y + 10.0,
@@ -481,7 +483,7 @@ impl Game {
             );
             y += 16.0;
 
-            draw_text(
+            draw_ui_text(
                 "Rest",
                 panel_x + 15.0,
                 y + 10.0,
@@ -495,7 +497,7 @@ impl Game {
             );
             y += 16.0;
 
-            draw_text(
+            draw_ui_text(
                 "Qi",
                 panel_x + 15.0,
                 y + 10.0,
@@ -509,7 +511,7 @@ impl Game {
             );
             y += 16.0;
 
-            draw_text(
+            draw_ui_text(
                 "Morale",
                 panel_x + 15.0,
                 y + 10.0,

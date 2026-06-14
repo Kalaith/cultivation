@@ -1,4 +1,6 @@
 use super::*;
+use crate::data::missions::{Mission, MissionType};
+use macroquad_toolkit::ui::draw_ui_text;
 
 impl SectBaseState {
     pub(super) fn draw_building_details(
@@ -75,7 +77,7 @@ impl SectBaseState {
         disciples: &[Disciple],
     ) {
         let b_type = &building.building_type;
-        draw_text(
+        draw_ui_text(
             &format!("{}", b_type),
             rect.x + 20.0,
             rect.y + 60.0,
@@ -83,14 +85,14 @@ impl SectBaseState {
             PRIMARY,
         );
         let d_y = rect.y + 100.0;
-        draw_text(
+        draw_ui_text(
             &format!("Level: {}", building.level),
             rect.x + 20.0,
             d_y,
             FONT_BODY_SIZE,
             TEXT_PRIMARY,
         );
-        draw_text(
+        draw_ui_text(
             &format!("Element: {:?}", building.element),
             rect.x + 20.0,
             d_y + 30.0,
@@ -104,7 +106,7 @@ impl SectBaseState {
         } else {
             TEXT_SECONDARY
         };
-        draw_text(
+        draw_ui_text(
             &format!("Feng Shui: {:.1}", building.feng_shui_score),
             rect.x + 20.0,
             d_y + 60.0,
@@ -125,7 +127,7 @@ impl SectBaseState {
         if building.building_type == BuildingType::SectHall {
             let capacity: u32 = self.calculate_population_capacity_from_buildings(disciples, &[]);
             let _ = capacity; // drawn below
-            draw_text(
+            draw_ui_text(
                 &format!(
                     "Population: {}/{}",
                     disciples.len(),
@@ -220,7 +222,7 @@ impl SectBaseState {
         b_type: &BuildingType,
         action_y: f32,
     ) -> Option<UpdateResult> {
-        draw_text(
+        draw_ui_text(
             "(Ruined)",
             rect.x + 200.0,
             rect.y + 60.0,
@@ -535,7 +537,15 @@ impl SectBaseState {
         completed_history: &[String],
         start_y: f32,
     ) -> Option<UpdateResult> {
-        let mut m_y = start_y;
+        let list_rect = Rect::new(
+            rect.x + 20.0,
+            start_y,
+            rect.w - 40.0,
+            rect.h - start_y + rect.y - 95.0,
+        );
+        let card_h = 74.0;
+        let card_gap = 10.0;
+        let mut available_missions: Vec<&Mission> = Vec::new();
         let mut selected_available = false;
         let selected_desc = self.selected_mission.clone();
         let mouse = vec2(mouse_position().0, mouse_position().1);
@@ -558,37 +568,86 @@ impl SectBaseState {
             if !available {
                 continue;
             }
+            available_missions.push(mission);
+        }
 
-            let is_selected = selected_desc.as_deref() == Some(mission.description.as_str());
-            let raw_label = mission.description.clone();
-            let label = if raw_label.len() > 60 {
-                format!("{}...", &raw_label[..57])
+        let total_h = available_missions.len() as f32 * (card_h + card_gap);
+        if list_rect.contains(mouse.into()) {
+            let wheel = mouse_wheel().1;
+            if total_h > list_rect.h {
+                self.mission_scroll -= wheel * 32.0;
+                self.mission_scroll = self
+                    .mission_scroll
+                    .clamp(0.0, (total_h - list_rect.h).max(0.0));
             } else {
-                raw_label.clone()
-            };
-            let btn_rect = Rect::new(rect.x + 20.0, m_y, rect.w - 40.0, 42.0);
+                self.mission_scroll = 0.0;
+            }
+        }
 
+        draw_ui_text(
+            "Mission Board",
+            rect.x + 20.0,
+            start_y - 16.0,
+            FONT_HEADER_SIZE,
+            PRIMARY,
+        );
+
+        let mut m_y = list_rect.y - self.mission_scroll;
+        for mission in available_missions {
+            let card_rect = Rect::new(list_rect.x, m_y, list_rect.w, card_h);
+            let is_selected = selected_desc.as_deref() == Some(mission.description.as_str());
             if is_selected {
-                if draw_button(btn_rect, &label, true) {
-                    self.selected_mission = Some(mission.description.clone());
-                }
                 selected_available = true;
-            } else if draw_button_muted(btn_rect, &label, false) {
+            }
+
+            if card_rect.y + card_h >= list_rect.y && card_rect.y <= list_rect.y + list_rect.h {
+                self.draw_mission_card(card_rect, mission, is_selected);
+            }
+
+            if card_rect.contains(mouse.into()) && is_mouse_button_pressed(MouseButton::Left) {
                 self.selected_mission = Some(mission.description.clone());
             }
 
-            if btn_rect.contains(mouse.into()) && raw_label.len() > label.len() {
-                draw_tooltip(mouse, &raw_label);
+            if card_rect.contains(mouse.into()) {
+                draw_tooltip(
+                    mouse,
+                    &format!(
+                        "{}\nRisk {} | {} ticks",
+                        mission.description, mission.danger_level, mission.duration
+                    ),
+                );
             }
 
-            m_y += 50.0;
+            m_y += card_h + card_gap;
+        }
+
+        if total_h > list_rect.h {
+            let track_x = list_rect.x + list_rect.w - 7.0;
+            let handle_h = (list_rect.h * list_rect.h / total_h).max(24.0);
+            let max_offset = (total_h - list_rect.h).max(1.0);
+            let handle_y =
+                list_rect.y + (self.mission_scroll / max_offset) * (list_rect.h - handle_h);
+            draw_rectangle(
+                track_x,
+                list_rect.y,
+                3.0,
+                list_rect.h,
+                Color::new(0.0, 0.0, 0.0, 0.32),
+            );
+            draw_rectangle(
+                track_x - 1.0,
+                handle_y,
+                5.0,
+                handle_h,
+                Color::new(PRIMARY.r, PRIMARY.g, PRIMARY.b, 0.62),
+            );
         }
 
         if let Some(selected) = &self.selected_mission {
             if selected_available {
                 let btn_rect =
                     Rect::new(rect.x + 20.0, rect.y + rect.h - 60.0, rect.w - 40.0, 40.0);
-                if draw_button(btn_rect, "Assign selected mission", false) {
+                if draw_button(btn_rect, "Send disciples beyond the gate", false) {
                     return Some(
                         UpdateResult::new().with_transition(StateTransition::ToMissionAssignment(
                             selected.clone(),
@@ -596,7 +655,7 @@ impl SectBaseState {
                     );
                 }
             } else {
-                draw_text(
+                draw_ui_text(
                     "Selected mission unavailable.",
                     rect.x + 20.0,
                     rect.y + rect.h - 30.0,
@@ -606,5 +665,120 @@ impl SectBaseState {
             }
         }
         None
+    }
+
+    fn draw_mission_card(&self, rect: Rect, mission: &Mission, selected: bool) {
+        let hover = rect.contains(mouse_position().into());
+        let alpha = if selected {
+            0.74
+        } else if hover {
+            0.52
+        } else {
+            0.34
+        };
+        let accent = mission_type_color(&mission.mission_type);
+        draw_rectangle(
+            rect.x,
+            rect.y,
+            rect.w,
+            rect.h,
+            Color::new(0.035, 0.028, 0.02, alpha),
+        );
+        draw_rectangle_lines(
+            rect.x,
+            rect.y,
+            rect.w,
+            rect.h,
+            if selected { 2.0 } else { 1.0 },
+            Color::new(
+                accent.r,
+                accent.g,
+                accent.b,
+                if selected { 0.88 } else { 0.38 },
+            ),
+        );
+        draw_rectangle(
+            rect.x,
+            rect.y,
+            5.0,
+            rect.h,
+            Color::new(accent.r, accent.g, accent.b, 0.72),
+        );
+
+        let title = mission_title(&mission.description);
+        draw_ui_text(
+            title,
+            rect.x + 16.0,
+            rect.y + 24.0,
+            FONT_BODY_SIZE,
+            if selected {
+                TEXT_PRIMARY
+            } else {
+                Color::new(TEXT_PRIMARY.r, TEXT_PRIMARY.g, TEXT_PRIMARY.b, 0.78)
+            },
+        );
+        draw_ui_text(
+            &format!(
+                "{} path | Risk {} | {} ticks",
+                mission_type_label(&mission.mission_type),
+                mission.danger_level,
+                mission.duration
+            ),
+            rect.x + 16.0,
+            rect.y + 47.0,
+            FONT_SMALL_SIZE,
+            Color::new(
+                TEXT_SECONDARY.r,
+                TEXT_SECONDARY.g,
+                TEXT_SECONDARY.b,
+                if selected { 0.92 } else { 0.62 },
+            ),
+        );
+        draw_ui_text(
+            mission_spoils(&mission.mission_type),
+            rect.x + rect.w - 205.0,
+            rect.y + 47.0,
+            FONT_SMALL_SIZE,
+            Color::new(
+                PRIMARY.r,
+                PRIMARY.g,
+                PRIMARY.b,
+                if selected { 0.9 } else { 0.48 },
+            ),
+        );
+    }
+}
+
+fn mission_title(description: &str) -> &str {
+    description.trim_end_matches('.')
+}
+
+fn mission_type_label(mission_type: &MissionType) -> &'static str {
+    match mission_type {
+        MissionType::Exploration => "Scout",
+        MissionType::ResourceGathering => "Gather",
+        MissionType::MonsterSuppression => "Hunt",
+        MissionType::Diplomacy => "Treaty",
+        MissionType::RuinDelve => "Ruin",
+    }
+}
+
+fn mission_spoils(mission_type: &MissionType) -> &'static str {
+    match mission_type {
+        MissionType::Exploration => "Spoils: rumors, herbs",
+        MissionType::ResourceGathering => "Spoils: ore, stones",
+        MissionType::MonsterSuppression => "Spoils: hides, prestige",
+        MissionType::Diplomacy => "Spoils: favor, trade",
+        MissionType::RuinDelve => "Spoils: relics, techniques",
+    }
+}
+
+fn mission_type_color(mission_type: &MissionType) -> Color {
+    match mission_type {
+        MissionType::Exploration => SECONDARY,
+        MissionType::ResourceGathering => PRIMARY,
+        MissionType::MonsterSuppression => ACCENT,
+        MissionType::Diplomacy => SUCCESS,
+        MissionType::RuinDelve => WARNING,
     }
 }

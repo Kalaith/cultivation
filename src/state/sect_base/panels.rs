@@ -1,4 +1,5 @@
 use super::*;
+use macroquad_toolkit::ui::{draw_ui_text, measure_ui_text};
 
 impl SectBaseState {
     pub(super) fn draw_header(
@@ -9,28 +10,26 @@ impl SectBaseState {
         herbs: u32,
         influence: u32,
         relics: u32,
+        sect_name: &str,
         current_season: &Season,
         season_ticks: u32,
         tutorial: &mut TutorialState,
     ) {
         draw_panel(Rect::new(0.0, 0.0, screen_w, header_h), None);
-        draw_text("SECT MANAGEMENT", 20.0, 40.0, FONT_TITLE_SIZE, PRIMARY);
+        let title = if sect_name == "Unnamed Sect" {
+            "Fallen Peak Sect"
+        } else {
+            sect_name
+        };
+        draw_screen_title(title, "Patriarch's command archive", 20.0, 31.0);
 
-        herbs::draw_season_indicator(250.0, 40.0, current_season, season_ticks);
+        herbs::draw_season_indicator(275.0, 40.0, current_season, season_ticks);
 
-        let res_text = format!(
-            "SS: {}  Herbs: {}  Infl: {}  Relics: {}",
-            spirit_stones, herbs, influence, relics
-        );
-        let res_dims = measure_text(&res_text, None, FONT_HEADER_SIZE as u16, 1.0);
-
-        draw_text(
-            &res_text,
-            screen_w - res_dims.width - 60.0,
-            40.0,
-            FONT_HEADER_SIZE,
-            TEXT_HIGHLIGHT,
-        );
+        let mut res_x = screen_w - 620.0;
+        res_x += draw_resource_seal(res_x, 38.0, "Spirit Stones", spirit_stones, PRIMARY) + 8.0;
+        res_x += draw_resource_seal(res_x, 38.0, "Medicinal Herbs", herbs, SUCCESS) + 8.0;
+        res_x += draw_resource_seal(res_x, 38.0, "Sect Prestige", influence, SECONDARY) + 8.0;
+        draw_resource_seal(res_x, 38.0, "Ancient Relics", relics, WARNING);
 
         if tutorial.active && tutorial.hidden {
             if draw_button(Rect::new(screen_w - 100.0, 10.0, 40.0, 40.0), "?", false) {
@@ -50,8 +49,15 @@ impl SectBaseState {
         width: f32,
         data: &GameData,
     ) -> Option<UpdateResult> {
-        let rect = Rect::new(0.0, header_h, width, screen_h - header_h);
-        draw_panel(rect, Some("Buildings"));
+        let rect = Rect::new(16.0, header_h + 16.0, width, screen_h - header_h - 32.0);
+        draw_panel(rect, Some("Sect Grounds"));
+        draw_rectangle(
+            rect.x,
+            rect.y,
+            rect.w,
+            rect.h,
+            Color::new(0.0, 0.0, 0.0, 0.16),
+        );
 
         let mut btn_y = rect.y + 40.0;
         for building in &data.buildings {
@@ -71,44 +77,52 @@ impl SectBaseState {
             }
             btn_y += 40.0;
 
-            if btn_y > rect.y + rect.h - 200.0 {
-                draw_text("...", rect.x + 10.0, btn_y, FONT_SMALL_SIZE, TEXT_SECONDARY);
+            if btn_y > rect.y + rect.h - 315.0 {
+                draw_ui_text("...", rect.x + 10.0, btn_y, FONT_SMALL_SIZE, TEXT_SECONDARY);
                 break;
             }
         }
 
         let nav_y_start = rect.y + rect.h - 270.0;
+        draw_ink_divider(rect.x + 14.0, nav_y_start - 16.0, width - 28.0);
+        draw_ui_text(
+            "Sect Archives",
+            rect.x + 14.0,
+            nav_y_start - 24.0,
+            FONT_SMALL_SIZE,
+            TEXT_SECONDARY,
+        );
         if draw_button_muted(
             Rect::new(rect.x + 10.0, nav_y_start, width - 20.0, 40.0),
-            "Disciples",
+            "Character Scrolls",
             false,
         ) {
             return Some(UpdateResult::new().with_transition(StateTransition::ToDiscipleRoster));
         }
         if draw_button_muted(
             Rect::new(rect.x + 10.0, nav_y_start + 50.0, width - 20.0, 40.0),
-            "World Map",
+            "Regional Map",
             false,
         ) {
             return Some(UpdateResult::new().with_transition(StateTransition::ToWorldMap));
         }
         if draw_button_muted(
             Rect::new(rect.x + 10.0, nav_y_start + 100.0, width - 20.0, 40.0),
-            "Factions",
+            "Known Powers",
             false,
         ) {
             return Some(UpdateResult::new().with_transition(StateTransition::ToFactionScreen));
         }
         if draw_button_muted(
             Rect::new(rect.x + 10.0, nav_y_start + 150.0, width - 20.0, 40.0),
-            "Trade",
+            "Market Pavilion",
             false,
         ) {
             return Some(UpdateResult::new().with_transition(StateTransition::ToTradeScreen));
         }
         if draw_button_muted(
             Rect::new(rect.x + 10.0, nav_y_start + 200.0, width - 20.0, 40.0),
-            "Construction",
+            "Raise Halls",
             false,
         ) {
             self.view = SectView::Map;
@@ -122,13 +136,6 @@ impl SectBaseState {
             self.view = SectView::SpiritBeasts;
         }
 
-        draw_rectangle(
-            rect.x,
-            rect.y,
-            rect.w,
-            rect.h,
-            Color::new(0.0, 0.0, 0.0, 0.12),
-        );
         None
     }
 
@@ -141,24 +148,30 @@ impl SectBaseState {
         width: f32,
         event_log: &[String],
     ) {
-        let rect = Rect::new(left_w + center_w, header_h, width, screen_h - header_h);
+        let rect = Rect::new(
+            screen_width() - width - 16.0,
+            header_h + 16.0,
+            width,
+            screen_h - header_h - 32.0,
+        );
         self.draw_event_log_panel(rect, event_log, screen_h);
     }
 
     fn draw_event_log_panel(&self, rect: Rect, event_log: &[String], screen_h: f32) {
-        draw_panel(rect, Some("Event Log"));
+        draw_panel(rect, Some("Sect Annals"));
         draw_rectangle(
             rect.x,
             rect.y,
             rect.w,
             rect.h,
-            Color::new(0.0, 0.0, 0.0, 0.35),
+            Color::new(0.0, 0.0, 0.0, 0.22),
         );
 
         let mut log_y = rect.y + 50.0;
         let max_width = rect.w - 20.0;
 
-        for event in event_log.iter().rev().take(20) {
+        for (idx, event) in event_log.iter().rev().take(20).enumerate() {
+            let event_color = self.event_color(event, idx);
             let words: Vec<&str> = event.split_whitespace().collect();
             let mut current_line = String::new();
 
@@ -170,12 +183,12 @@ impl SectBaseState {
                 };
 
                 if test_line.len() as f32 * 7.0 > max_width {
-                    draw_text(
+                    draw_ui_text(
                         &current_line,
                         rect.x + 10.0,
                         log_y,
                         FONT_SMALL_SIZE,
-                        Color::new(TEXT_SECONDARY.r, TEXT_SECONDARY.g, TEXT_SECONDARY.b, 0.55),
+                        event_color,
                     );
                     log_y += 20.0;
                     current_line = word.to_string();
@@ -184,12 +197,12 @@ impl SectBaseState {
                 }
             }
             if !current_line.is_empty() {
-                draw_text(
+                draw_ui_text(
                     &current_line,
                     rect.x + 10.0,
                     log_y,
                     FONT_SMALL_SIZE,
-                    Color::new(TEXT_SECONDARY.r, TEXT_SECONDARY.g, TEXT_SECONDARY.b, 0.55),
+                    event_color,
                 );
                 log_y += 20.0;
             }
@@ -197,6 +210,25 @@ impl SectBaseState {
             if log_y > screen_h - 20.0 {
                 break;
             }
+        }
+    }
+
+    fn event_color(&self, event: &str, idx: usize) -> Color {
+        let lower = event.to_ascii_lowercase();
+        let base_alpha = (0.78 - idx as f32 * 0.035).clamp(0.35, 0.78);
+        if lower.contains("breakthrough") || lower.contains("ready") {
+            Color::new(WARNING.r, WARNING.g, WARNING.b, base_alpha)
+        } else if lower.contains("war") || lower.contains("cannot") || lower.contains("danger") {
+            Color::new(FAILURE.r, FAILURE.g, FAILURE.b, base_alpha)
+        } else if lower.contains("recovered") || lower.contains("saved") {
+            Color::new(SUCCESS.r, SUCCESS.g, SUCCESS.b, base_alpha)
+        } else {
+            Color::new(
+                TEXT_SECONDARY.r,
+                TEXT_SECONDARY.g,
+                TEXT_SECONDARY.b,
+                base_alpha,
+            )
         }
     }
 

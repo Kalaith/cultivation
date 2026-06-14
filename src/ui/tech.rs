@@ -8,6 +8,7 @@ use crate::engine::actions::Action;
 use crate::ui::components::*;
 use crate::ui::theme::*;
 use macroquad::prelude::*;
+use macroquad_toolkit::ui::draw_ui_text;
 
 /// State for the tech tree modal
 pub struct TechTreeState {
@@ -71,7 +72,7 @@ pub fn draw_tech_tree_modal(
     );
 
     // Spirit stones display
-    draw_text(
+    draw_ui_text(
         &format!("Spirit Stones: {}", spirit_stones),
         modal_x + 200.0,
         modal_y + 28.0,
@@ -143,7 +144,7 @@ pub fn draw_tech_tree_modal(
     // Draw scroll indicators and scrollbar if needed
     if total_height > content_h {
         if state.scroll_offset > 0.0 {
-            draw_text(
+            draw_ui_text(
                 "^ Scroll up ^",
                 modal_x + modal_w / 2.0 - 40.0,
                 content_y + 15.0,
@@ -152,7 +153,7 @@ pub fn draw_tech_tree_modal(
             );
         }
         if state.scroll_offset < total_height - content_h {
-            draw_text(
+            draw_ui_text(
                 "v Scroll down v",
                 modal_x + modal_w / 2.0 - 45.0,
                 modal_y + modal_h - 15.0,
@@ -301,14 +302,14 @@ fn draw_tech_entry(
         TEXT_SECONDARY
     };
 
-    draw_text(status_icon, x + 10.0, text_y, FONT_BODY_SIZE, name_color);
-    draw_text(&tech.name, x + 50.0, text_y, FONT_HEADER_SIZE, name_color);
+    draw_ui_text(status_icon, x + 10.0, text_y, FONT_BODY_SIZE, name_color);
+    draw_ui_text(&tech.name, x + 50.0, text_y, FONT_HEADER_SIZE, name_color);
 
     // Cost (right-aligned)
     if !is_unlocked {
         let cost_text = format!("{} SS", tech.cost_spirit_stones);
         let cost_color = if can_afford { TEXT_HIGHLIGHT } else { FAILURE };
-        draw_text(
+        draw_ui_text(
             &cost_text,
             x + width - 100.0,
             text_y,
@@ -325,7 +326,7 @@ fn draw_tech_entry(
     } else {
         tech.description.clone()
     };
-    draw_text(&desc, x + 15.0, text_y, FONT_SMALL_SIZE, TEXT_SECONDARY);
+    draw_ui_text(&desc, x + 15.0, text_y, FONT_SMALL_SIZE, TEXT_SECONDARY);
 
     text_y += 20.0;
 
@@ -352,7 +353,7 @@ fn draw_tech_entry(
         }
 
         let unlocks_text = format!("Unlocks: {}", unlocks_parts.join(" | "));
-        draw_text(&unlocks_text, x + 15.0, text_y, FONT_SMALL_SIZE, SECONDARY);
+        draw_ui_text(&unlocks_text, x + 15.0, text_y, FONT_SMALL_SIZE, SECONDARY);
         text_y += 20.0;
     }
 
@@ -372,7 +373,7 @@ fn draw_tech_entry(
             .collect();
 
         let prereq_color = if prereqs_met { TEXT_SECONDARY } else { FAILURE };
-        draw_text(
+        draw_ui_text(
             &format!("Requires: {}", prereq_names.join(", ")),
             x + 15.0,
             text_y,
@@ -388,7 +389,7 @@ fn draw_tech_entry(
             return Some(Action::ResearchTech(tech.id.clone()));
         }
     } else if is_unlocked {
-        draw_text(
+        draw_ui_text(
             "Learned",
             x + width - 80.0,
             y + entry_height - 25.0,

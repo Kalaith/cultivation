@@ -3,6 +3,7 @@ use crate::state::{StateTransition, UpdateResult};
 use crate::ui::components::*;
 use crate::ui::theme::*;
 use macroquad::prelude::*;
+use macroquad_toolkit::ui::draw_ui_text;
 use std::collections::HashMap;
 
 pub struct TradeScreenState {
@@ -33,8 +34,8 @@ impl TradeScreenState {
 
         // Header
         draw_panel(Rect::new(0.0, 0.0, screen_w, 60.0), None);
-        draw_text("TRADE & ECONOMY", 20.0, 40.0, FONT_TITLE_SIZE, PRIMARY);
-        draw_text(
+        draw_ui_text("TRADE & ECONOMY", 20.0, 40.0, FONT_TITLE_SIZE, PRIMARY);
+        draw_ui_text(
             &format!("Spirit Stones: {}", spirit_stones),
             screen_w - 250.0,
             40.0,
@@ -69,7 +70,7 @@ impl TradeScreenState {
             };
             draw_rectangle(item_rect.x, item_rect.y, item_rect.w, item_rect.h, bg_color);
 
-            draw_text(
+            draw_ui_text(
                 &node.name,
                 item_rect.x + 10.0,
                 item_rect.y + 22.0,
@@ -86,7 +87,7 @@ impl TradeScreenState {
                     .map(|f| f.name.clone())
                     .unwrap_or_else(|| node.controller_faction_id.clone())
             };
-            draw_text(
+            draw_ui_text(
                 &format!("Controlled by: {}", controller),
                 item_rect.x + 10.0,
                 item_rect.y + 40.0,
@@ -103,7 +104,7 @@ impl TradeScreenState {
 
         // Trade Routes section
         y += 20.0;
-        draw_text("Trade Routes", 20.0, y, FONT_HEADER_SIZE, ACCENT);
+        draw_ui_text("Trade Routes", 20.0, y, FONT_HEADER_SIZE, ACCENT);
         y += 25.0;
 
         for route in &world_sim.economy.routes {
@@ -116,7 +117,7 @@ impl TradeScreenState {
             };
 
             let status = if route.active { "Active" } else { "Inactive" };
-            draw_text(
+            draw_ui_text(
                 &format!(
                     "{} <-> {} [{}] Safety: {:.0}%",
                     route.from_node,
@@ -144,11 +145,11 @@ impl TradeScreenState {
                 let mut dy = content_y + 60.0;
                 let dx = detail_x + 20.0;
 
-                draw_text(&node.name, dx, dy, FONT_TITLE_SIZE, PRIMARY);
+                draw_ui_text(&node.name, dx, dy, FONT_TITLE_SIZE, PRIMARY);
                 dy += 40.0;
 
                 // Show prices
-                draw_text("Available Goods:", dx, dy, FONT_BODY_SIZE, TEXT_PRIMARY);
+                draw_ui_text("Available Goods:", dx, dy, FONT_BODY_SIZE, TEXT_PRIMARY);
                 dy += 25.0;
 
                 // Header
@@ -157,10 +158,10 @@ impl TradeScreenState {
                 let col3 = dx + 250.0;
                 let col4 = dx + 350.0;
 
-                draw_text("Item", col1, dy, FONT_SMALL_SIZE, TEXT_SECONDARY);
-                draw_text("Base Price", col2, dy, FONT_SMALL_SIZE, TEXT_SECONDARY);
-                draw_text("Supply", col3, dy, FONT_SMALL_SIZE, TEXT_SECONDARY);
-                draw_text("Demand", col4, dy, FONT_SMALL_SIZE, TEXT_SECONDARY);
+                draw_ui_text("Item", col1, dy, FONT_SMALL_SIZE, TEXT_SECONDARY);
+                draw_ui_text("Base Price", col2, dy, FONT_SMALL_SIZE, TEXT_SECONDARY);
+                draw_ui_text("Supply", col3, dy, FONT_SMALL_SIZE, TEXT_SECONDARY);
+                draw_ui_text("Demand", col4, dy, FONT_SMALL_SIZE, TEXT_SECONDARY);
                 dy += 20.0;
 
                 // Line separator
@@ -190,8 +191,8 @@ impl TradeScreenState {
                         .collect::<Vec<String>>()
                         .join(" ");
 
-                    draw_text(&item_name, col1, dy, FONT_SMALL_SIZE, TEXT_PRIMARY);
-                    draw_text(&format!("{} SS", price), col2, dy, FONT_SMALL_SIZE, WARNING);
+                    draw_ui_text(&item_name, col1, dy, FONT_SMALL_SIZE, TEXT_PRIMARY);
+                    draw_ui_text(&format!("{} SS", price), col2, dy, FONT_SMALL_SIZE, WARNING);
 
                     let supply_color = if supply > 100 {
                         SUCCESS
@@ -200,7 +201,7 @@ impl TradeScreenState {
                     } else {
                         FAILURE
                     };
-                    draw_text(
+                    draw_ui_text(
                         &format!("{}", supply),
                         col3,
                         dy,
@@ -215,7 +216,7 @@ impl TradeScreenState {
                     } else {
                         TEXT_SECONDARY
                     };
-                    draw_text(
+                    draw_ui_text(
                         &format!("{:.1}x", demand),
                         col4,
                         dy,
@@ -229,11 +230,11 @@ impl TradeScreenState {
                 dy += 20.0;
 
                 // Your inventory section
-                draw_text("Your Inventory:", dx, dy, FONT_BODY_SIZE, ACCENT);
+                draw_ui_text("Your Inventory:", dx, dy, FONT_BODY_SIZE, ACCENT);
                 dy += 25.0;
 
                 if inventory.is_empty() {
-                    draw_text(
+                    draw_ui_text(
                         "No items in inventory",
                         dx,
                         dy,
@@ -244,7 +245,7 @@ impl TradeScreenState {
                     for (item_id, count) in inventory {
                         if *count > 0 {
                             let item_name = item_id.replace('_', " ");
-                            draw_text(
+                            draw_ui_text(
                                 &format!("{}: {}", item_name, count),
                                 dx,
                                 dy,
@@ -260,9 +261,9 @@ impl TradeScreenState {
 
                 // Seasonal info
                 let season_mod = &world_sim.seasonal_modifiers;
-                draw_text("Seasonal Modifiers:", dx, dy, FONT_BODY_SIZE, ACCENT);
+                draw_ui_text("Seasonal Modifiers:", dx, dy, FONT_BODY_SIZE, ACCENT);
                 dy += 25.0;
-                draw_text(
+                draw_ui_text(
                     &format!(
                         "Trade Activity: {:.0}%",
                         season_mod.trade_activity_mod * 100.0
@@ -278,7 +279,7 @@ impl TradeScreenState {
                 );
             }
         } else {
-            draw_text(
+            draw_ui_text(
                 "Select a market to view prices",
                 detail_x + 20.0,
                 content_y + 100.0,

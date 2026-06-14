@@ -4,6 +4,7 @@ use crate::state::{StateTransition, UpdateResult};
 use crate::ui::components::draw_button;
 use crate::ui::theme::{FONT_SMALL_SIZE, FONT_TITLE_SIZE, PRIMARY, TEXT_HIGHLIGHT, TEXT_SECONDARY};
 use macroquad::prelude::*;
+use macroquad_toolkit::ui::{draw_ui_text, measure_ui_text};
 
 pub struct MainMenuState {
     has_save: bool,
@@ -57,7 +58,7 @@ impl MainMenuState {
 
         // Warning if save exists and hovering new game
         if self.has_save && new_game_btn.contains(mouse_position().into()) {
-            draw_text(
+            draw_ui_text(
                 "(This will overwrite your save)",
                 center_x - 110.0,
                 btn_y - 15.0,
@@ -75,8 +76,8 @@ impl MainMenuState {
 
     pub fn draw(&self, _data: &GameData, _spirit_stones: u32) {
         let title = "HEAVENLY MANDATE";
-        let dims = measure_text(title, None, FONT_TITLE_SIZE as u16, 1.0);
-        draw_text(
+        let dims = measure_ui_text(title, None, FONT_TITLE_SIZE as u16, 1.0);
+        draw_ui_text(
             title,
             screen_width() / 2.0 - dims.width / 2.0,
             150.0,
@@ -86,8 +87,8 @@ impl MainMenuState {
 
         // Subtitle
         let subtitle = "A Cultivation Sect Management Game";
-        let sub_dims = measure_text(subtitle, None, 20, 1.0);
-        draw_text(
+        let sub_dims = measure_ui_text(subtitle, None, 20, 1.0);
+        draw_ui_text(
             subtitle,
             screen_width() / 2.0 - sub_dims.width / 2.0,
             190.0,
@@ -96,7 +97,7 @@ impl MainMenuState {
         );
 
         // Version info
-        draw_text(
+        draw_ui_text(
             "v0.1.0",
             screen_width() - 60.0,
             screen_height() - 20.0,
@@ -106,7 +107,7 @@ impl MainMenuState {
 
         // Save indicator
         if self.has_save {
-            draw_text(
+            draw_ui_text(
                 "Save found",
                 20.0,
                 screen_height() - 20.0,

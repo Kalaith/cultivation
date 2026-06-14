@@ -1,9 +1,11 @@
-use crate::data::relations::ReputationTier;
+use crate::data::factions::{Faction, FactionSpecialty, FactionType};
+use crate::data::relations::{FactionRelation, ReputationTier};
 use crate::engine::world_sim::WorldSim;
 use crate::state::{StateTransition, UpdateResult};
 use crate::ui::components::*;
 use crate::ui::theme::*;
 use macroquad::prelude::*;
+use macroquad_toolkit::ui::draw_ui_text;
 
 pub struct FactionScreenState {
     selected_faction: Option<usize>,
@@ -25,285 +27,350 @@ impl FactionScreenState {
 
         let screen_w = screen_width();
         let screen_h = screen_height();
-
-        // Header
-        draw_panel(Rect::new(0.0, 0.0, screen_w, 60.0), None);
-        draw_text("FACTIONS & DIPLOMACY", 20.0, 40.0, FONT_TITLE_SIZE, PRIMARY);
-        draw_text(
-            "Press ESC to return",
-            screen_w - 200.0,
-            40.0,
-            FONT_BODY_SIZE,
-            TEXT_SECONDARY,
+        draw_panel(Rect::new(0.0, 0.0, screen_w, 70.0), None);
+        draw_screen_title(
+            "Known Powers of the Region",
+            "Diplomatic tablets kept in the patriarch's archive",
+            24.0,
+            34.0,
         );
 
-        // Two-column layout: Faction list on left, details on right
-        let list_width = 350.0;
-        let detail_x = list_width + 20.0;
-        let content_y = 80.0;
-        let content_height = screen_h - 100.0;
-
-        // Faction List Panel
-        draw_panel(
-            Rect::new(10.0, content_y, list_width, content_height),
-            Some("Known Factions"),
+        let content_y = 90.0;
+        let content_h = screen_h - 110.0;
+        let list_w = 380.0;
+        let list_rect = Rect::new(18.0, content_y, list_w, content_h);
+        let detail_rect = Rect::new(
+            list_rect.x + list_w + 18.0,
+            content_y,
+            screen_w - list_w - 54.0,
+            content_h,
         );
 
-        let mut y = content_y + 50.0;
-        for (i, faction) in world_sim.factions.iter().enumerate() {
-            let relation = world_sim.get_relation(&faction.id);
-            let reputation = relation.map(|r| r.reputation).unwrap_or(0);
-            let tier = relation
-                .map(|r| r.reputation_tier())
-                .unwrap_or(ReputationTier::Neutral);
-
-            let item_rect = Rect::new(20.0, y, list_width - 20.0, 60.0);
-            let is_selected = self.selected_faction == Some(i);
-            let is_hovered = item_rect.contains(mouse_position().into());
-
-            // Background for item
-            let bg_color = if is_selected {
-                PANEL_DARK
-            } else if is_hovered {
-                Color::new(0.2, 0.22, 0.25, 1.0)
-            } else {
-                PANEL
-            };
-            draw_rectangle(item_rect.x, item_rect.y, item_rect.w, item_rect.h, bg_color);
-
-            // Faction name
-            draw_text(
-                &faction.name,
-                item_rect.x + 10.0,
-                item_rect.y + 22.0,
-                FONT_HEADER_SIZE,
-                TEXT_PRIMARY,
-            );
-
-            // Faction type and reputation
-            let type_text = format!("{}", faction.faction_type);
-            draw_text(
-                &type_text,
-                item_rect.x + 10.0,
-                item_rect.y + 42.0,
-                FONT_SMALL_SIZE,
-                TEXT_SECONDARY,
-            );
-
-            // Reputation bar
-            let bar_x = item_rect.x + 180.0;
-            let bar_y = item_rect.y + 35.0;
-            let bar_width = 100.0;
-            let bar_height = 12.0;
-
-            // Background
-            draw_rectangle(bar_x, bar_y, bar_width, bar_height, PANEL_DARK);
-
-            // Fill based on reputation (-100 to +100 mapped to 0-100%)
-            let fill_percent = ((reputation + 100) as f32 / 200.0).clamp(0.0, 1.0);
-            let fill_color = if reputation > 25 {
-                SUCCESS
-            } else if reputation < -25 {
-                FAILURE
-            } else {
-                WARNING
-            };
-            draw_rectangle(
-                bar_x,
-                bar_y,
-                bar_width * fill_percent,
-                bar_height,
-                fill_color,
-            );
-
-            // Reputation text
-            draw_text(
-                &format!("{}", tier),
-                bar_x + bar_width + 5.0,
-                bar_y + 10.0,
-                FONT_SMALL_SIZE,
-                fill_color,
-            );
-
-            // Handle click
-            if is_hovered && is_mouse_button_pressed(MouseButton::Left) {
-                self.selected_faction = Some(i);
-            }
-
-            y += 65.0;
-        }
-
-        // Detail Panel
-        let detail_width = screen_w - detail_x - 20.0;
-        draw_panel(
-            Rect::new(detail_x, content_y, detail_width, content_height),
-            Some("Faction Details"),
-        );
+        self.draw_faction_list(list_rect, world_sim);
+        draw_panel(detail_rect, Some("Power Record"));
 
         if let Some(idx) = self.selected_faction {
             if let Some(faction) = world_sim.factions.get(idx) {
-                let relation = world_sim.get_relation(&faction.id);
-
-                let mut dy = content_y + 60.0;
-                let dx = detail_x + 20.0;
-
-                // Faction name and type
-                draw_text(&faction.name, dx, dy, FONT_TITLE_SIZE, PRIMARY);
-                dy += 30.0;
-
-                draw_text(
-                    &format!("Type: {}", faction.faction_type),
-                    dx,
-                    dy,
-                    FONT_BODY_SIZE,
-                    TEXT_SECONDARY,
+                self.draw_faction_details(
+                    detail_rect,
+                    faction,
+                    world_sim.get_relation(&faction.id),
                 );
-                dy += 25.0;
-
-                draw_text(
-                    &format!("Specialty: {}", faction.specialty),
-                    dx,
-                    dy,
-                    FONT_BODY_SIZE,
-                    TEXT_SECONDARY,
-                );
-                dy += 25.0;
-
-                draw_text(
-                    &format!("Power Level: {}", faction.power_level),
-                    dx,
-                    dy,
-                    FONT_BODY_SIZE,
-                    TEXT_SECONDARY,
-                );
-                dy += 25.0;
-
-                draw_text(
-                    &format!("Wealth: {} SS", faction.wealth),
-                    dx,
-                    dy,
-                    FONT_BODY_SIZE,
-                    TEXT_SECONDARY,
-                );
-                dy += 35.0;
-
-                // Description
-                if !faction.description.is_empty() {
-                    draw_text("Description:", dx, dy, FONT_BODY_SIZE, TEXT_PRIMARY);
-                    dy += 20.0;
-
-                    // Word wrap the description
-                    let max_width = detail_width - 40.0;
-                    let words: Vec<&str> = faction.description.split_whitespace().collect();
-                    let mut line = String::new();
-                    for word in words {
-                        let test_line = if line.is_empty() {
-                            word.to_string()
-                        } else {
-                            format!("{} {}", line, word)
-                        };
-                        let text_width = test_line.len() as f32 * 7.0; // Approximate
-                        if text_width > max_width && !line.is_empty() {
-                            draw_text(&line, dx, dy, FONT_SMALL_SIZE, TEXT_SECONDARY);
-                            dy += 18.0;
-                            line = word.to_string();
-                        } else {
-                            line = test_line;
-                        }
-                    }
-                    if !line.is_empty() {
-                        draw_text(&line, dx, dy, FONT_SMALL_SIZE, TEXT_SECONDARY);
-                        dy += 25.0;
-                    }
-                }
-                dy += 10.0;
-
-                // Relation info
-                if let Some(rel) = relation {
-                    draw_text("--- Relations ---", dx, dy, FONT_BODY_SIZE, ACCENT);
-                    dy += 25.0;
-
-                    let tier = rel.reputation_tier();
-                    let (r, g, b) = tier.color();
-                    let tier_color =
-                        Color::new(r as f32 / 255.0, g as f32 / 255.0, b as f32 / 255.0, 1.0);
-
-                    draw_text(
-                        &format!("Reputation: {} ({})", rel.reputation, tier),
-                        dx,
-                        dy,
-                        FONT_BODY_SIZE,
-                        tier_color,
-                    );
-                    dy += 25.0;
-
-                    if rel.at_war {
-                        draw_text("STATUS: AT WAR", dx, dy, FONT_HEADER_SIZE, FAILURE);
-                        dy += 25.0;
-                    }
-
-                    if let Some(treaty) = &rel.treaty {
-                        draw_text(
-                            &format!("Active Treaty: {}", treaty.name()),
-                            dx,
-                            dy,
-                            FONT_BODY_SIZE,
-                            SUCCESS,
-                        );
-                        dy += 25.0;
-                    }
-
-                    draw_text(
-                        &format!(
-                            "Friendly Actions: {} | Hostile Actions: {}",
-                            rel.friendly_actions, rel.hostile_actions
-                        ),
-                        dx,
-                        dy,
-                        FONT_SMALL_SIZE,
-                        TEXT_SECONDARY,
-                    );
-                    dy += 35.0;
-
-                    // Diplomatic action buttons (placeholder - would need Action system)
-                    draw_text("--- Diplomatic Actions ---", dx, dy, FONT_BODY_SIZE, ACCENT);
-                    dy += 30.0;
-
-                    let btn_width = 150.0;
-                    let btn_height = 35.0;
-
-                    if draw_button(Rect::new(dx, dy, btn_width, btn_height), "Send Gift", false) {
-                        // Would trigger Action::SendDiplomat
-                    }
-
-                    if draw_button(
-                        Rect::new(dx + btn_width + 10.0, dy, btn_width, btn_height),
-                        "Request Treaty",
-                        rel.treaty.is_some(),
-                    ) {
-                        // Would trigger treaty request
-                    }
-                }
             }
         } else {
-            draw_text(
-                "Select a faction to view details",
-                detail_x + 20.0,
-                content_y + 100.0,
+            draw_ui_text(
+                "Choose a power tablet to read its public record.",
+                detail_rect.x + 24.0,
+                detail_rect.y + 88.0,
                 FONT_BODY_SIZE,
                 TEXT_SECONDARY,
             );
         }
 
-        // Back button
-        if draw_button(Rect::new(20.0, screen_h - 60.0, 100.0, 40.0), "Back", false) {
+        if draw_button(Rect::new(22.0, screen_h - 58.0, 100.0, 40.0), "Back", false) {
             return UpdateResult::new().with_transition(StateTransition::ToSectBase);
         }
 
         UpdateResult::new()
     }
 
-    pub fn draw(&self, _world_sim: &WorldSim) {
-        // Handled in update
+    fn draw_faction_list(&mut self, rect: Rect, world_sim: &WorldSim) {
+        draw_panel(rect, Some("Power Tablets"));
+        let row_h = 74.0;
+        let gap = 8.0;
+        let list_y = rect.y + 50.0;
+        let list_h = rect.h - 64.0;
+        let total_h = world_sim.factions.len() as f32 * (row_h + gap);
+        let mouse = vec2(mouse_position().0, mouse_position().1);
+
+        if Rect::new(rect.x, list_y, rect.w, list_h).contains(mouse.into()) {
+            let wheel = mouse_wheel().1;
+            if total_h > list_h {
+                self.scroll_offset -= wheel * 32.0;
+                self.scroll_offset = self.scroll_offset.clamp(0.0, (total_h - list_h).max(0.0));
+            } else {
+                self.scroll_offset = 0.0;
+            }
+        }
+
+        let mut y = list_y - self.scroll_offset;
+        for (i, faction) in world_sim.factions.iter().enumerate() {
+            let row = Rect::new(rect.x + 12.0, y, rect.w - 24.0, row_h);
+            if row.y + row_h >= list_y && row.y <= list_y + list_h {
+                self.draw_faction_row(row, faction, world_sim.get_relation(&faction.id), i);
+                if row.contains(mouse.into()) && is_mouse_button_pressed(MouseButton::Left) {
+                    self.selected_faction = Some(i);
+                }
+            }
+            y += row_h + gap;
+        }
     }
+
+    fn draw_faction_row(
+        &self,
+        rect: Rect,
+        faction: &Faction,
+        relation: Option<&FactionRelation>,
+        idx: usize,
+    ) {
+        let selected = self.selected_faction == Some(idx);
+        let hovered = rect.contains(mouse_position().into());
+        let color = faction_color(&faction.faction_type);
+        let alpha = if selected {
+            0.70
+        } else if hovered {
+            0.48
+        } else {
+            0.32
+        };
+        draw_rectangle(
+            rect.x,
+            rect.y,
+            rect.w,
+            rect.h,
+            Color::new(0.035, 0.028, 0.02, alpha),
+        );
+        draw_rectangle_lines(
+            rect.x,
+            rect.y,
+            rect.w,
+            rect.h,
+            if selected { 2.0 } else { 1.0 },
+            Color::new(
+                color.r,
+                color.g,
+                color.b,
+                if selected { 0.86 } else { 0.44 },
+            ),
+        );
+        draw_ui_text(
+            faction_sigill(&faction.faction_type),
+            rect.x + 12.0,
+            rect.y + 28.0,
+            FONT_SMALL_SIZE,
+            color,
+        );
+        draw_ui_text(
+            &faction.name,
+            rect.x + 74.0,
+            rect.y + 25.0,
+            FONT_BODY_SIZE,
+            TEXT_PRIMARY,
+        );
+        let tier = relation
+            .map(|rel| rel.reputation_tier())
+            .unwrap_or(ReputationTier::Neutral);
+        draw_ui_text(
+            &format!("{} | {}", realm_label(&faction.leader_realm), tier),
+            rect.x + 74.0,
+            rect.y + 50.0,
+            FONT_SMALL_SIZE,
+            tier_color(tier),
+        );
+    }
+
+    fn draw_faction_details(
+        &self,
+        rect: Rect,
+        faction: &Faction,
+        relation: Option<&FactionRelation>,
+    ) {
+        let x = rect.x + 28.0;
+        let mut y = rect.y + 68.0;
+        let tier = relation
+            .map(|rel| rel.reputation_tier())
+            .unwrap_or(ReputationTier::Neutral);
+
+        draw_ui_text(&faction.name, x, y, FONT_TITLE_SIZE, PRIMARY);
+        y += 34.0;
+        draw_ui_text(
+            faction_type_title(&faction.faction_type),
+            x,
+            y,
+            FONT_BODY_SIZE,
+            SECONDARY,
+        );
+        y += 34.0;
+
+        let columns = [
+            ("Leader", leader_title(faction)),
+            ("Cultivation", realm_label(&faction.leader_realm)),
+            ("Relationship", tier.to_string()),
+            ("Specialty", specialty_label(&faction.specialty).to_string()),
+        ];
+        for (label, value) in columns {
+            draw_ui_text(label, x, y, FONT_SMALL_SIZE, TEXT_SECONDARY);
+            draw_ui_text(&value, x + 150.0, y, FONT_BODY_SIZE, TEXT_PRIMARY);
+            y += 28.0;
+        }
+
+        y += 10.0;
+        draw_ink_divider(x, y, rect.w - 56.0);
+        y += 32.0;
+
+        draw_ui_text("Known Technique", x, y, FONT_SMALL_SIZE, TEXT_SECONDARY);
+        draw_ui_text(
+            signature_technique(faction),
+            x + 150.0,
+            y,
+            FONT_BODY_SIZE,
+            TEXT_HIGHLIGHT,
+        );
+        y += 38.0;
+
+        if !faction.description.is_empty() {
+            y = draw_wrapped_text(
+                &faction.description,
+                x,
+                y,
+                rect.w - 60.0,
+                FONT_BODY_SIZE,
+                TEXT_SECONDARY,
+            );
+            y += 18.0;
+        }
+
+        let relation_label = relation
+            .map(|rel| {
+                if rel.at_war {
+                    "State: Open War".to_string()
+                } else if let Some(treaty) = &rel.treaty {
+                    format!("Treaty: {}", treaty.name())
+                } else {
+                    format!("Reputation: {} ({})", rel.reputation, tier)
+                }
+            })
+            .unwrap_or_else(|| "Reputation: Unknown".to_string());
+        draw_ui_text(&relation_label, x, y, FONT_BODY_SIZE, tier_color(tier));
+        y += 40.0;
+
+        draw_ui_text(
+            &format!(
+                "Treasury: {} spirit stones | Regional power: {}",
+                faction.wealth, faction.power_level
+            ),
+            x,
+            y,
+            FONT_SMALL_SIZE,
+            TEXT_SECONDARY,
+        );
+        y += 46.0;
+
+        if draw_button(Rect::new(x, y, 150.0, 36.0), "Offer Gift", false) {
+            // Hooked later through diplomacy actions.
+        }
+        if draw_button(Rect::new(x + 164.0, y, 170.0, 36.0), "Seek Treaty", false) {
+            // Hooked later through diplomacy actions.
+        }
+    }
+
+    pub fn draw(&self, _world_sim: &WorldSim) {
+        // Handled in update.
+    }
+}
+
+fn faction_color(faction_type: &FactionType) -> Color {
+    match faction_type {
+        FactionType::Sect => SECONDARY,
+        FactionType::MerchantGuild => PRIMARY,
+        FactionType::DemonCult => ACCENT,
+        FactionType::ImperialCourt => WARNING,
+        FactionType::BanditClan => FAILURE,
+        FactionType::BeastHorde => SUCCESS,
+    }
+}
+
+fn faction_sigill(faction_type: &FactionType) -> &'static str {
+    match faction_type {
+        FactionType::Sect => "SECT",
+        FactionType::MerchantGuild => "GUILD",
+        FactionType::DemonCult => "CULT",
+        FactionType::ImperialCourt => "COURT",
+        FactionType::BanditClan => "CLAN",
+        FactionType::BeastHorde => "HORDE",
+    }
+}
+
+fn faction_type_title(faction_type: &FactionType) -> &'static str {
+    match faction_type {
+        FactionType::Sect => "Orthodox Cultivation Sect",
+        FactionType::MerchantGuild => "Merchant Cultivator Guild",
+        FactionType::DemonCult => "Forbidden Moon Cult",
+        FactionType::ImperialCourt => "Imperial Cultivation Court",
+        FactionType::BanditClan => "Rogue Mountain Clan",
+        FactionType::BeastHorde => "Spirit Beast Horde",
+    }
+}
+
+fn specialty_label(specialty: &FactionSpecialty) -> &'static str {
+    match specialty {
+        FactionSpecialty::Trade => "Caravan and auction houses",
+        FactionSpecialty::Combat => "Sword and body cultivation",
+        FactionSpecialty::Alchemy => "Pill refining",
+        FactionSpecialty::Formations => "Arrays and seals",
+        FactionSpecialty::Intelligence => "Secrets and shadows",
+        FactionSpecialty::Agriculture => "Spirit herb gardens",
+    }
+}
+
+fn signature_technique(faction: &Faction) -> &'static str {
+    match faction.specialty {
+        FactionSpecialty::Trade => "Golden Scale Exchange Art",
+        FactionSpecialty::Combat => "Crimson Mountain Breaking Fist",
+        FactionSpecialty::Alchemy => "Azure Cauldron Returning Breath",
+        FactionSpecialty::Formations => "Nine Palace Imperial Seal",
+        FactionSpecialty::Intelligence => "Shadow Moon Veil",
+        FactionSpecialty::Agriculture => "Jade Lotus Verdant Method",
+    }
+}
+
+fn leader_title(faction: &Faction) -> String {
+    let title = match faction.faction_type {
+        FactionType::Sect => "Elder",
+        FactionType::MerchantGuild => "Guildmaster",
+        FactionType::DemonCult => "Moon Hierarch",
+        FactionType::ImperialCourt => "Imperial Envoy",
+        FactionType::BanditClan => "Mountain Chief",
+        FactionType::BeastHorde => "Beast Sovereign",
+    };
+    format!("{} {}", title, leader_name_seed(&faction.name))
+}
+
+fn leader_name_seed(name: &str) -> &'static str {
+    if name.contains("Azure") {
+        "Blue Crane"
+    } else if name.contains("Golden") {
+        "Gold Abacus"
+    } else if name.contains("Crimson") {
+        "Red Fang"
+    } else if name.contains("Shadow") {
+        "Silent Moon"
+    } else if name.contains("Imperial") {
+        "Iron Seal"
+    } else if name.contains("Lotus") {
+        "Jade Rain"
+    } else {
+        "Broken Blade"
+    }
+}
+
+fn realm_label(id: &str) -> String {
+    if id.is_empty() {
+        return "Unknown".to_string();
+    }
+    id.split('_')
+        .map(|part| {
+            let mut chars = part.chars();
+            match chars.next() {
+                Some(first) => first.to_uppercase().collect::<String>() + chars.as_str(),
+                None => String::new(),
+            }
+        })
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
+fn tier_color(tier: ReputationTier) -> Color {
+    let (r, g, b) = tier.color();
+    Color::new(r as f32 / 255.0, g as f32 / 255.0, b as f32 / 255.0, 1.0)
 }

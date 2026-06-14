@@ -1,8 +1,10 @@
 use crate::data::loader::GameData;
 use crate::engine::actions::Action;
 use crate::state::UpdateResult;
+use crate::ui::components::draw_button;
 use crate::ui::theme::*;
 use macroquad::prelude::*;
+use macroquad_toolkit::ui::{draw_ui_text, measure_ui_text};
 
 pub struct SectCreationState {
     pub input_buffer: String,
@@ -39,13 +41,22 @@ impl SectCreationState {
             }
         }
 
+        let begin_rect = Rect::new(screen_width() / 2.0 - 100.0, 330.0, 200.0, 48.0);
+        if !self.input_buffer.is_empty()
+            && begin_rect.contains(mouse_position().into())
+            && is_mouse_button_pressed(MouseButton::Left)
+        {
+            return UpdateResult::new()
+                .with_action(Action::StartNewGame(self.input_buffer.clone()));
+        }
+
         UpdateResult::new()
     }
 
     pub fn draw(&self, _data: &GameData) {
         let title_text = "FOUND A NEW SECT";
-        let title_dims = measure_text(title_text, None, FONT_TITLE_SIZE as u16, 1.0);
-        draw_text(
+        let title_dims = measure_ui_text(title_text, None, FONT_TITLE_SIZE as u16, 1.0);
+        draw_ui_text(
             title_text,
             (screen_width() - title_dims.width) / 2.0,
             100.0,
@@ -53,7 +64,7 @@ impl SectCreationState {
             TEXT_HIGHLIGHT,
         );
 
-        draw_text(
+        draw_ui_text(
             "Enter Sect Name:",
             screen_width() / 2.0 - 100.0,
             200.0,
@@ -65,7 +76,7 @@ impl SectCreationState {
         let box_x = screen_width() / 2.0 - 150.0;
         let box_y = 230.0;
         draw_rectangle(box_x, box_y, 300.0, 40.0, BUTTON_NORMAL);
-        draw_text(
+        draw_ui_text(
             &self.input_buffer,
             box_x + 10.0,
             box_y + 30.0,
@@ -75,7 +86,7 @@ impl SectCreationState {
 
         // Blink cursor
         if (get_time() * 2.0) as i32 % 2 == 0 {
-            let text_dims = measure_text(&self.input_buffer, None, FONT_BODY_SIZE as u16, 1.0);
+            let text_dims = measure_ui_text(&self.input_buffer, None, FONT_BODY_SIZE as u16, 1.0);
             draw_line(
                 box_x + 10.0 + text_dims.width,
                 box_y + 5.0,
@@ -86,14 +97,10 @@ impl SectCreationState {
             );
         }
 
-        let instruction = "Press ENTER to Begin";
-        let inst_dims = measure_text(instruction, None, FONT_BODY_SIZE as u16, 1.0);
-        draw_text(
-            instruction,
-            (screen_width() - inst_dims.width) / 2.0,
-            350.0,
-            FONT_BODY_SIZE,
-            TEXT_SECONDARY,
+        draw_button(
+            Rect::new(screen_width() / 2.0 - 100.0, 330.0, 200.0, 48.0),
+            "Begin",
+            !self.input_buffer.is_empty(),
         );
     }
 }

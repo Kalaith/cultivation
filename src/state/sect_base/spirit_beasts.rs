@@ -1,4 +1,5 @@
 use super::*;
+use macroquad_toolkit::ui::draw_ui_text;
 
 impl SectBaseState {
     pub(super) fn draw_spirit_beasts_view(
@@ -11,7 +12,7 @@ impl SectBaseState {
         draw_panel(rect, Some("Spirit Beasts"));
 
         let header_y = rect.y + 40.0;
-        draw_text(
+        draw_ui_text(
             &format!("Owned: {}", spirit_beasts.len()),
             rect.x + 20.0,
             header_y,
@@ -83,7 +84,7 @@ impl SectBaseState {
 
     fn draw_beast_details_panel(&self, right_rect: Rect, beast: &SpiritBeast, data: &GameData) {
         let mut dy = right_rect.y + 40.0;
-        draw_text(
+        draw_ui_text(
             &beast.name,
             right_rect.x + 20.0,
             dy,
@@ -91,7 +92,7 @@ impl SectBaseState {
             PRIMARY,
         );
         dy += 24.0;
-        draw_text(
+        draw_ui_text(
             &format!("Species: {}", beast.species),
             right_rect.x + 20.0,
             dy,
@@ -99,7 +100,7 @@ impl SectBaseState {
             TEXT_SECONDARY,
         );
         dy += 20.0;
-        draw_text(
+        draw_ui_text(
             &format!("Tier: {:?}", beast.tier),
             right_rect.x + 20.0,
             dy,
@@ -107,7 +108,7 @@ impl SectBaseState {
             TEXT_SECONDARY,
         );
         dy += 20.0;
-        draw_text(
+        draw_ui_text(
             &format!("Loyalty: {}", beast.loyalty),
             right_rect.x + 20.0,
             dy,
@@ -115,7 +116,7 @@ impl SectBaseState {
             TEXT_SECONDARY,
         );
         dy += 20.0;
-        draw_text(
+        draw_ui_text(
             &format!("Hunger: {}", beast.hunger),
             right_rect.x + 20.0,
             dy,
@@ -124,7 +125,7 @@ impl SectBaseState {
         );
         dy += 30.0;
 
-        draw_text(
+        draw_ui_text(
             "Equipment:",
             right_rect.x + 20.0,
             dy,
@@ -156,7 +157,7 @@ impl SectBaseState {
                 .map(|item| item.name.clone())
                 .unwrap_or_else(|| "Empty".to_string());
 
-            draw_text(
+            draw_ui_text(
                 &format!("{}: {}", slot_name, item_label),
                 right_rect.x + 30.0,
                 dy,
@@ -238,7 +239,7 @@ impl SectBaseState {
         }
 
         if !found_any {
-            draw_text(
+            draw_ui_text(
                 "No beast equipment in inventory.",
                 modal_x + 20.0,
                 modal_y + 80.0,

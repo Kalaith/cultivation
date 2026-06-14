@@ -5,6 +5,7 @@ use crate::state::{StateTransition, UpdateResult};
 use crate::ui::components::*;
 use crate::ui::theme::*;
 use macroquad::prelude::*;
+use macroquad_toolkit::ui::{draw_ui_text, measure_ui_text};
 
 pub struct MissionResolutionState {
     current_outcome: Option<MissionOutcome>,
@@ -55,11 +56,11 @@ impl MissionResolutionState {
                     format!("{} {}", line, word)
                 };
 
-                let dims = measure_text(&test_line, None, font_size as u16, 1.0);
+                let dims = measure_ui_text(&test_line, None, font_size as u16, 1.0);
                 if dims.width > max_text_width {
                     // Draw current line and start new
-                    let line_dims = measure_text(&line, None, font_size as u16, 1.0);
-                    draw_text(
+                    let line_dims = measure_ui_text(&line, None, font_size as u16, 1.0);
+                    draw_ui_text(
                         &line,
                         x + (w - line_dims.width) / 2.0,
                         draw_y,
@@ -73,8 +74,8 @@ impl MissionResolutionState {
                 }
             }
             if !line.is_empty() {
-                let line_dims = measure_text(&line, None, font_size as u16, 1.0);
-                draw_text(
+                let line_dims = measure_ui_text(&line, None, font_size as u16, 1.0);
+                draw_ui_text(
                     &line,
                     x + (w - line_dims.width) / 2.0,
                     draw_y,
@@ -89,9 +90,9 @@ impl MissionResolutionState {
             } else {
                 ("FAILURE", FAILURE)
             };
-            let status_dims = measure_text(status_text, None, FONT_TITLE_SIZE as u16, 1.0);
+            let status_dims = measure_ui_text(status_text, None, FONT_TITLE_SIZE as u16, 1.0);
             draw_y += 20.0;
-            draw_text(
+            draw_ui_text(
                 status_text,
                 x + (w - status_dims.width) / 2.0,
                 draw_y,
@@ -105,7 +106,7 @@ impl MissionResolutionState {
                 if log_y > y + h - 100.0 {
                     break;
                 }
-                draw_text(log, x + 40.0, log_y, FONT_BODY_SIZE, TEXT_SECONDARY);
+                draw_ui_text(log, x + 40.0, log_y, FONT_BODY_SIZE, TEXT_SECONDARY);
                 log_y += 25.0;
             }
 

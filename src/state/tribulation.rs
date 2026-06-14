@@ -5,6 +5,7 @@ use crate::state::{StateTransition, UpdateResult};
 use crate::ui::components::*;
 use crate::ui::theme::*;
 use macroquad::prelude::*;
+use macroquad_toolkit::ui::draw_ui_text;
 
 pub struct TribulationEncounterState {
     pub tribulation: TribulationState,
@@ -51,14 +52,14 @@ impl TribulationEncounterState {
         let screen_h = screen_height();
 
         // Title
-        draw_text(
+        draw_ui_text(
             &self.tribulation.config.name,
             20.0,
             50.0,
             FONT_TITLE_SIZE,
             Color::new(0.8, 0.2, 0.2, 1.0),
         );
-        draw_text(
+        draw_ui_text(
             &self.tribulation.config.description,
             20.0,
             80.0,
@@ -73,7 +74,7 @@ impl TribulationEncounterState {
 
             // Draw Disciple Sprite/Box
             draw_rectangle(cx - 30.0, cy - 30.0, 60.0, 60.0, PRIMARY);
-            draw_text(
+            draw_ui_text(
                 &disciple.name,
                 cx - 40.0,
                 cy + 50.0,
@@ -89,7 +90,7 @@ impl TribulationEncounterState {
                 hp_pct,
                 Color::new(0.8, 0.1, 0.1, 1.0),
             );
-            draw_text(
+            draw_ui_text(
                 &format!(
                     "{}/{}",
                     self.tribulation.disciple_hp, self.tribulation.disciple_max_hp
@@ -102,7 +103,7 @@ impl TribulationEncounterState {
         }
 
         // Wave Status
-        draw_text(
+        draw_ui_text(
             &format!(
                 "Wave: {} / {}",
                 self.tribulation.current_wave, self.tribulation.config.total_waves
@@ -124,7 +125,7 @@ impl TribulationEncounterState {
 
         // Show last 5 logs
         for log in self.tribulation.log.iter().rev().take(5) {
-            draw_text(log, log_x + 10.0, log_y, FONT_BODY_SIZE, TEXT_SECONDARY);
+            draw_ui_text(log, log_x + 10.0, log_y, FONT_BODY_SIZE, TEXT_SECONDARY);
             log_y += 25.0;
         }
 
@@ -150,7 +151,7 @@ impl TribulationEncounterState {
             } else {
                 Color::new(0.8, 0.2, 0.2, 1.0)
             };
-            draw_text(
+            draw_ui_text(
                 result_text,
                 screen_w / 2.0 - 60.0,
                 screen_h / 2.0 - 100.0,

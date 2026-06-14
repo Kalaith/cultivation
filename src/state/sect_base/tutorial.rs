@@ -1,4 +1,5 @@
 use super::*;
+use macroquad_toolkit::ui::draw_ui_text;
 
 impl SectBaseState {
     pub(super) fn draw_tutorial_overlay(
@@ -39,7 +40,7 @@ impl SectBaseState {
         let text_x = rect.x + portrait_w + 25.0;
         let text_w = rect.w - (portrait_w * 2.0) - 50.0;
 
-        draw_text(
+        draw_ui_text(
             title,
             text_x,
             rect.y + 60.0,
@@ -59,7 +60,7 @@ impl SectBaseState {
             };
 
             if test_line.len() as f32 * 7.0 > text_w {
-                draw_text(
+                draw_ui_text(
                     &current_line,
                     text_x,
                     text_y,
@@ -73,7 +74,7 @@ impl SectBaseState {
             }
         }
         if !current_line.is_empty() {
-            draw_text(
+            draw_ui_text(
                 &current_line,
                 text_x,
                 text_y,

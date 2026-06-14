@@ -52,6 +52,7 @@ pub struct SectBaseState {
     pub(super) selected_beast_index: Option<usize>,
     pub(super) beast_equip_modal_open: bool,
     pub(super) selected_mission: Option<String>,
+    pub(super) mission_scroll: f32,
     pub(super) herb_planting_modal: Option<usize>,
     pub(super) disciple_assignment_modal: bool,
     pub(super) infusion_modal_open: bool,
@@ -76,6 +77,7 @@ impl SectBaseState {
             selected_beast_index: None,
             beast_equip_modal_open: false,
             selected_mission: None,
+            mission_scroll: 0.0,
             herb_planting_modal: None,
             disciple_assignment_modal: false,
             infusion_modal_open: false,
@@ -91,6 +93,7 @@ impl SectBaseState {
         herbs: u32,
         influence: u32,
         relics: u32,
+        sect_name: &str,
         inventory: &std::collections::HashMap<String, u32>,
         unlocked_techs: &[String],
         event_log: &[String],
@@ -110,12 +113,20 @@ impl SectBaseState {
 
         let screen_w = screen_width();
         let screen_h = screen_height();
-        let header_h = 60.0;
-        let left_panel_w = 250.0;
-        let right_panel_w = 250.0;
-        let center_w = screen_w - left_panel_w - right_panel_w - 20.0;
+        let header_h = 74.0;
+        let left_panel_w = 230.0;
+        let right_panel_w = 280.0;
+        let center_w = screen_w - left_panel_w - right_panel_w - 70.0;
 
-        let center_rect = Rect::new(left_panel_w, header_h, center_w, screen_h - header_h);
+        let center_rect = match self.view {
+            SectView::Map => Rect::new(0.0, header_h, screen_w, screen_h - header_h),
+            _ => Rect::new(
+                left_panel_w + 34.0,
+                header_h + 16.0,
+                center_w,
+                screen_h - header_h - 32.0,
+            ),
+        };
         if let Some(res) = self.draw_center_panel(
             center_rect,
             data,
@@ -143,6 +154,7 @@ impl SectBaseState {
             herbs,
             influence,
             relics,
+            sect_name,
             current_season,
             season_ticks,
             tutorial,

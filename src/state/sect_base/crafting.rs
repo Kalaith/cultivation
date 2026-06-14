@@ -1,4 +1,5 @@
 use super::*;
+use macroquad_toolkit::ui::draw_ui_text;
 
 impl SectBaseState {
     pub(super) fn draw_construction_modal(
@@ -63,7 +64,7 @@ impl SectBaseState {
         }
 
         if available_defs.is_empty() {
-            draw_text(
+            draw_ui_text(
                 "No available buildings.",
                 modal_x + 20.0,
                 content_y + 20.0,
@@ -99,7 +100,7 @@ impl SectBaseState {
                 } else {
                     def.description.clone()
                 };
-                draw_text(
+                draw_ui_text(
                     &desc,
                     modal_x + 25.0,
                     desc_y,
@@ -122,7 +123,7 @@ impl SectBaseState {
             let handle_y = track_y + (self.construction_scroll / max_offset) * (track_h - handle_h);
             draw_rectangle(track_x - 1.0, handle_y, 6.0, handle_h, TEXT_HIGHLIGHT);
 
-            draw_text(
+            draw_ui_text(
                 "Scroll",
                 modal_x + 20.0,
                 modal_y + modal_h - 15.0,
@@ -179,7 +180,7 @@ impl SectBaseState {
         let disciple_mind = assigned_disciple.map(|d| d.attributes.mind);
 
         let info_y = modal_y + 45.0;
-        draw_text(
+        draw_ui_text(
             &format!("Building Lv.{}", building_level),
             modal_x + 20.0,
             info_y,
@@ -187,7 +188,7 @@ impl SectBaseState {
             TEXT_SECONDARY,
         );
         if let Some(d) = assigned_disciple {
-            draw_text(
+            draw_ui_text(
                 &format!("Worker: {} (Mind: {})", d.name, d.attributes.mind),
                 modal_x + 150.0,
                 info_y,
@@ -195,7 +196,7 @@ impl SectBaseState {
                 TEXT_SECONDARY,
             );
         } else {
-            draw_text(
+            draw_ui_text(
                 "No worker assigned",
                 modal_x + 150.0,
                 info_y,
@@ -212,7 +213,7 @@ impl SectBaseState {
             .collect();
 
         if recipes.is_empty() {
-            draw_text(
+            draw_ui_text(
                 "No discovered recipes for this station.",
                 modal_x + 20.0,
                 r_y,
@@ -230,7 +231,7 @@ impl SectBaseState {
 
         for recipe in recipes {
             if r_y > modal_y + modal_h - 30.0 {
-                draw_text("...", modal_x + 20.0, r_y, FONT_SMALL_SIZE, TEXT_SECONDARY);
+                draw_ui_text("...", modal_x + 20.0, r_y, FONT_SMALL_SIZE, TEXT_SECONDARY);
                 break;
             }
 
@@ -303,7 +304,7 @@ impl SectBaseState {
             }
         }
 
-        draw_text(
+        draw_ui_text(
             &format!("{}%", success_chance),
             modal_x + modal_w - 70.0,
             *r_y + 22.0,
@@ -322,7 +323,7 @@ impl SectBaseState {
         } else {
             Color::new(0.8, 0.3, 0.3, 1.0)
         };
-        draw_text(
+        draw_ui_text(
             &status_text,
             modal_x + 25.0,
             *r_y + 50.0,

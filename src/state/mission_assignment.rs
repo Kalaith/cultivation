@@ -5,6 +5,7 @@ use crate::state::{StateTransition, UpdateResult};
 use crate::ui::components::*;
 use crate::ui::theme::*;
 use macroquad::prelude::*;
+use macroquad_toolkit::ui::draw_ui_text;
 
 pub struct MissionAssignmentState {
     pub mission_description: String,
@@ -30,8 +31,8 @@ impl MissionAssignmentState {
 
         // --- Header ---
         draw_panel(Rect::new(0.0, 0.0, screen_w, header_h), None);
-        draw_text("ASSIGN DISCIPLES", 20.0, 40.0, FONT_TITLE_SIZE, PRIMARY);
-        draw_text(
+        draw_ui_text("ASSIGN DISCIPLES", 20.0, 40.0, FONT_TITLE_SIZE, PRIMARY);
+        draw_ui_text(
             &format!("Mission: {}", self.mission_description),
             400.0,
             40.0,
@@ -80,7 +81,7 @@ impl MissionAssignmentState {
                     btn_rect.h,
                     Color::new(0.4, 0.15, 0.15, 0.5),
                 );
-                draw_text(
+                draw_ui_text(
                     &label,
                     btn_rect.x + 10.0,
                     btn_rect.y + 25.0,
@@ -103,7 +104,7 @@ impl MissionAssignmentState {
         let right_rect = Rect::new(left_w + 20.0, content_y, 250.0, content_h);
         draw_panel(right_rect, Some("Orders"));
 
-        draw_text(
+        draw_ui_text(
             "Selected Team:",
             right_rect.x + 20.0,
             right_rect.y + 60.0,
@@ -113,7 +114,7 @@ impl MissionAssignmentState {
         let mut y = right_rect.y + 90.0;
         for &idx in &self.selected_disciples {
             if let Some(d) = disciples.get(idx) {
-                draw_text(
+                draw_ui_text(
                     &format!("- {}", d.name),
                     right_rect.x + 20.0,
                     y,

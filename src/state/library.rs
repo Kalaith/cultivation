@@ -4,6 +4,7 @@ use crate::state::{StateTransition, UpdateResult};
 use crate::ui::components::*;
 use crate::ui::theme::*;
 use macroquad::prelude::*;
+use macroquad_toolkit::ui::{draw_ui_text, measure_ui_text};
 
 pub struct LibraryState;
 
@@ -28,10 +29,10 @@ impl LibraryState {
 
         // --- Header ---
         draw_panel(Rect::new(0.0, 0.0, screen_w, header_h), None);
-        draw_text("LIBRARY PAVILION", 20.0, 40.0, FONT_TITLE_SIZE, PRIMARY);
+        draw_ui_text("LIBRARY PAVILION", 20.0, 40.0, FONT_TITLE_SIZE, PRIMARY);
         let res_text = format!("Spirit Stones: {}", spirit_stones);
-        let res_dims = measure_text(&res_text, None, FONT_HEADER_SIZE as u16, 1.0);
-        draw_text(
+        let res_dims = measure_ui_text(&res_text, None, FONT_HEADER_SIZE as u16, 1.0);
+        draw_ui_text(
             &res_text,
             screen_w - res_dims.width - 20.0,
             40.0,
@@ -50,7 +51,7 @@ impl LibraryState {
         draw_panel(left_rect, Some("Hall of Fallen"));
 
         if deceased.is_empty() {
-            draw_text(
+            draw_ui_text(
                 "No disciples have fallen on the path... yet.",
                 left_rect.x + 20.0,
                 left_rect.y + 60.0,
@@ -65,8 +66,8 @@ impl LibraryState {
                 } // Clip
 
                 let text = format!("{}. {} ({:?})", i + 1, d.name, d.realm_at_death);
-                draw_text(&text, left_rect.x + 20.0, y, FONT_BODY_SIZE, TEXT_PRIMARY);
-                draw_text(
+                draw_ui_text(&text, left_rect.x + 20.0, y, FONT_BODY_SIZE, TEXT_PRIMARY);
+                draw_ui_text(
                     &format!("Cause: {}", d.cause_of_death),
                     left_rect.x + 30.0,
                     y + 20.0,
@@ -80,7 +81,7 @@ impl LibraryState {
         // --- Right Panel: Scriptures (Placeholder) ---
         let right_rect = Rect::new(left_w + 20.0, content_y, right_w, content_h);
         draw_panel(right_rect, Some("Scripture Pavilion"));
-        draw_text(
+        draw_ui_text(
             "Coming Soon: Ancient Techniques & Doctrines",
             right_rect.x + 20.0,
             right_rect.y + 60.0,
