@@ -8,7 +8,7 @@ impl Game {
         match result {
             WorldSimResult::EventTriggered(event) => {
                 self.event_log.push(format!(
-                    "[World Event] {}: {}",
+                    "[Regional Omen] {}: {}",
                     event.name, event.description
                 ));
                 // Apply immediate effects if no choices required
@@ -29,7 +29,7 @@ impl Game {
             WorldSimResult::FactionAction { faction_id, action } => {
                 if let Some(faction) = self.world_sim.get_faction(&faction_id) {
                     self.event_log.push(format!(
-                        "[Faction] {} took action: {:?}",
+                        "[Power Tablet] {} moved: {:?}",
                         faction.name, action
                     ));
                 }
@@ -49,7 +49,7 @@ impl Game {
                     .map(|f| f.name.clone())
                     .unwrap_or(defender.clone());
                 self.event_log.push(format!(
-                    "[War] {} has declared war on {}!",
+                    "[War Banner] {} has declared war on {}!",
                     aggressor_name, defender_name
                 ));
             }
@@ -75,12 +75,12 @@ impl Game {
                         .map(|f| f.name.clone())
                         .unwrap_or(v);
                     self.event_log.push(format!(
-                        "[War] The war between {} and {} has ended. {} is victorious!",
+                        "[War Banner] The war between {} and {} has ended. {} is victorious!",
                         a_name, b_name, v_name
                     ));
                 } else {
                     self.event_log.push(format!(
-                        "[War] The war between {} and {} has ended in a truce.",
+                        "[War Banner] The war between {} and {} has ended in a truce.",
                         a_name, b_name
                     ));
                 }
@@ -91,7 +91,7 @@ impl Game {
                 new_faction,
             } => {
                 self.event_log.push(format!(
-                    "[Territory] {} has changed hands from {} to {}.",
+                    "[Territory Tablet] {} has changed hands from {} to {}.",
                     node_id, old_faction, new_faction
                 ));
             }
@@ -103,14 +103,16 @@ impl Game {
                 // Silent unless significant change
                 if (new_price as i32 - old_price as i32).abs() > 10 {
                     self.event_log.push(format!(
-                        "[Market] {} prices changed: {} -> {}.",
+                        "[Caravan Market] {} prices changed: {} -> {}.",
                         item_id, old_price, new_price
                     ));
                 }
             }
             WorldSimResult::RouteDisrupted { route_id, reason } => {
-                self.event_log
-                    .push(format!("[Trade] Route {} disrupted: {}", route_id, reason));
+                self.event_log.push(format!(
+                    "[Caravan Route] {} disrupted: {}",
+                    route_id, reason
+                ));
             }
             WorldSimResult::Notification(msg) => {
                 self.event_log.push(msg);
@@ -142,7 +144,7 @@ impl Game {
             }
             EventEffect::SpawnMission { mission_id } => {
                 self.event_log
-                    .push(format!("New mission available: {}", mission_id));
+                    .push(format!("New dispatch posted at the gate: {}", mission_id));
             }
             EventEffect::ModifyResource { resource, delta } => match resource {
                 crate::data::world_events::ResourceType::SpiritStones => {
@@ -172,7 +174,7 @@ impl Game {
                 description,
             } => {
                 self.event_log.push(format!(
-                    "Combat triggered: {} (Power: {})",
+                    "Hostile omen: {} (Power: {})",
                     description, enemy_power
                 ));
             }
@@ -180,7 +182,7 @@ impl Game {
                 if !self.unlocked_techs.contains(tech_id) {
                     self.unlocked_techs.push(tech_id.clone());
                     self.event_log
-                        .push(format!("Technology unlocked: {}", tech_id));
+                        .push(format!("Doctrine recovered: {}", tech_id));
                 }
             }
             EventEffect::ModifyCorruption { node_id, delta } => {
@@ -215,14 +217,14 @@ impl Game {
             EventEffect::GiveItem { item_id, amount } => {
                 *self.inventory.entry(item_id.clone()).or_insert(0) += amount;
                 self.event_log
-                    .push(format!("Received {}x {}", amount, item_id));
+                    .push(format!("Sect stores received {}x {}", amount, item_id));
             }
             EventEffect::ModifyCultivationSpeed {
                 modifier,
                 duration_ticks,
             } => {
                 self.event_log.push(format!(
-                    "Cultivation speed modified by {}x for {} ticks",
+                    "Mountain qi circulation shifted by {}x for {} ticks",
                     modifier, duration_ticks
                 ));
             }

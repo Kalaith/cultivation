@@ -19,6 +19,10 @@ impl Game {
             Action::RecruitDisciple => self.handle_recruit_disciple(),
             Action::PromoteDisciple(idx) => self.handle_promote_disciple(idx),
             Action::AttemptBreakthrough(idx) => self.handle_attempt_breakthrough_action(idx),
+            Action::ResolveTribulation {
+                disciple_idx,
+                survived,
+            } => self.handle_resolve_tribulation(disciple_idx, survived),
             Action::StartMission(mission_desc, disciple_indices) => {
                 self.handle_start_mission(mission_desc, disciple_indices)
             }

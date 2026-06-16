@@ -6,7 +6,7 @@ impl Game {
         let count = *self.inventory.get(&item_id).unwrap_or(&0);
         if count == 0 {
             self.event_log
-                .push("Item not found in inventory.".to_string());
+                .push("The requested supply is absent from sect stores.".to_string());
             return;
         }
 
@@ -19,7 +19,7 @@ impl Game {
 
         if item.equipment.is_some() {
             self.event_log.push(format!(
-                "{} is equipment. Equip it from the roster.",
+                "{} is an artifact. Bind it from the disciple scroll.",
                 item.name
             ));
             return;
@@ -49,7 +49,7 @@ impl Game {
         {
             if *bn_id == item_id {
                 logs.push(format!(
-                    "{} overcame their bottleneck: Use {}!",
+                    "{} fulfilled a fate trial: use {}!",
                     disciple.name, item.name
                 ));
                 disciple.breakthrough_bottleneck = None;
@@ -65,7 +65,7 @@ impl Game {
         if let Some(beast_item) = self.data.beast_equipment_definitions.get(&item_id) {
             if beast_item.beast_only {
                 self.event_log
-                    .push("Cannot equip beast-only items on disciples.".to_string());
+                    .push("That guardian gear cannot be bound to a disciple.".to_string());
                 return;
             }
         }
@@ -73,19 +73,19 @@ impl Game {
         let count = *self.inventory.get(&item_id).unwrap_or(&0);
         if count == 0 {
             self.event_log
-                .push("Cannot equip: item not in inventory.".to_string());
+                .push("That artifact is absent from sect stores.".to_string());
             return;
         }
 
         let Some(item) = self.data.items.get(&item_id).cloned() else {
             self.event_log
-                .push("Cannot equip: unknown item.".to_string());
+                .push("The requested artifact is unknown to the archive.".to_string());
             return;
         };
 
         let Some(equipment) = item.equipment.clone() else {
             self.event_log
-                .push(format!("{} cannot be equipped.", item.name));
+                .push(format!("{} cannot be bound as an artifact.", item.name));
             return;
         };
 
@@ -117,7 +117,7 @@ impl Game {
         }
 
         self.event_log
-            .push(format!("{} equipped {}.", disciple.name, item.name));
+            .push(format!("{} bound {}.", disciple.name, item.name));
     }
 
     pub(in crate::game) fn handle_unequip_item(
@@ -141,7 +141,7 @@ impl Game {
         *self.inventory.entry(item_id.clone()).or_insert(0) += 1;
         disciple.equipment.remove(&slot);
         self.event_log
-            .push(format!("{} unequipped {}.", disciple.name, item.name));
+            .push(format!("{} unbound {}.", disciple.name, item.name));
     }
 
     pub(in crate::game) fn handle_repair_item(&mut self, item_id: String, disciple_idx: usize) {
@@ -149,18 +149,20 @@ impl Game {
             return;
         };
         let Some(item) = self.data.items.get(&item_id) else {
-            self.event_log.push("Unknown item.".to_string());
+            self.event_log
+                .push("The requested artifact is unknown to the archive.".to_string());
             return;
         };
 
         if item.equipment.is_none() {
             self.event_log
-                .push("Item has no durability to repair.".to_string());
+                .push("This supply has no artifact vessel to mend.".to_string());
             return;
         }
 
         if !disciple.equipment.values().any(|id| id == &item_id) {
-            self.event_log.push("Item is not equipped.".to_string());
+            self.event_log
+                .push("The artifact is not currently bound.".to_string());
             return;
         }
 
@@ -169,7 +171,7 @@ impl Game {
 
         if self.spirit_stones < repair_cost {
             self.event_log.push(format!(
-                "Not enough Spirit Stones to repair ({} required).",
+                "The treasury lacks spirit stones to mend this artifact ({} required).",
                 repair_cost
             ));
             return;
@@ -177,7 +179,7 @@ impl Game {
 
         self.spirit_stones -= repair_cost;
         self.event_log.push(format!(
-            "Repaired {} for {} Spirit Stones.",
+            "Mended {} for {} spirit stones.",
             item.name, repair_cost
         ));
     }
@@ -186,30 +188,31 @@ impl Game {
         let count = *self.inventory.get(&item_id).unwrap_or(&0);
         if count == 0 {
             self.event_log
-                .push("Beast equipment not in inventory.".to_string());
+                .push("Guardian gear is absent from sect stores.".to_string());
             return;
         }
 
         let Some(item) = self.data.beast_equipment_definitions.get(&item_id) else {
             self.event_log
-                .push("Unknown beast equipment item.".to_string());
+                .push("The requested guardian gear is unknown to the archive.".to_string());
             return;
         };
 
         if !item.beast_only {
             self.event_log
-                .push("Item is not beast-only equipment.".to_string());
+                .push("This artifact is not made for mountain guardians.".to_string());
             return;
         }
 
         let Some(beast) = self.spirit_beasts.iter_mut().find(|b| b.id == beast_id) else {
-            self.event_log.push("Spirit beast not found.".to_string());
+            self.event_log
+                .push("No matching mountain guardian answered.".to_string());
             return;
         };
 
         if !beast.can_equip(item) {
             self.event_log
-                .push("Beast cannot equip this item yet.".to_string());
+                .push("This guardian cannot bear that gear yet.".to_string());
             return;
         }
 
@@ -239,7 +242,7 @@ impl Game {
         };
 
         self.event_log.push(format!(
-            "{} equipped {} ({})",
+            "{} bound {} ({})",
             beast.name, item.name, slot_label
         ));
     }

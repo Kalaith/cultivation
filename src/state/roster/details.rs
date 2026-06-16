@@ -43,9 +43,9 @@ impl DiscipleRosterState {
         );
         draw_ui_text(
             if breakthrough_ready {
-                "BREAKTHROUGH"
+                "HEAVENLY GATE"
             } else {
-                "NEXT BREAKTHROUGH"
+                "NEXT GATE"
             },
             circle_center.x - 82.0,
             circle_center.y + 98.0,
@@ -256,7 +256,11 @@ impl DiscipleRosterState {
         }
 
         let row2_y = btn_y + btn_h + spacing;
-        if draw_button(Rect::new(right_x, row2_y, btn_w, btn_h), "Use Pill", false) {
+        if draw_button(
+            Rect::new(right_x, row2_y, btn_w, btn_h),
+            "Administer Pill",
+            false,
+        ) {
             self.item_modal_open = true;
         }
 
@@ -272,7 +276,7 @@ impl DiscipleRosterState {
         if disciple.rank != DiscipleRank::Outer && disciple.realm != "Mortal" {
             if draw_button(
                 Rect::new(right_x, row3_y, btn_w * 2.0 + spacing, btn_h),
-                "Change Cultivation Law",
+                "Assign Cultivation Law",
                 false,
             ) {
                 self.law_modal_open = true;
@@ -283,7 +287,7 @@ impl DiscipleRosterState {
         if disciple.rank == DiscipleRank::Outer && disciple.realm != "Mortal" {
             if draw_button(
                 Rect::new(right_x, row4_y, btn_w * 2.0 + spacing, btn_h),
-                "Promote to Inner (100 Spirit Stones)",
+                "Raise to Inner Court (100 SS)",
                 false,
             ) {
                 return Some(

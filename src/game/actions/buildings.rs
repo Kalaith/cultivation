@@ -8,13 +8,14 @@ impl Game {
     pub(in crate::game) fn handle_upgrade_building(&mut self, building_type: BuildingType) {
         if !self.disciples.iter().any(|d| d.rank == DiscipleRank::Outer) {
             self.event_log
-                .push("Cannot Build: No Outer Disciples available to work!".to_string());
+                .push("No outer disciples are available to raise the hall beams.".to_string());
             return;
         }
 
         let cost = 50;
         if self.spirit_stones < cost {
-            self.event_log.push("Not enough Spirit Stones.".to_string());
+            self.event_log
+                .push("The treasury lacks spirit stones for hall work.".to_string());
             return;
         }
 
@@ -30,7 +31,7 @@ impl Game {
         self.spirit_stones -= cost;
         building.level += 1;
         self.event_log.push(format!(
-            "Upgraded {:?} to Lv {}",
+            "Raised {:?} to hall grade {}.",
             building.building_type, building.level
         ));
     }
@@ -47,7 +48,7 @@ impl Game {
         let cost = building.repair_cost;
         if self.spirit_stones < cost {
             self.event_log.push(format!(
-                "Not enough Spirit Stones to repair ({} required).",
+                "The treasury lacks spirit stones to restore this hall ({} required).",
                 cost
             ));
             return;
@@ -57,7 +58,7 @@ impl Game {
         let building_type = building.building_type.clone();
         building.status = crate::data::buildings::BuildingStatus::Active;
         self.event_log
-            .push(format!("Repaired {}!", building.building_type));
+            .push(format!("Restored {}!", building.building_type));
         self.show_moment(
             MomentKind::Founding,
             "A Hall Rises From Ruin",
@@ -88,13 +89,15 @@ impl Game {
                 .any(|b| b.building_type == b_type)
         {
             self.event_log
-                .push(format!("Cannot build: {} already exists.", b_type));
+                .push(format!("The sect already has a {}.", b_type));
             return;
         }
 
         if self.spirit_stones < cost {
-            self.event_log
-                .push(format!("Not enough Spirit Stones ({} required).", cost));
+            self.event_log.push(format!(
+                "The treasury lacks spirit stones ({} required).",
+                cost
+            ));
             return;
         }
 
@@ -110,7 +113,7 @@ impl Game {
         new_b.status = crate::data::buildings::BuildingStatus::Active;
         self.data.buildings.push(new_b);
         self.event_log
-            .push(format!("Constructed {} at {},{}", b_type, x, y));
+            .push(format!("Raised {} at {},{}.", b_type, x, y));
         self.show_moment(
             MomentKind::Founding,
             "New Hall Raised",
@@ -132,7 +135,7 @@ impl Game {
             if let Some(recipe) = self.data.recipes.iter().find(|r| r.id == *recipe_id) {
                 let recipe_name = recipe.name.clone();
                 self.event_log
-                    .push(format!("Discovered recipe: {}!", recipe_name));
+                    .push(format!("Recovered workshop formula: {}!", recipe_name));
                 self.show_moment(
                     MomentKind::Discovery,
                     "A Forgotten Method Surfaces",

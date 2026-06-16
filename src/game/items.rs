@@ -28,22 +28,22 @@ impl Game {
                             .map(|i| i.recovery_ticks_remaining)
                             .unwrap_or(0);
                         logs.push(format!(
-                            "{} used {} on {}. Recovery time reduced by {} ticks ({} remaining).",
-                            item.name,
-                            effective_amt,
+                            "{} received {} healing from {}. Recovery omen shortened by {} ticks ({} remaining).",
                             disciple.name,
+                            effective_amt,
+                            item.name,
                             before_ticks - after_ticks,
                             after_ticks
                         ));
                     } else {
                         logs.push(format!(
-                            "{} fully healed {} with {}!",
-                            disciple.name, disciple.name, item.name
+                            "{}'s wounds closed under {}.",
+                            disciple.name, item.name
                         ));
                     }
                 } else {
                     logs.push(format!(
-                        "{} is not injured. {} had no effect.",
+                        "{} bears no wound. {} leaves no mark.",
                         disciple.name, item.name
                     ));
                 }
@@ -53,12 +53,12 @@ impl Game {
                 disciple.exp += effective_amt;
                 if is_herb {
                     logs.push(format!(
-                        "{} gained {} Cultivation XP from {} (50% herb efficiency).",
+                        "{} gained {} qi insight from {} (raw herb inefficiency).",
                         disciple.name, effective_amt, item.name
                     ));
                 } else {
                     logs.push(format!(
-                        "{} gained {} Cultivation XP from {}.",
+                        "{} gained {} qi insight from {}.",
                         disciple.name, effective_amt, item.name
                     ));
                 }
@@ -92,13 +92,13 @@ impl Game {
                     1.0,
                 ));
                 logs.push(format!(
-                    "{} received a temporary {} buff (+{} for {} ticks).",
+                    "{} bears a temporary {} blessing (+{} for {} ticks).",
                     disciple.name, stat, value, duration_ticks
                 ));
             }
             crate::data::items::ItemEffect::DamageShield(amt) => {
                 logs.push(format!(
-                    "{} activated a damage shield ({} points) from {}!",
+                    "{} awakened a warding shell ({} strength) from {}.",
                     disciple.name, amt, item.name
                 ));
             }
@@ -106,19 +106,19 @@ impl Game {
                 let effective_amt = ((*amt as f32) * efficiency) as u32;
                 disciple.exp += effective_amt;
                 logs.push(format!(
-                    "{} gained {} Cultivation XP from Qi Burst ({}).",
+                    "{} gained {} qi insight from a Qi Burst ({}).",
                     disciple.name, effective_amt, item.name
                 ));
             }
             crate::data::items::ItemEffect::ElementalStrike(element, amt) => {
                 logs.push(format!(
-                    "{} unleashed a {:?} elemental strike ({} damage) from {}!",
+                    "{} released a {:?} strike ({} force) from {}.",
                     disciple.name, element, amt, item.name
                 ));
             }
             crate::data::items::ItemEffect::MissionSpeedBoost(amt) => {
                 logs.push(format!(
-                    "{} gained mission speed boost ({} ticks) from {}.",
+                    "{} carries a swifter dispatch omen ({} ticks) from {}.",
                     disciple.name, amt, item.name
                 ));
             }
@@ -141,7 +141,7 @@ impl Game {
             _ => {}
         }
         format!(
-            "{}'s {} increased by {}!",
+            "{}'s {} cultivation rose by {}.",
             disciple.name, label, effective_amt
         )
     }

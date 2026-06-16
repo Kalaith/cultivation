@@ -216,7 +216,7 @@ impl DiscipleRosterState {
 
         y = modal_y + 250.0;
         draw_ui_text(
-            "Unbound Inventory",
+            "Unbound Artifacts",
             modal_x + 20.0,
             y,
             FONT_BODY_SIZE,

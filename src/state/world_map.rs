@@ -24,7 +24,7 @@ impl WorldMapState {
 
         draw_panel(Rect::new(0.0, 0.0, screen_w, 70.0), None);
         draw_screen_title(
-            "Ancient Regional Map",
+            "Outside Route Map",
             "Routes, threats, and powers beyond the mountain gate",
             24.0,
             34.0,
@@ -75,7 +75,7 @@ impl WorldMapState {
 
         if draw_button(
             Rect::new(screen_w - 128.0, screen_h - 58.0, 100.0, 40.0),
-            "Back",
+            "Return",
             false,
         ) {
             return UpdateResult::new().with_transition(StateTransition::ToSectBase);
@@ -127,7 +127,7 @@ impl WorldMapState {
         }
 
         draw_ui_text(
-            "Regional Ink Map",
+            "Outer Realm Ink Map",
             rect.x + 22.0,
             rect.y + 34.0,
             FONT_HEADER_SIZE,

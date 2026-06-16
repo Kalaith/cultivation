@@ -18,7 +18,7 @@ impl Game {
 
         if !self.has_ingredients(&recipe.ingredients) {
             self.event_log
-                .push("Cannot Craft: Missing ingredients.".to_string());
+                .push("Workshop lacks the offerings for this formula.".to_string());
             return;
         }
 
@@ -66,7 +66,7 @@ impl Game {
                 {
                     if *bn_recipe == recipe_id {
                         self.event_log.push(format!(
-                            "{} overcame their bottleneck: Craft {}!",
+                            "{} fulfilled a fate trial: refine {}!",
                             disciple.name, recipe.name
                         ));
                         disciple.breakthrough_bottleneck = None;
@@ -127,20 +127,22 @@ impl Game {
             .iter()
             .all(|p| self.unlocked_techs.contains(p));
         if !prereqs_met {
-            self.event_log.push("Prerequisites not met.".to_string());
+            self.event_log
+                .push("Earlier doctrine slips are still sealed.".to_string());
             return;
         }
 
         if self.spirit_stones < tech.cost_spirit_stones {
             self.event_log
-                .push("Not enough Spirit Stones to research.".to_string());
+                .push("The treasury lacks spirit stones for doctrine recovery.".to_string());
             return;
         }
 
         self.spirit_stones -= tech.cost_spirit_stones;
         self.unlocked_techs.push(tech_id.clone());
         let tech_name = tech.name.clone();
-        self.event_log.push(format!("Researched: {}", tech_name));
+        self.event_log
+            .push(format!("Doctrine recovered: {}", tech_name));
         self.show_moment(
             MomentKind::Discovery,
             "A Jade Slip Opens",

@@ -10,7 +10,7 @@ impl Game {
 
         let relevant_stat = ongoing.mission.mission_type.get_relevant_stat();
         logs.push(format!(
-            "Mission Type: {:?} (Uses {:?})",
+            "Dispatch path: {:?} (tests {:?})",
             ongoing.mission.mission_type, relevant_stat
         ));
 
@@ -40,7 +40,7 @@ impl Game {
                 }
 
                 logs.push(format!(
-                    "{}: Realm Pwr {} + Attr {} = {}",
+                    "{}: realm merit {} + aptitude {} = {}",
                     disciple.name, realm_power, attr_power, total_power
                 ));
             }
@@ -48,7 +48,7 @@ impl Game {
 
         let difficulty = (ongoing.mission.danger_level * 2) as i32;
         logs.push(format!(
-            "Team Power: {} vs Difficulty: {}",
+            "Team merit: {} vs omen: {}",
             team_power, difficulty
         ));
 
@@ -57,7 +57,7 @@ impl Game {
         let chance = (base_chance + power_modifier + trait_modifier).clamp(0.1, 0.95);
 
         logs.push(format!(
-            "Success Chance: {:.0}% (Trait Mod: {:+.0}%)",
+            "Favorable omen: {:.0}% (fate marks {:+.0}%)",
             chance * 100.0,
             trait_modifier * 100.0
         ));
@@ -66,7 +66,7 @@ impl Game {
         let success = roll < chance;
 
         let rewards = if success {
-            logs.push("Mission Successful!".to_string());
+            logs.push("Dispatch returned in triumph.".to_string());
 
             match ongoing.mission.mission_type {
                 crate::data::missions::MissionType::Exploration => MissionRewards {
@@ -159,7 +159,7 @@ impl Game {
                 }
             }
         } else {
-            logs.push("Mission Failed.".to_string());
+            logs.push("Dispatch ended in failure.".to_string());
             MissionRewards::default()
         };
 

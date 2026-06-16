@@ -37,7 +37,7 @@ impl MissionResolutionState {
             let rect = Rect::new(x, y, w, h);
 
             draw_moment_backdrop(screen_w, screen_h, outcome.success);
-            draw_panel(rect, Some("Sect Annal: Mission Return"));
+            draw_panel(rect, Some("Sect Annal: Dispatch Return"));
 
             let accent = if outcome.success { SUCCESS } else { FAILURE };
             draw_status_stamp(
@@ -59,7 +59,7 @@ impl MissionResolutionState {
                 if outcome.success {
                     "The disciples return through the mountain gate."
                 } else {
-                    "The mountain gate opens to wounded silence."
+                    "The mountain gate opens onto wounded silence."
                 },
                 rect.x + 36.0,
                 draw_y,
@@ -72,7 +72,7 @@ impl MissionResolutionState {
             draw_y += 28.0;
 
             draw_ui_text(
-                "Journey Record",
+                "Dispatch Record",
                 rect.x + 36.0,
                 draw_y,
                 FONT_BODY_SIZE,
@@ -97,7 +97,7 @@ impl MissionResolutionState {
                 if outcome.success {
                     "Record Spoils"
                 } else {
-                    "Close the Annal"
+                    "Seal the Annal"
                 },
                 true,
             ) {
@@ -276,11 +276,7 @@ fn reward_entries(rewards: &MissionRewards) -> Vec<(&'static str, String, Color)
         entries.push(("Spirit Stones", rewards.spirit_stones.to_string(), PRIMARY));
     }
     if rewards.disciple_exp > 0 {
-        entries.push((
-            "Cultivation",
-            format!("{} exp", rewards.disciple_exp),
-            SECONDARY,
-        ));
+        entries.push(("Insight", format!("{} qi", rewards.disciple_exp), SECONDARY));
     }
     if rewards.herbs > 0 {
         entries.push(("Herbs", rewards.herbs.to_string(), SUCCESS));

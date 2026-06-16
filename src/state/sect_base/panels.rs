@@ -21,7 +21,7 @@ impl SectBaseState {
         } else {
             sect_name
         };
-        draw_screen_title(title, "Patriarch's command archive", 20.0, 31.0);
+        draw_screen_title(title, "Mountain command ledger", 20.0, 31.0);
 
         herbs::draw_season_indicator(275.0, 40.0, current_season, season_ticks);
 
@@ -37,7 +37,7 @@ impl SectBaseState {
             }
         }
 
-        if draw_button(Rect::new(screen_w - 50.0, 10.0, 40.0, 40.0), "O", false) {
+        if draw_button(Rect::new(screen_w - 50.0, 10.0, 40.0, 40.0), "S", false) {
             self.settings_open = !self.settings_open;
         }
     }
@@ -59,12 +59,14 @@ impl SectBaseState {
             Color::new(0.0, 0.0, 0.0, 0.16),
         );
 
-        let mut btn_y = rect.y + 40.0;
+        self.draw_mountain_mandate(rect, data);
+
+        let mut btn_y = rect.y + 132.0;
         for building in &data.buildings {
             let status_str = match building.status {
                 BuildingStatus::Active => "",
                 BuildingStatus::Ruined => " (Ruined)",
-                BuildingStatus::Constructing => " (Building...)",
+                BuildingStatus::Constructing => " (Raising...)",
             };
             let label = format!("{}{}", building.building_type, status_str);
 
@@ -86,7 +88,7 @@ impl SectBaseState {
         let nav_y_start = rect.y + rect.h - 270.0;
         draw_ink_divider(rect.x + 14.0, nav_y_start - 16.0, width - 28.0);
         draw_ui_text(
-            "Sect Archives",
+            "Patriarch's Ledgers",
             rect.x + 14.0,
             nav_y_start - 24.0,
             FONT_SMALL_SIZE,
@@ -94,28 +96,28 @@ impl SectBaseState {
         );
         if draw_button_muted(
             Rect::new(rect.x + 10.0, nav_y_start, width - 20.0, 40.0),
-            "Character Scrolls",
+            "Disciple Scrolls",
             false,
         ) {
             return Some(UpdateResult::new().with_transition(StateTransition::ToDiscipleRoster));
         }
         if draw_button_muted(
             Rect::new(rect.x + 10.0, nav_y_start + 50.0, width - 20.0, 40.0),
-            "Regional Map",
+            "Outside Routes",
             false,
         ) {
             return Some(UpdateResult::new().with_transition(StateTransition::ToWorldMap));
         }
         if draw_button_muted(
             Rect::new(rect.x + 10.0, nav_y_start + 100.0, width - 20.0, 40.0),
-            "Known Powers",
+            "Regional Powers",
             false,
         ) {
             return Some(UpdateResult::new().with_transition(StateTransition::ToFactionScreen));
         }
         if draw_button_muted(
             Rect::new(rect.x + 10.0, nav_y_start + 150.0, width - 20.0, 40.0),
-            "Market Pavilion",
+            "Caravan Ledger",
             false,
         ) {
             return Some(UpdateResult::new().with_transition(StateTransition::ToTradeScreen));
@@ -130,13 +132,51 @@ impl SectBaseState {
         }
         if draw_button_muted(
             Rect::new(rect.x + 10.0, nav_y_start + 250.0, width - 20.0, 40.0),
-            "Spirit Beasts",
+            "Mountain Guardians",
             false,
         ) {
             self.view = SectView::SpiritBeasts;
         }
 
         None
+    }
+
+    fn draw_mountain_mandate(&self, rect: Rect, data: &GameData) {
+        let active = data
+            .buildings
+            .iter()
+            .filter(|b| b.status == BuildingStatus::Active)
+            .count() as u32;
+        let ruined = data
+            .buildings
+            .iter()
+            .filter(|b| b.status == BuildingStatus::Ruined)
+            .count() as u32;
+        let raising = data
+            .buildings
+            .iter()
+            .filter(|b| b.status == BuildingStatus::Constructing)
+            .count() as u32;
+        let y = rect.y + 52.0;
+
+        draw_ui_text(
+            "Mountain Mandate",
+            rect.x + 14.0,
+            y,
+            FONT_SMALL_SIZE,
+            TEXT_HIGHLIGHT,
+        );
+        draw_ink_divider(rect.x + 14.0, y + 10.0, rect.w - 28.0);
+        draw_small_mandate_stat(rect.x + 14.0, y + 38.0, "Active", active, SUCCESS);
+        draw_small_mandate_stat(rect.x + 88.0, y + 38.0, "Ruined", ruined, FAILURE);
+        draw_small_mandate_stat(rect.x + 162.0, y + 38.0, "Raising", raising, WARNING);
+        draw_ui_text(
+            "Restore halls before ambition outruns shelter.",
+            rect.x + 14.0,
+            y + 62.0,
+            FONT_SMALL_SIZE,
+            TEXT_SECONDARY,
+        );
     }
 
     pub(super) fn draw_right_panel(
@@ -167,11 +207,38 @@ impl SectBaseState {
             Color::new(0.0, 0.0, 0.0, 0.22),
         );
 
-        let mut log_y = rect.y + 50.0;
+        draw_ui_text(
+            "Recent Edicts and Omens",
+            rect.x + 14.0,
+            rect.y + 52.0,
+            FONT_SMALL_SIZE,
+            TEXT_HIGHLIGHT,
+        );
+        draw_ink_divider(rect.x + 14.0, rect.y + 62.0, rect.w - 28.0);
+
+        if event_log.is_empty() {
+            draw_wrapped_text(
+                "The annals are waiting for the patriarch's first decree.",
+                rect.x + 14.0,
+                rect.y + 98.0,
+                rect.w - 28.0,
+                FONT_BODY_SIZE,
+                TEXT_SECONDARY,
+            );
+            return;
+        }
+
+        let mut log_y = rect.y + 96.0;
         let max_width = rect.w - 20.0;
 
         for (idx, event) in event_log.iter().rev().take(20).enumerate() {
             let event_color = self.event_color(event, idx);
+            draw_circle(
+                rect.x + 13.0,
+                log_y - 6.0,
+                3.0,
+                Color::new(event_color.r, event_color.g, event_color.b, event_color.a),
+            );
             let words: Vec<&str> = event.split_whitespace().collect();
             let mut current_line = String::new();
 
@@ -185,7 +252,7 @@ impl SectBaseState {
                 if test_line.len() as f32 * 7.0 > max_width {
                     draw_ui_text(
                         &current_line,
-                        rect.x + 10.0,
+                        rect.x + 22.0,
                         log_y,
                         FONT_SMALL_SIZE,
                         event_color,
@@ -199,7 +266,7 @@ impl SectBaseState {
             if !current_line.is_empty() {
                 draw_ui_text(
                     &current_line,
-                    rect.x + 10.0,
+                    rect.x + 22.0,
                     log_y,
                     FONT_SMALL_SIZE,
                     event_color,
@@ -245,11 +312,11 @@ impl SectBaseState {
         let modal_y = (screen_h - modal_h) / 2.0;
         let modal_rect = Rect::new(modal_x, modal_y, modal_w, modal_h);
 
-        draw_panel(modal_rect, Some("Settings"));
+        draw_panel(modal_rect, Some("Patriarch's Seal"));
 
         if draw_button(
             Rect::new(modal_x + 50.0, modal_y + 60.0, 200.0, 40.0),
-            "Save Game",
+            "Inscribe Chronicle",
             false,
         ) {
             return Some(UpdateResult::new().with_action(Action::SaveGame));
@@ -257,7 +324,7 @@ impl SectBaseState {
 
         if draw_button(
             Rect::new(modal_x + 50.0, modal_y + 120.0, 200.0, 40.0),
-            "Exit to Menu",
+            "Return to Title",
             false,
         ) {
             return Some(UpdateResult::new().with_transition(StateTransition::ToMainMenu));
@@ -265,11 +332,22 @@ impl SectBaseState {
 
         if draw_button(
             Rect::new(modal_x + 50.0, modal_y + 180.0, 200.0, 40.0),
-            "Close",
+            "Close Seal",
             false,
         ) {
             self.settings_open = false;
         }
         None
     }
+}
+
+fn draw_small_mandate_stat(x: f32, y: f32, label: &str, value: u32, color: Color) {
+    draw_ui_text(label, x, y, FONT_SMALL_SIZE, TEXT_SECONDARY);
+    draw_ui_text(
+        &value.to_string(),
+        x,
+        y + 20.0,
+        FONT_BODY_SIZE,
+        Color::new(color.r, color.g, color.b, 0.92),
+    );
 }

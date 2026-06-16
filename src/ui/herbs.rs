@@ -1,7 +1,7 @@
-//! Herb System UI Components
+//! Spirit herb and apothecary UI components
 //!
-//! This module provides reusable UI components for the herb system,
-//! keeping UI logic separate from game logic.
+//! This module provides reusable UI components for sect herb gardens,
+//! preserving jars, and alchemy prep while keeping game logic separate.
 
 use crate::data::buildings::{Building, BuildingType};
 use crate::data::disciples::{Disciple, DiscipleRank};
@@ -13,6 +13,8 @@ use crate::ui::components::*;
 use crate::ui::theme::*;
 use macroquad::prelude::*;
 use macroquad_toolkit::ui::draw_ui_text;
+
+pub use crate::ui::herb_widgets::draw_season_indicator;
 
 /// Result from herb UI interactions
 pub struct HerbUiResult {
@@ -55,9 +57,8 @@ pub fn draw_herb_garden_panel(
 ) -> f32 {
     let mut cur_y = y;
 
-    // Season display
     draw_ui_text(
-        &format!("Current Season: {}", current_season),
+        &format!("Mountain Season: {}", current_season),
         x,
         cur_y,
         FONT_BODY_SIZE,
@@ -78,7 +79,7 @@ pub fn draw_herb_garden_panel(
         TEXT_SECONDARY
     };
     draw_ui_text(
-        &format!("Assigned Worker: {}", worker_name),
+        &format!("Garden Attendant: {}", worker_name),
         x,
         cur_y,
         FONT_BODY_SIZE,
@@ -86,8 +87,14 @@ pub fn draw_herb_garden_panel(
     );
     cur_y += 35.0;
 
-    // Plot display
-    draw_ui_text("Herb Plots:", x, cur_y, FONT_HEADER_SIZE, TEXT_HIGHLIGHT);
+    draw_ink_divider(x, cur_y - 8.0, width - 20.0);
+    draw_ui_text(
+        "Spirit Herb Terraces",
+        x,
+        cur_y + 14.0,
+        FONT_HEADER_SIZE,
+        TEXT_HIGHLIGHT,
+    );
     cur_y += 30.0;
 
     let max_plots = building.get_max_herb_plots();
@@ -103,6 +110,13 @@ pub fn draw_herb_garden_panel(
             plot_rect.w,
             plot_rect.h,
             Color::new(0.1, 0.15, 0.1, 0.8),
+        );
+        draw_rectangle(
+            plot_rect.x,
+            plot_rect.y,
+            6.0,
+            plot_rect.h,
+            Color::new(PRIMARY.r, PRIMARY.g, PRIMARY.b, 0.45),
         );
         draw_rectangle_lines(
             plot_rect.x,
@@ -129,7 +143,7 @@ pub fn draw_herb_garden_panel(
 
             // Draw herb name with element color
             draw_ui_text(
-                &format!("Plot {}: {}", i + 1, herb_name),
+                &format!("Terrace {}: {}", i + 1, herb_name),
                 x + 10.0,
                 cur_y + 25.0,
                 FONT_BODY_SIZE,
@@ -140,7 +154,7 @@ pub fn draw_herb_garden_panel(
                 // Ready to harvest
                 if building.assigned_disciple.is_some() {
                     draw_ui_text(
-                        "READY - Harvesting...",
+                        "Ripe - attendant harvesting",
                         x + 10.0,
                         cur_y + 50.0,
                         FONT_SMALL_SIZE,
@@ -148,7 +162,7 @@ pub fn draw_herb_garden_panel(
                     );
                 } else {
                     draw_ui_text(
-                        "MATURE - Needs worker!",
+                        "Ripe - no attendant assigned",
                         x + 10.0,
                         cur_y + 50.0,
                         FONT_SMALL_SIZE,
@@ -180,7 +194,7 @@ pub fn draw_herb_garden_panel(
         } else {
             // Empty plot
             draw_ui_text(
-                &format!("Plot {}: Empty", i + 1),
+                &format!("Terrace {}: vacant spirit soil", i + 1),
                 x + 10.0,
                 cur_y + 35.0,
                 FONT_BODY_SIZE,
@@ -194,7 +208,7 @@ pub fn draw_herb_garden_panel(
     // Show locked plots
     for i in building.herb_plots.len()..max_plots {
         draw_ui_text(
-            &format!("Plot {}: (Upgrade to unlock)", i + 1),
+            &format!("Terrace {}: restore the garden to unlock", i + 1),
             x,
             cur_y + 20.0,
             FONT_SMALL_SIZE,
@@ -223,7 +237,7 @@ pub fn draw_herb_planting_modal(
 
     draw_panel(
         Rect::new(modal_x, modal_y, modal_w, modal_h),
-        Some(&format!("Plant in Plot {}", selected_plot + 1)),
+        Some(&format!("Sow Spirit Herb - Terrace {}", selected_plot + 1)),
     );
 
     if draw_button(
@@ -238,7 +252,10 @@ pub fn draw_herb_planting_modal(
     let mut h_y = modal_y + 55.0;
 
     draw_ui_text(
-        &format!("Season: {} | Max Tier: {}", current_season, max_tier),
+        &format!(
+            "Seasonal omen: {} | Garden grade: tier {}",
+            current_season, max_tier
+        ),
         modal_x + 20.0,
         h_y,
         FONT_SMALL_SIZE,
@@ -263,7 +280,7 @@ pub fn draw_herb_planting_modal(
 
         // Display herb option
         let status = if !in_season && !has_infusion {
-            " (Wrong Season)"
+            " (out of season)"
         } else {
             ""
         };
@@ -287,7 +304,7 @@ pub fn draw_herb_planting_modal(
             found_any = true;
             if draw_button(
                 Rect::new(modal_x + modal_w - 100.0, h_y, 80.0, 30.0),
-                "Plant",
+                "Sow",
                 false,
             ) {
                 return HerbUiResult::with_action(Action::PlantHerb(
@@ -303,8 +320,8 @@ pub fn draw_herb_planting_modal(
         if text_rect.contains(mouse_position().into()) {
             let lines = vec![
                 herb.description.clone(),
-                format!("Growth: {} ticks", herb.grow_time_ticks),
-                format!("Seasons: {:?}", herb.grow_seasons),
+                format!("Growth vigil: {} ticks", herb.grow_time_ticks),
+                format!("Favorable seasons: {:?}", herb.grow_seasons),
             ];
             draw_tooltip_box(mouse_position().0 + 15.0, mouse_position().1 + 15.0, &lines);
         }
@@ -319,7 +336,7 @@ pub fn draw_herb_planting_modal(
 
     if !found_any {
         draw_ui_text(
-            "No herbs available to plant this season.",
+            "No seed slips favor this season.",
             modal_x + 20.0,
             h_y,
             FONT_BODY_SIZE,
@@ -346,7 +363,7 @@ pub fn draw_disciple_assignment_modal(
 
     draw_panel(
         Rect::new(modal_x, modal_y, modal_w, modal_h),
-        Some("Assign Worker"),
+        Some("Appoint Hall Attendant"),
     );
 
     if draw_button(
@@ -363,7 +380,7 @@ pub fn draw_disciple_assignment_modal(
     if building.assigned_disciple.is_some() {
         if draw_button(
             Rect::new(modal_x + 20.0, d_y, modal_w - 40.0, 35.0),
-            "Remove Assignment",
+            "Recall Attendant",
             false,
         ) {
             return HerbUiResult::with_action(Action::AssignDiscipleToBuilding(building.id, None));
@@ -372,7 +389,7 @@ pub fn draw_disciple_assignment_modal(
     }
 
     draw_ui_text(
-        "Available Outer Disciples:",
+        "Outer disciples awaiting duty:",
         modal_x + 20.0,
         d_y,
         FONT_BODY_SIZE,
@@ -393,7 +410,7 @@ pub fn draw_disciple_assignment_modal(
 
         if is_assigned_elsewhere {
             draw_ui_text(
-                &format!("{} (Assigned elsewhere)", disciple.name),
+                &format!("{} (serving another hall)", disciple.name),
                 modal_x + 20.0,
                 d_y + 18.0,
                 FONT_SMALL_SIZE,
@@ -407,11 +424,14 @@ pub fn draw_disciple_assignment_modal(
         let is_current = building.assigned_disciple == Some(disciple.id);
         let label = if is_current {
             format!(
-                "{} (Current) - Spirit: {}",
+                "{} (current attendant) - Spirit Root: {}",
                 disciple.name, disciple.attributes.spirit
             )
         } else {
-            format!("{} - Spirit: {}", disciple.name, disciple.attributes.spirit)
+            format!(
+                "{} - Spirit Root: {}",
+                disciple.name, disciple.attributes.spirit
+            )
         };
 
         if draw_button(
@@ -435,7 +455,7 @@ pub fn draw_disciple_assignment_modal(
 
     if !found_any {
         draw_ui_text(
-            "No Outer Disciples available.",
+            "No outer disciples await duty.",
             modal_x + 20.0,
             d_y,
             FONT_BODY_SIZE,
@@ -443,7 +463,7 @@ pub fn draw_disciple_assignment_modal(
         );
         d_y += 25.0;
         draw_ui_text(
-            "Recruit more disciples at the Sect Hall.",
+            "Recruit more hands at the Sect Hall.",
             modal_x + 20.0,
             d_y,
             FONT_SMALL_SIZE,
@@ -470,7 +490,7 @@ pub fn draw_drying_pavilion_panel(
 
     draw_ui_text(
         &format!(
-            "Efficiency: 5 raw -> {} dried ({:.0}% loss)",
+            "Drying rite: 5 fresh -> {} preserved ({:.0}% loss)",
             output_per_5,
             loss_rate * 100.0
         ),
@@ -482,7 +502,7 @@ pub fn draw_drying_pavilion_panel(
     cur_y += 35.0;
 
     draw_ui_text(
-        "Available to Dry:",
+        "Fresh Herbs for the Drying Racks",
         x,
         cur_y,
         FONT_HEADER_SIZE,
@@ -503,14 +523,17 @@ pub fn draw_drying_pavilion_panel(
 
         let count = *inventory.get(herb_id).unwrap_or(&0);
         if count >= 5 {
-            let label = format!("{}: {} (Dry 5 -> {})", herb.name, count, output_per_5);
+            let label = format!(
+                "{}: {} fresh (preserve 5 -> {})",
+                herb.name, count, output_per_5
+            );
             if draw_button(Rect::new(x, cur_y, width - 20.0, 35.0), &label, false) {
                 action = Some(Action::ProcessDryingPavilion(building.id, herb_id.clone()));
             }
             cur_y += 40.0;
         } else if count > 0 {
             draw_ui_text(
-                &format!("{}: {} (Need 5)", herb.name, count),
+                &format!("{}: {} fresh (need 5)", herb.name, count),
                 x,
                 cur_y + 20.0,
                 FONT_SMALL_SIZE,
@@ -548,7 +571,13 @@ pub fn draw_greenhouse_panel(
         .map(|e| e.color())
         .unwrap_or(TEXT_SECONDARY);
 
-    draw_ui_text("Element Infusion:", x, cur_y, FONT_BODY_SIZE, TEXT_PRIMARY);
+    draw_ui_text(
+        "Season-Bending Infusion:",
+        x,
+        cur_y,
+        FONT_BODY_SIZE,
+        TEXT_PRIMARY,
+    );
     draw_ui_text(
         &infusion_text,
         x + 150.0,
@@ -560,7 +589,7 @@ pub fn draw_greenhouse_panel(
 
     if building.infused_element.is_some() {
         draw_ui_text(
-            "Allows growing herbs of this element in any season.",
+            "The array lets matching herbs ignore the mortal season.",
             x,
             cur_y,
             FONT_SMALL_SIZE,
@@ -589,7 +618,7 @@ pub fn draw_infusion_modal(building: &Building) -> HerbUiResult {
 
     draw_panel(
         Rect::new(modal_x, modal_y, modal_w, modal_h),
-        Some("Set Element Infusion"),
+        Some("Tune Greenhouse Array"),
     );
 
     if draw_button(
@@ -606,7 +635,7 @@ pub fn draw_infusion_modal(building: &Building) -> HerbUiResult {
     if building.infused_element.is_some() {
         if draw_button(
             Rect::new(modal_x + 20.0, e_y, modal_w - 40.0, 35.0),
-            "Clear Infusion",
+            "Extinguish Array",
             false,
         ) {
             return HerbUiResult::with_action(Action::SetGreenhouseInfusion(building.id, None));
@@ -615,7 +644,7 @@ pub fn draw_infusion_modal(building: &Building) -> HerbUiResult {
     }
 
     draw_ui_text(
-        "Select Element:",
+        "Choose array aspect:",
         modal_x + 20.0,
         e_y,
         FONT_BODY_SIZE,
@@ -669,7 +698,7 @@ pub fn draw_herb_storage_panel(
 
     let decay_reduction = building.get_decay_reduction();
     draw_ui_text(
-        &format!("Decay Reduction: {:.0}%", decay_reduction * 100.0),
+        &format!("Preservation Seal: {:.0}%", decay_reduction * 100.0),
         x,
         cur_y,
         FONT_BODY_SIZE,
@@ -680,7 +709,7 @@ pub fn draw_herb_storage_panel(
     let base_decay = 10.0;
     let effective_decay = base_decay * (1.0 - decay_reduction);
     draw_ui_text(
-        &format!("Effective Decay Rate: {:.1}% per season", effective_decay),
+        &format!("Expected withering: {:.1}% per season", effective_decay),
         x,
         cur_y,
         FONT_SMALL_SIZE,
@@ -688,7 +717,13 @@ pub fn draw_herb_storage_panel(
     );
     cur_y += 35.0;
 
-    draw_ui_text("Stored Herbs:", x, cur_y, FONT_HEADER_SIZE, TEXT_HIGHLIGHT);
+    draw_ui_text(
+        "Apothecary Stores",
+        x,
+        cur_y,
+        FONT_HEADER_SIZE,
+        TEXT_HIGHLIGHT,
+    );
     cur_y += 30.0;
 
     // List herbs in inventory
@@ -729,7 +764,7 @@ pub fn draw_herb_storage_panel(
 
     if !found_any {
         draw_ui_text(
-            "No herbs in storage.",
+            "No herbs rest in the jars.",
             x,
             cur_y,
             FONT_BODY_SIZE,
@@ -739,30 +774,4 @@ pub fn draw_herb_storage_panel(
     }
 
     cur_y
-}
-
-/// Draw season indicator widget
-pub fn draw_season_indicator(x: f32, y: f32, current_season: &Season, ticks_remaining: u32) {
-    let season_color = match current_season {
-        Season::Spring => Color::new(0.5, 0.9, 0.5, 1.0), // Light green
-        Season::Summer => Color::new(0.9, 0.7, 0.2, 1.0), // Golden yellow
-        Season::Autumn => Color::new(0.9, 0.5, 0.2, 1.0), // Orange
-        Season::Winter => Color::new(0.7, 0.8, 0.95, 1.0), // Ice blue
-    };
-
-    draw_ui_text(
-        &format!("{}", current_season),
-        x,
-        y,
-        FONT_BODY_SIZE,
-        season_color,
-    );
-
-    // Progress to next season
-    let progress = 1.0 - (ticks_remaining as f32 / 3600.0);
-    draw_progress_bar(
-        Rect::new(x + 70.0, y - 12.0, 80.0, 10.0),
-        progress,
-        season_color,
-    );
 }

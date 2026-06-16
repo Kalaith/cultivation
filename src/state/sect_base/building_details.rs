@@ -1,5 +1,4 @@
 use super::*;
-use crate::data::missions::{Mission, MissionType};
 use macroquad_toolkit::ui::draw_ui_text;
 
 impl SectBaseState {
@@ -22,11 +21,11 @@ impl SectBaseState {
         let building = data.buildings.iter().find(|b| b.id == id)?.clone();
         let b_type = building.building_type.clone();
 
-        self.draw_building_header(rect, &building, disciples);
+        self.draw_building_header(rect, &building, data, disciples);
 
         if draw_button(
             Rect::new(rect.x + rect.w - 80.0, rect.y + 10.0, 60.0, 30.0),
-            "Back",
+            "Map",
             false,
         ) {
             self.view = SectView::Map;
@@ -36,7 +35,7 @@ impl SectBaseState {
             return None;
         }
 
-        let action_y = self.calculate_action_y(rect, &building, disciples);
+        let action_y = self.calculate_action_y(rect, &building, data, disciples);
 
         if let Some(res) = self.dispatch_building_type(
             rect,
@@ -74,9 +73,15 @@ impl SectBaseState {
         &self,
         rect: Rect,
         building: &crate::data::buildings::Building,
+        data: &GameData,
         disciples: &[Disciple],
     ) {
         let b_type = &building.building_type;
+        let status_label = match building.status {
+            BuildingStatus::Active => "Active Hall",
+            BuildingStatus::Ruined => "Ruined Hall",
+            BuildingStatus::Constructing => "Being Raised",
+        };
         draw_ui_text(
             &format!("{}", b_type),
             rect.x + 20.0,
@@ -84,18 +89,25 @@ impl SectBaseState {
             FONT_HEADER_SIZE,
             PRIMARY,
         );
+        draw_ui_text(
+            status_label,
+            rect.x + 20.0,
+            rect.y + 84.0,
+            FONT_SMALL_SIZE,
+            status_color(&building.status),
+        );
         let d_y = rect.y + 100.0;
         draw_ui_text(
-            &format!("Level: {}", building.level),
+            &format!("Hall Grade: {}", building.level),
             rect.x + 20.0,
-            d_y,
+            d_y + 14.0,
             FONT_BODY_SIZE,
             TEXT_PRIMARY,
         );
         draw_ui_text(
-            &format!("Element: {:?}", building.element),
+            &format!("Aspect: {:?}", building.element),
             rect.x + 20.0,
-            d_y + 30.0,
+            d_y + 44.0,
             FONT_BODY_SIZE,
             TEXT_SECONDARY,
         );
@@ -109,32 +121,39 @@ impl SectBaseState {
         draw_ui_text(
             &format!("Feng Shui: {:.1}", building.feng_shui_score),
             rect.x + 20.0,
-            d_y + 60.0,
+            d_y + 74.0,
             FONT_BODY_SIZE,
             fs_color,
         );
+
+        if let Some(def) = data.building_definitions.get(&building.building_type) {
+            draw_wrapped_text(
+                &def.description,
+                rect.x + 300.0,
+                rect.y + 72.0,
+                (rect.w - 340.0).max(220.0),
+                FONT_BODY_SIZE,
+                TEXT_SECONDARY,
+            );
+        }
     }
 
     fn calculate_action_y(
         &self,
         rect: Rect,
         building: &crate::data::buildings::Building,
+        data: &GameData,
         disciples: &[Disciple],
     ) -> f32 {
         let d_y = rect.y + 100.0;
         let mut action_y = d_y + 100.0;
 
         if building.building_type == BuildingType::SectHall {
-            let capacity: u32 = self.calculate_population_capacity_from_buildings(disciples, &[]);
-            let _ = capacity; // drawn below
+            let capacity = self.calculate_population_capacity_from_buildings(&data.buildings);
             draw_ui_text(
-                &format!(
-                    "Population: {}/{}",
-                    disciples.len(),
-                    self.get_sect_capacity_display(building)
-                ),
+                &format!("Sect census: {}/{}", disciples.len(), capacity),
                 rect.x + 20.0,
-                d_y + 90.0,
+                d_y + 104.0,
                 FONT_BODY_SIZE,
                 TEXT_SECONDARY,
             );
@@ -144,20 +163,15 @@ impl SectBaseState {
         action_y
     }
 
-    fn get_sect_capacity_display(
-        &self,
-        _building: &crate::data::buildings::Building,
-    ) -> &'static str {
-        // Capacity is calculated externally; just show placeholder
-        "?"
-    }
-
     fn calculate_population_capacity_from_buildings(
         &self,
-        _disciples: &[Disciple],
-        _buildings: &[crate::data::buildings::Building],
+        buildings: &[crate::data::buildings::Building],
     ) -> u32 {
-        0 // Placeholder - actual capacity computed elsewhere
+        buildings
+            .iter()
+            .filter(|b| b.status == BuildingStatus::Active)
+            .map(|b| b.get_max_disciples() + b.get_dorm_capacity())
+            .sum()
     }
 
     fn dispatch_building_type(
@@ -229,11 +243,19 @@ impl SectBaseState {
             FONT_HEADER_SIZE,
             Color::new(0.8, 0.2, 0.2, 1.0),
         );
+        draw_wrapped_text(
+            "Broken beams and cold incense mark a debt the patriarch can repay.",
+            rect.x + 20.0,
+            action_y - 42.0,
+            rect.w - 40.0,
+            FONT_BODY_SIZE,
+            TEXT_SECONDARY,
+        );
         let repair_cost = building.repair_cost;
         let repair_label = if *b_type == BuildingType::SectHall {
-            format!("Restore ({} SS)", repair_cost)
+            format!("Restore Hall ({} SS)", repair_cost)
         } else {
-            format!("Repair ({} SS)", repair_cost)
+            format!("Raise Beams ({} SS)", repair_cost)
         };
         if draw_button(
             Rect::new(rect.x + 20.0, action_y, 200.0, 40.0),
@@ -253,7 +275,7 @@ impl SectBaseState {
     ) -> Option<UpdateResult> {
         if draw_button(
             Rect::new(rect.x + 20.0, action_y, 150.0, 40.0),
-            "Upgrade (50 SS)",
+            "Raise Grade (50 SS)",
             false,
         ) {
             return Some(UpdateResult::new().with_action(Action::UpgradeBuilding(b_type.clone())));
@@ -262,14 +284,14 @@ impl SectBaseState {
         if *b_type == BuildingType::SectHall {
             if draw_button(
                 Rect::new(rect.x + 180.0, action_y, 150.0, 40.0),
-                "Recruit",
+                "Accept Disciple",
                 false,
             ) {
                 return Some(UpdateResult::new().with_action(Action::RecruitDisciple));
             }
             if draw_button(
                 Rect::new(rect.x + 340.0, action_y, 150.0, 40.0),
-                "Research / Tech",
+                "Recover Doctrine",
                 false,
             ) {
                 self.tech_tree_open = true;
@@ -283,7 +305,7 @@ impl SectBaseState {
         ) {
             if draw_button(
                 Rect::new(rect.x + 180.0, action_y, 150.0, 40.0),
-                "Crafting",
+                "Open Workshop",
                 false,
             ) {
                 self.crafting_modal_open = true;
@@ -354,7 +376,7 @@ impl SectBaseState {
 
         if draw_button(
             Rect::new(rect.x + 20.0, action_y, 140.0, 40.0),
-            "Upgrade (50 SS)",
+            "Raise Hall (50 SS)",
             false,
         ) {
             return Some(UpdateResult::new().with_action(Action::UpgradeBuilding(b_type.clone())));
@@ -362,7 +384,7 @@ impl SectBaseState {
 
         if draw_button(
             Rect::new(rect.x + 170.0, action_y, 140.0, 40.0),
-            "Assign Worker",
+            "Appoint",
             false,
         ) {
             self.disciple_assignment_modal = true;
@@ -371,7 +393,7 @@ impl SectBaseState {
         if *b_type == BuildingType::Greenhouse {
             if draw_button(
                 Rect::new(rect.x + 320.0, action_y, 140.0, 40.0),
-                "Set Infusion",
+                "Tune Array",
                 false,
             ) {
                 self.infusion_modal_open = true;
@@ -409,7 +431,7 @@ impl SectBaseState {
             if plot.growing.is_none() {
                 if draw_button(
                     Rect::new(rect.x + rect.w - 120.0, plot_btn_y + 10.0, 80.0, 30.0),
-                    "Plant",
+                    "Sow",
                     false,
                 ) {
                     self.herb_planting_modal = Some(i);
@@ -472,7 +494,7 @@ impl SectBaseState {
     ) -> Option<UpdateResult> {
         if draw_button(
             Rect::new(rect.x + 20.0, action_y, 150.0, 40.0),
-            "Upgrade (50 SS)",
+            "Raise Hall (50 SS)",
             false,
         ) {
             return Some(
@@ -506,7 +528,7 @@ impl SectBaseState {
     ) -> Option<UpdateResult> {
         if draw_button(
             Rect::new(rect.x + 20.0, action_y, 150.0, 40.0),
-            "Upgrade (50 SS)",
+            "Raise Hall (50 SS)",
             false,
         ) {
             return Some(
@@ -527,258 +549,12 @@ impl SectBaseState {
 
         None
     }
-
-    pub(super) fn draw_mission_list(
-        &mut self,
-        rect: Rect,
-        data: &GameData,
-        ongoing_missions: &[OngoingMission],
-        completed_missions: &[MissionOutcome],
-        completed_history: &[String],
-        start_y: f32,
-    ) -> Option<UpdateResult> {
-        let list_rect = Rect::new(
-            rect.x + 20.0,
-            start_y,
-            rect.w - 40.0,
-            rect.h - start_y + rect.y - 95.0,
-        );
-        let card_h = 74.0;
-        let card_gap = 10.0;
-        let mut available_missions: Vec<&Mission> = Vec::new();
-        let mut selected_available = false;
-        let selected_desc = self.selected_mission.clone();
-        let mouse = vec2(mouse_position().0, mouse_position().1);
-
-        for mission in &data.missions {
-            let is_ongoing = ongoing_missions
-                .iter()
-                .any(|m| m.mission.description == mission.description);
-            let is_pending = completed_missions
-                .iter()
-                .any(|m| m.description == mission.description);
-            let is_historically_complete = completed_history.contains(&mission.description);
-
-            let available = if mission.repeatable {
-                !is_ongoing && !is_pending
-            } else {
-                !is_ongoing && !is_pending && !is_historically_complete
-            };
-
-            if !available {
-                continue;
-            }
-            available_missions.push(mission);
-        }
-
-        let total_h = available_missions.len() as f32 * (card_h + card_gap);
-        if list_rect.contains(mouse.into()) {
-            let wheel = mouse_wheel().1;
-            if total_h > list_rect.h {
-                self.mission_scroll -= wheel * 32.0;
-                self.mission_scroll = self
-                    .mission_scroll
-                    .clamp(0.0, (total_h - list_rect.h).max(0.0));
-            } else {
-                self.mission_scroll = 0.0;
-            }
-        }
-
-        draw_ui_text(
-            "Mission Board",
-            rect.x + 20.0,
-            start_y - 16.0,
-            FONT_HEADER_SIZE,
-            PRIMARY,
-        );
-
-        let mut m_y = list_rect.y - self.mission_scroll;
-        for mission in available_missions {
-            let card_rect = Rect::new(list_rect.x, m_y, list_rect.w, card_h);
-            let is_selected = selected_desc.as_deref() == Some(mission.description.as_str());
-            if is_selected {
-                selected_available = true;
-            }
-
-            if card_rect.y + card_h >= list_rect.y && card_rect.y <= list_rect.y + list_rect.h {
-                self.draw_mission_card(card_rect, mission, is_selected);
-            }
-
-            if card_rect.contains(mouse.into()) && is_mouse_button_pressed(MouseButton::Left) {
-                self.selected_mission = Some(mission.description.clone());
-            }
-
-            if card_rect.contains(mouse.into()) {
-                draw_tooltip(
-                    mouse,
-                    &format!(
-                        "{}\nRisk {} | {} ticks",
-                        mission.description, mission.danger_level, mission.duration
-                    ),
-                );
-            }
-
-            m_y += card_h + card_gap;
-        }
-
-        if total_h > list_rect.h {
-            let track_x = list_rect.x + list_rect.w - 7.0;
-            let handle_h = (list_rect.h * list_rect.h / total_h).max(24.0);
-            let max_offset = (total_h - list_rect.h).max(1.0);
-            let handle_y =
-                list_rect.y + (self.mission_scroll / max_offset) * (list_rect.h - handle_h);
-            draw_rectangle(
-                track_x,
-                list_rect.y,
-                3.0,
-                list_rect.h,
-                Color::new(0.0, 0.0, 0.0, 0.32),
-            );
-            draw_rectangle(
-                track_x - 1.0,
-                handle_y,
-                5.0,
-                handle_h,
-                Color::new(PRIMARY.r, PRIMARY.g, PRIMARY.b, 0.62),
-            );
-        }
-
-        if let Some(selected) = &self.selected_mission {
-            if selected_available {
-                let btn_rect =
-                    Rect::new(rect.x + 20.0, rect.y + rect.h - 60.0, rect.w - 40.0, 40.0);
-                if draw_button(btn_rect, "Send disciples beyond the gate", false) {
-                    return Some(
-                        UpdateResult::new().with_transition(StateTransition::ToMissionAssignment(
-                            selected.clone(),
-                        )),
-                    );
-                }
-            } else {
-                draw_ui_text(
-                    "Selected mission unavailable.",
-                    rect.x + 20.0,
-                    rect.y + rect.h - 30.0,
-                    FONT_SMALL_SIZE,
-                    TEXT_SECONDARY,
-                );
-            }
-        }
-        None
-    }
-
-    fn draw_mission_card(&self, rect: Rect, mission: &Mission, selected: bool) {
-        let hover = rect.contains(mouse_position().into());
-        let alpha = if selected {
-            0.74
-        } else if hover {
-            0.52
-        } else {
-            0.34
-        };
-        let accent = mission_type_color(&mission.mission_type);
-        draw_rectangle(
-            rect.x,
-            rect.y,
-            rect.w,
-            rect.h,
-            Color::new(0.035, 0.028, 0.02, alpha),
-        );
-        draw_rectangle_lines(
-            rect.x,
-            rect.y,
-            rect.w,
-            rect.h,
-            if selected { 2.0 } else { 1.0 },
-            Color::new(
-                accent.r,
-                accent.g,
-                accent.b,
-                if selected { 0.88 } else { 0.38 },
-            ),
-        );
-        draw_rectangle(
-            rect.x,
-            rect.y,
-            5.0,
-            rect.h,
-            Color::new(accent.r, accent.g, accent.b, 0.72),
-        );
-
-        let title = mission_title(&mission.description);
-        draw_ui_text(
-            title,
-            rect.x + 16.0,
-            rect.y + 24.0,
-            FONT_BODY_SIZE,
-            if selected {
-                TEXT_PRIMARY
-            } else {
-                Color::new(TEXT_PRIMARY.r, TEXT_PRIMARY.g, TEXT_PRIMARY.b, 0.78)
-            },
-        );
-        draw_ui_text(
-            &format!(
-                "{} path | Risk {} | {} ticks",
-                mission_type_label(&mission.mission_type),
-                mission.danger_level,
-                mission.duration
-            ),
-            rect.x + 16.0,
-            rect.y + 47.0,
-            FONT_SMALL_SIZE,
-            Color::new(
-                TEXT_SECONDARY.r,
-                TEXT_SECONDARY.g,
-                TEXT_SECONDARY.b,
-                if selected { 0.92 } else { 0.62 },
-            ),
-        );
-        draw_ui_text(
-            mission_spoils(&mission.mission_type),
-            rect.x + rect.w - 205.0,
-            rect.y + 47.0,
-            FONT_SMALL_SIZE,
-            Color::new(
-                PRIMARY.r,
-                PRIMARY.g,
-                PRIMARY.b,
-                if selected { 0.9 } else { 0.48 },
-            ),
-        );
-    }
 }
 
-fn mission_title(description: &str) -> &str {
-    description.trim_end_matches('.')
-}
-
-fn mission_type_label(mission_type: &MissionType) -> &'static str {
-    match mission_type {
-        MissionType::Exploration => "Scout",
-        MissionType::ResourceGathering => "Gather",
-        MissionType::MonsterSuppression => "Hunt",
-        MissionType::Diplomacy => "Treaty",
-        MissionType::RuinDelve => "Ruin",
-    }
-}
-
-fn mission_spoils(mission_type: &MissionType) -> &'static str {
-    match mission_type {
-        MissionType::Exploration => "Spoils: rumors, herbs",
-        MissionType::ResourceGathering => "Spoils: ore, stones",
-        MissionType::MonsterSuppression => "Spoils: hides, prestige",
-        MissionType::Diplomacy => "Spoils: favor, trade",
-        MissionType::RuinDelve => "Spoils: relics, techniques",
-    }
-}
-
-fn mission_type_color(mission_type: &MissionType) -> Color {
-    match mission_type {
-        MissionType::Exploration => SECONDARY,
-        MissionType::ResourceGathering => PRIMARY,
-        MissionType::MonsterSuppression => ACCENT,
-        MissionType::Diplomacy => SUCCESS,
-        MissionType::RuinDelve => WARNING,
+fn status_color(status: &BuildingStatus) -> Color {
+    match status {
+        BuildingStatus::Active => SUCCESS,
+        BuildingStatus::Ruined => FAILURE,
+        BuildingStatus::Constructing => WARNING,
     }
 }

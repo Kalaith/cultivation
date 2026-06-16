@@ -10,27 +10,29 @@ impl Game {
         let building = match self.data.buildings.iter().find(|b| b.id == building_id) {
             Some(b) => b.clone(),
             None => {
-                self.event_log.push("Building not found.".to_string());
+                self.event_log
+                    .push("No matching hall was found on the mountain.".to_string());
                 return;
             }
         };
 
         if building.building_type != BuildingType::DryingPavilion {
             self.event_log
-                .push("This is not a Drying Pavilion.".to_string());
+                .push("Only the Drying Pavilion can preserve fresh herbs.".to_string());
             return;
         }
 
         // Check if we have the herb (and it's not already dried)
         if herb_id.starts_with("dried_") {
-            self.event_log.push("Already dried.".to_string());
+            self.event_log
+                .push("That herb is already preserved.".to_string());
             return;
         }
 
         let current_count = *self.inventory.get(herb_id).unwrap_or(&0);
         if current_count < 5 {
             self.event_log.push(format!(
-                "Need at least 5 {} to dry (have {}).",
+                "The drying racks need 5 fresh {} (sect stores have {}).",
                 herb_id, current_count
             ));
             return;
@@ -50,7 +52,7 @@ impl Game {
         *self.inventory.entry(dried_id.clone()).or_insert(0) += output_amount;
 
         self.event_log.push(format!(
-            "Dried 5 {} -> {} {}.",
+            "Preserved 5 fresh {} into {} {}.",
             herb_id, output_amount, dried_id
         ));
     }
@@ -63,18 +65,19 @@ impl Game {
     ) {
         if let Some(building) = self.data.buildings.iter_mut().find(|b| b.id == building_id) {
             if building.building_type != BuildingType::Greenhouse {
-                self.event_log.push("This is not a Greenhouse.".to_string());
+                self.event_log
+                    .push("Only the Greenhouse can hold a season-bending array.".to_string());
                 return;
             }
 
             if let Some(ref elem) = element {
                 building.infused_element = Some(elem.clone());
                 self.event_log
-                    .push(format!("Greenhouse infused with {} element.", elem));
+                    .push(format!("Greenhouse array tuned to the {} aspect.", elem));
             } else {
                 building.infused_element = None;
                 self.event_log
-                    .push("Greenhouse infusion cleared.".to_string());
+                    .push("Greenhouse array extinguished.".to_string());
             }
         }
     }
@@ -124,7 +127,7 @@ impl Game {
 
                             harvested_herbs.push((growing.herb_id.clone(), harvest_amount));
                             log_messages.push(format!(
-                                "Harvested {}x {} from {}.",
+                                "Gathered {}x {} from {}.",
                                 harvest_amount, growing.herb_id, building.building_type
                             ));
 
@@ -136,7 +139,7 @@ impl Game {
                             plot.decay_ticks += 1;
                             if plot.decay_ticks > 60 {
                                 log_messages.push(format!(
-                                    "A {} withered in {} - no worker to harvest!",
+                                    "A {} withered in {} with no attendant to harvest it.",
                                     growing.herb_id, building.building_type
                                 ));
                                 plot.growing = None;
@@ -197,7 +200,10 @@ impl Game {
                     let actual_decay = decay_amount.min(*count);
                     if actual_decay > 0 {
                         *count -= actual_decay;
-                        decay_messages.push(format!("{} {} decayed.", actual_decay, herb_id));
+                        decay_messages.push(format!(
+                            "{} {} withered in the apothecary jars.",
+                            actual_decay, herb_id
+                        ));
                     }
                 }
             }
@@ -232,8 +238,8 @@ impl Game {
         // Check tier restrictions
         if herb.tier > building.get_max_herb_tier() {
             self.event_log.push(format!(
-                "Cannot plant {} - tier {} exceeds {} capacity.",
-                herb.name, herb.tier, building.building_type
+                "{} is too potent for the current {} terrace grade (tier {}).",
+                herb.name, building.building_type, herb.tier
             ));
             return false;
         }
@@ -245,7 +251,7 @@ impl Game {
 
         if !can_grow_this_season {
             self.event_log.push(format!(
-                "Cannot plant {} - wrong season ({}).",
+                "{} rejects the current mountain season ({}).",
                 herb.name, self.current_season
             ));
             return false;
@@ -258,7 +264,8 @@ impl Game {
         }
 
         if building.herb_plots[plot_index].growing.is_some() {
-            self.event_log.push("Plot is already occupied.".to_string());
+            self.event_log
+                .push("That spirit terrace is already occupied.".to_string());
             return false;
         }
 
@@ -266,7 +273,7 @@ impl Game {
         let growing = GrowingHerb::new(herb_id.to_string(), herb.grow_time_ticks);
         building.herb_plots[plot_index].growing = Some(growing);
         self.event_log.push(format!(
-            "Planted {} in {}.",
+            "Sowed {} in {}.",
             herb.name, building.building_type
         ));
         true
@@ -286,7 +293,7 @@ impl Game {
                 .any(|d| d.id == d_id && d.rank == DiscipleRank::Outer);
             if !is_valid_worker {
                 self.event_log
-                    .push("Only Outer Disciples can be assigned to work buildings.".to_string());
+                    .push("Only outer disciples can be appointed to hall duty.".to_string());
                 return false;
             }
 
@@ -298,7 +305,7 @@ impl Game {
                 .any(|b| b.assigned_disciple == Some(d_id));
             if already_assigned {
                 self.event_log
-                    .push("This disciple is already assigned to another building.".to_string());
+                    .push("That disciple already serves another hall.".to_string());
                 return false;
             }
         }
@@ -307,11 +314,13 @@ impl Game {
         if let Some(building) = self.data.buildings.iter_mut().find(|b| b.id == building_id) {
             building.assigned_disciple = disciple_id;
             if disciple_id.is_some() {
-                self.event_log
-                    .push(format!("Assigned disciple to {}.", building.building_type));
+                self.event_log.push(format!(
+                    "Appointed an attendant to {}.",
+                    building.building_type
+                ));
             } else {
                 self.event_log.push(format!(
-                    "Removed assignment from {}.",
+                    "Recalled the attendant from {}.",
                     building.building_type
                 ));
             }

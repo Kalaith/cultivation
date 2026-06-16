@@ -8,7 +8,7 @@ impl SectBaseState {
         data: &mut GameData,
         _grid: &mut Grid,
         textures: &TextureManager,
-        _spirit_stones: u32,
+        spirit_stones: u32,
         _unlocked_techs: &[String],
     ) -> Option<UpdateResult> {
         self.draw_mountain_vista(rect);
@@ -69,7 +69,7 @@ impl SectBaseState {
         }
 
         if self.crafting_modal_open {
-            return self.draw_construction_modal(data, _unlocked_techs);
+            return self.draw_construction_modal(data, _unlocked_techs, spirit_stones);
         }
 
         None

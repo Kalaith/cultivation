@@ -1,5 +1,5 @@
 use super::super::{BreakthroughResult, Game};
-use crate::data::disciples::DiscipleRank;
+use crate::data::disciples::{DiscipleRank, Injury};
 use crate::data::history::DeceasedDisciple;
 use crate::data::spirit_beasts::SpiritBeast;
 use crate::engine::proc_gen::generate_disciple;
@@ -13,7 +13,8 @@ impl Game {
         let capacity = self.get_population_capacity();
         if capacity == 0 || self.disciples.len() as u32 >= capacity {
             self.event_log.push(
-                "Population cap reached. Build Dormitories or upgrade the Sect Hall.".to_string(),
+                "The mountain has no room for another disciple. Raise dormitories or the Sect Hall."
+                    .to_string(),
             );
             return;
         }
@@ -21,7 +22,7 @@ impl Game {
         let new_disciple = generate_disciple(&self.data);
         let recruit_name = new_disciple.name.clone();
         self.event_log
-            .push(format!("Recruited: {}", new_disciple.name));
+            .push(format!("Accepted disciple: {}", new_disciple.name));
         self.disciples.push(new_disciple);
         self.show_moment(
             MomentKind::Recruitment,
@@ -45,14 +46,15 @@ impl Game {
 
         if disciple.realm == "Mortal" {
             self.event_log
-                .push("Cannot Promote: Must reach Qi Refinement first.".to_string());
+                .push("Promotion waits until the disciple senses Qi Refinement.".to_string());
             return;
         }
 
         let cost = 100;
         if self.spirit_stones < cost {
-            self.event_log
-                .push("Cannot Promote: Not enough Spirit Stones (100).".to_string());
+            self.event_log.push(
+                "The treasury lacks spirit stones for inner-disciple rites (100).".to_string(),
+            );
             return;
         }
 
@@ -63,7 +65,7 @@ impl Game {
             disciple.qi = 100;
         }
         self.event_log
-            .push(format!("Promoted {} to Inner Disciple!", disciple.name));
+            .push(format!("Raised {} into the inner court.", disciple.name));
     }
 
     pub(in crate::game) fn handle_attempt_breakthrough_action(&mut self, idx: usize) {
@@ -74,12 +76,14 @@ impl Game {
         if !disciple.can_attempt_breakthrough() {
             if disciple.is_injured() {
                 self.event_log.push(format!(
-                    "{} cannot attempt breakthrough while injured!",
+                    "{} cannot approach the heavenly gate while injured.",
                     disciple.name
                 ));
             } else {
-                self.event_log
-                    .push(format!("{} is not ready for breakthrough.", disciple.name));
+                self.event_log.push(format!(
+                    "{} is not ready to face the heavenly gate.",
+                    disciple.name
+                ));
             }
             return;
         }
@@ -104,7 +108,7 @@ impl Game {
                 self.deceased_disciples.push(DeceasedDisciple::new(
                     disciple.name.clone(),
                     disciple.realm.clone(),
-                    "Failed Breakthrough".to_string(),
+                    "Breakthrough calamity".to_string(),
                     self.tick,
                 ));
                 self.disciples.remove(idx);
@@ -146,21 +150,21 @@ impl Game {
         if self.data.laws.contains_key(&law_id) {
             disciple.law_id = Some(law_id.clone());
             self.event_log
-                .push(format!("{} is now practicing {}.", disciple.name, law_id));
+                .push(format!("{} now studies the {} law.", disciple.name, law_id));
         }
     }
 
     pub(in crate::game) fn handle_recruit_spirit_beast(&mut self, def_id: String) {
         let Some(def) = self.data.spirit_beast_definitions.get(&def_id) else {
             self.event_log
-                .push("Failed to recruit Spirit Beast: Unknown definition.".to_string());
+                .push("No known spirit beast answers that pact.".to_string());
             return;
         };
 
         let mut beast = SpiritBeast::new_from_definition(def);
         beast.id = random::next_u64();
         self.event_log
-            .push(format!("Recruited Spirit Beast: {}", def.name));
+            .push(format!("Bound mountain guardian: {}", def.name));
         self.show_moment(
             MomentKind::SpiritBeast,
             "A Spirit Beast Answers",
@@ -219,5 +223,114 @@ impl Game {
             .get(realm_id)
             .map(|stage| stage.name.clone())
             .unwrap_or_else(|| realm_id.to_string())
+    }
+
+    pub(in crate::game) fn handle_resolve_tribulation(&mut self, idx: usize, survived: bool) {
+        let Some(disciple) = self.disciples.get(idx).cloned() else {
+            return;
+        };
+
+        if survived {
+            self.advance_disciple_after_tribulation(idx, &disciple);
+            return;
+        }
+
+        let bloodline_survivor = disciple
+            .bloodline
+            .bloodline_id
+            .as_ref()
+            .and_then(|id| self.data.bloodlines.get(id))
+            .map(|bloodline| bloodline.passive_effects.survivor)
+            .unwrap_or(false);
+        let is_survivor = disciple.fate_traits.iter().any(|t| t.survivor) || bloodline_survivor;
+
+        if is_survivor {
+            if let Some(disciple) = self.disciples.get_mut(idx) {
+                disciple.injure(Injury::from_combat(3));
+                disciple.exp = (disciple.exp as f32 * 0.25) as u32;
+                disciple.breakthrough_readiness = 0.0;
+                let name = disciple.name.clone();
+                self.event_log.push(format!(
+                    "{} survived the tribulation by a thread, but their meridians are badly wounded.",
+                    name
+                ));
+                self.show_moment(
+                    MomentKind::Tragedy,
+                    "Heaven Leaves a Scar",
+                    "Tribulation survived at terrible cost",
+                    format!(
+                        "{} crawled back from the thunder, alive but broken for now.",
+                        name
+                    ),
+                );
+            }
+            return;
+        }
+
+        self.event_log.push(format!(
+            "{} was claimed by heavenly tribulation.",
+            disciple.name
+        ));
+        self.show_moment(
+            MomentKind::Tragedy,
+            "Thunder Claims a Disciple",
+            "The immortal road demands blood",
+            format!(
+                "{} vanished beneath the final bolt. The sect annals mark their name in ash.",
+                disciple.name
+            ),
+        );
+        self.deceased_disciples.push(DeceasedDisciple::new(
+            disciple.name,
+            disciple.realm,
+            "Heavenly Tribulation".to_string(),
+            self.tick,
+        ));
+        self.disciples.remove(idx);
+    }
+
+    fn advance_disciple_after_tribulation(
+        &mut self,
+        idx: usize,
+        disciple: &crate::data::disciples::Disciple,
+    ) {
+        let Some(stage_idx) = self
+            .data
+            .stages_order
+            .iter()
+            .position(|id| id == &disciple.realm)
+        else {
+            return;
+        };
+        let Some(next_id) = self.data.stages_order.get(stage_idx + 1).cloned() else {
+            self.event_log.push(format!(
+                "{} survived tribulation and stands at the apex of known cultivation.",
+                disciple.name
+            ));
+            return;
+        };
+        let next_name = self.realm_display_name(&next_id);
+
+        if let Some(disciple) = self.disciples.get_mut(idx) {
+            disciple.realm = next_id;
+            disciple.sub_stage = 0;
+            disciple.exp = 0;
+            disciple.exp_to_next_level = (disciple.exp_to_next_level as f32 * 2.5) as u32;
+            disciple.breakthrough_readiness = 0.0;
+            let name = disciple.name.clone();
+            self.event_log.push(format!(
+                "{} overcame heavenly tribulation and entered {}.",
+                name, next_name
+            ));
+            self.show_moment(
+                MomentKind::Breakthrough,
+                "Thunder Refines the Dao",
+                "Tribulation overcome",
+                format!(
+                    "{} has survived heaven's judgment and stepped into {}. The fallen sect's fate rises with them.",
+                    name, next_name
+                ),
+            );
+        }
     }
 }

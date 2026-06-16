@@ -29,8 +29,8 @@ impl FactionScreenState {
         let screen_h = screen_height();
         draw_panel(Rect::new(0.0, 0.0, screen_w, 70.0), None);
         draw_screen_title(
-            "Known Powers of the Region",
-            "Diplomatic tablets kept in the patriarch's archive",
+            "Regional Power Ledger",
+            "Rival sects, courts, caravans, and threats beyond the mountain gate",
             24.0,
             34.0,
         );
@@ -47,7 +47,7 @@ impl FactionScreenState {
         );
 
         self.draw_faction_list(list_rect, world_sim);
-        draw_panel(detail_rect, Some("Power Record"));
+        draw_panel(detail_rect, Some("Rival Power Record"));
 
         if let Some(idx) = self.selected_faction {
             if let Some(faction) = world_sim.factions.get(idx) {
@@ -59,7 +59,7 @@ impl FactionScreenState {
             }
         } else {
             draw_ui_text(
-                "Choose a power tablet to read its public record.",
+                "Choose a diplomatic tablet before issuing an edict.",
                 detail_rect.x + 24.0,
                 detail_rect.y + 88.0,
                 FONT_BODY_SIZE,
@@ -67,7 +67,11 @@ impl FactionScreenState {
             );
         }
 
-        if draw_button(Rect::new(22.0, screen_h - 58.0, 100.0, 40.0), "Back", false) {
+        if draw_button(
+            Rect::new(22.0, screen_h - 58.0, 100.0, 40.0),
+            "Return",
+            false,
+        ) {
             return UpdateResult::new().with_transition(StateTransition::ToSectBase);
         }
 
@@ -75,7 +79,7 @@ impl FactionScreenState {
     }
 
     fn draw_faction_list(&mut self, rect: Rect, world_sim: &WorldSim) {
-        draw_panel(rect, Some("Power Tablets"));
+        draw_panel(rect, Some("Diplomatic Tablets"));
         let row_h = 74.0;
         let gap = 8.0;
         let list_y = rect.y + 50.0;
@@ -193,10 +197,13 @@ impl FactionScreenState {
         y += 34.0;
 
         let columns = [
-            ("Leader", leader_title(faction)),
-            ("Cultivation", realm_label(&faction.leader_realm)),
-            ("Relationship", tier.to_string()),
-            ("Specialty", specialty_label(&faction.specialty).to_string()),
+            ("Seat Holder", leader_title(faction)),
+            ("Realm", realm_label(&faction.leader_realm)),
+            ("Sect Bearing", tier.to_string()),
+            (
+                "Known Strength",
+                specialty_label(&faction.specialty).to_string(),
+            ),
         ];
         for (label, value) in columns {
             draw_ui_text(label, x, y, FONT_SMALL_SIZE, TEXT_SECONDARY);
@@ -208,7 +215,7 @@ impl FactionScreenState {
         draw_ink_divider(x, y, rect.w - 56.0);
         y += 32.0;
 
-        draw_ui_text("Known Technique", x, y, FONT_SMALL_SIZE, TEXT_SECONDARY);
+        draw_ui_text("Signature Art", x, y, FONT_SMALL_SIZE, TEXT_SECONDARY);
         draw_ui_text(
             signature_technique(faction),
             x + 150.0,
@@ -233,20 +240,20 @@ impl FactionScreenState {
         let relation_label = relation
             .map(|rel| {
                 if rel.at_war {
-                    "State: Open War".to_string()
+                    "War banner raised".to_string()
                 } else if let Some(treaty) = &rel.treaty {
-                    format!("Treaty: {}", treaty.name())
+                    format!("Oath tablet: {}", treaty.name())
                 } else {
-                    format!("Reputation: {} ({})", rel.reputation, tier)
+                    format!("Sect standing: {} ({})", rel.reputation, tier)
                 }
             })
-            .unwrap_or_else(|| "Reputation: Unknown".to_string());
+            .unwrap_or_else(|| "Sect standing: Unknown".to_string());
         draw_ui_text(&relation_label, x, y, FONT_BODY_SIZE, tier_color(tier));
         y += 40.0;
 
         draw_ui_text(
             &format!(
-                "Treasury: {} spirit stones | Regional power: {}",
+                "Visible treasury: {} spirit stones | Regional power: {}",
                 faction.wealth, faction.power_level
             ),
             x,
@@ -256,10 +263,10 @@ impl FactionScreenState {
         );
         y += 46.0;
 
-        if draw_button(Rect::new(x, y, 150.0, 36.0), "Offer Gift", false) {
+        if draw_button(Rect::new(x, y, 150.0, 36.0), "Send Tribute", false) {
             // Hooked later through diplomacy actions.
         }
-        if draw_button(Rect::new(x + 164.0, y, 170.0, 36.0), "Seek Treaty", false) {
+        if draw_button(Rect::new(x + 164.0, y, 170.0, 36.0), "Request Oath", false) {
             // Hooked later through diplomacy actions.
         }
     }

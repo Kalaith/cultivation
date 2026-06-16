@@ -23,9 +23,9 @@ impl RosterFilter {
         match self {
             RosterFilter::All => "All",
             RosterFilter::Outer => "Outer",
-            RosterFilter::Inner => "Inner",
-            RosterFilter::Injured => "Injured",
-            RosterFilter::Ready => "Ready",
+            RosterFilter::Inner => "Inner+",
+            RosterFilter::Injured => "Wound",
+            RosterFilter::Ready => "Gate",
         }
     }
 
@@ -105,7 +105,7 @@ impl DiscipleRosterState {
         draw_panel(
             right_rect,
             Some(if selected_actual_index.is_some() {
-                "Character Scroll"
+                "Disciple Scroll"
             } else {
                 "Unopened Scroll"
             }),
@@ -136,7 +136,7 @@ impl DiscipleRosterState {
 
         if draw_button(
             Rect::new(screen_w - 120.0, screen_h - 50.0, 100.0, 40.0),
-            "Back",
+            "Sect",
             false,
         ) {
             return UpdateResult::new().with_transition(StateTransition::ToSectBase);
@@ -148,7 +148,7 @@ impl DiscipleRosterState {
     fn draw_header(&self, screen_w: f32, header_h: f32, disciples: &[Disciple]) {
         draw_panel(Rect::new(0.0, 0.0, screen_w, header_h), None);
         draw_screen_title(
-            "Character Scrolls",
+            "Disciple Scrolls",
             "Records of bodies, spirit roots, and unfinished destinies",
             20.0,
             31.0,
@@ -161,9 +161,9 @@ impl DiscipleRosterState {
             .count();
         let mut seal_x = screen_w - 360.0;
         seal_x +=
-            draw_resource_seal(seal_x, 38.0, "Disciples", disciples.len() as u32, PRIMARY) + 8.0;
-        seal_x += draw_resource_seal(seal_x, 38.0, "Injured", injured_count as u32, FAILURE) + 8.0;
-        draw_resource_seal(seal_x, 38.0, "Breakthroughs", ready_count as u32, WARNING);
+            draw_resource_seal(seal_x, 38.0, "Tablets", disciples.len() as u32, PRIMARY) + 8.0;
+        seal_x += draw_resource_seal(seal_x, 38.0, "Wounded", injured_count as u32, FAILURE) + 8.0;
+        draw_resource_seal(seal_x, 38.0, "At Gate", ready_count as u32, WARNING);
     }
 
     fn draw_roster_list(
@@ -269,7 +269,7 @@ impl DiscipleRosterState {
         }
 
         draw_ui_text(
-            &format!("Records: {} / {}", filtered.len(), disciples.len()),
+            &format!("Tablets: {} / {}", filtered.len(), disciples.len()),
             left_rect.x + 10.0,
             left_rect.y + content_h - 10.0,
             FONT_SMALL_SIZE,
@@ -315,18 +315,18 @@ impl DiscipleRosterState {
 
 fn disciple_tablet_label(disciple: &Disciple) -> String {
     let rank = match disciple.rank {
-        DiscipleRank::Outer => "Outer",
-        DiscipleRank::Inner => "Inner",
+        DiscipleRank::Outer => "Outer Gate",
+        DiscipleRank::Inner => "Inner Court",
         DiscipleRank::Elder => "Elder",
         DiscipleRank::SectLeader => "Patriarch",
     };
 
     let mut status = String::new();
     if disciple.is_injured() {
-        status.push_str(" | Injured");
+        status.push_str(" | Wounded");
     }
     if disciple.can_attempt_breakthrough() {
-        status.push_str(" | Breakthrough");
+        status.push_str(" | At Gate");
     }
 
     format!("{} - {}{}", disciple.name, rank, status)

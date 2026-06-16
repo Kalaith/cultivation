@@ -89,13 +89,13 @@ impl Game {
                 if let Some(ref bn) = bottleneck {
                     let desc = bn.description(&self.data);
                     self.event_log.push(format!(
-                        "{} is ready for breakthrough but faces a bottleneck: {}",
+                        "{} feels the heavenly gate, but fate demands a trial first: {}",
                         disciple.name, desc
                     ));
                     disciple.breakthrough_bottleneck = Some(bn.clone());
                 } else {
                     self.event_log.push(format!(
-                        "{} is ready for breakthrough! Visit Roster to attempt.",
+                        "{} stands before a heavenly gate. Open Disciple Scrolls to attempt breakthrough.",
                         disciple.name
                     ));
                 }
@@ -312,8 +312,9 @@ impl Game {
             self.spirit_stones -= salary_cost;
         } else {
             self.spirit_stones = 0;
-            self.event_log
-                .push("Warning: Cannot pay salaries! Morale is falling.".to_string());
+            self.event_log.push(
+                "The treasury cannot pay inner-court stipends. Sect morale falls.".to_string(),
+            );
         }
     }
 
@@ -350,7 +351,7 @@ impl Game {
             }
             GameState::MissionAssignment(s) => s.update(&self.data, &self.disciples),
             GameState::SectCreation(s) => s.update(),
-            GameState::Tribulation(s) => s.update(),
+            GameState::Tribulation(s) => s.update(&self.disciples),
             GameState::FactionScreen(s) => s.update(&self.world_sim),
             GameState::TradeScreen(s) => {
                 s.update(&self.world_sim, self.spirit_stones, &self.inventory)

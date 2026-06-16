@@ -61,30 +61,28 @@ pub fn draw_tech_tree_modal(
 
     draw_panel(
         Rect::new(modal_x, modal_y, modal_w, modal_h),
-        Some("Sect Knowledge Tree"),
+        Some("Doctrine Recovery Ledger"),
     );
 
     // Close button (top-right)
     draw_button(
         Rect::new(modal_x + modal_w - 60.0, modal_y + 10.0, 50.0, 30.0),
-        "Close",
+        "Seal",
         false,
     );
 
-    // Spirit stones display
-    draw_ui_text(
-        &format!("Spirit Stones: {}", spirit_stones),
-        modal_x + 200.0,
-        modal_y + 28.0,
-        FONT_BODY_SIZE,
-        TEXT_HIGHLIGHT,
+    draw_doctrine_header(
+        Rect::new(modal_x + 18.0, modal_y + 46.0, modal_w - 36.0, 86.0),
+        data,
+        unlocked_techs,
+        spirit_stones,
     );
 
     // Content area (with padding for header)
     let content_x = modal_x + 15.0;
-    let content_y = modal_y + 50.0;
+    let content_y = modal_y + 142.0;
     let content_w = modal_w - 30.0;
-    let content_h = modal_h - 60.0;
+    let content_h = modal_h - 152.0;
 
     // Sort techs by prerequisites (dependency order)
     let sorted_techs = sort_techs_by_dependency(data);
@@ -145,7 +143,7 @@ pub fn draw_tech_tree_modal(
     if total_height > content_h {
         if state.scroll_offset > 0.0 {
             draw_ui_text(
-                "^ Scroll up ^",
+                "^ earlier doctrines ^",
                 modal_x + modal_w / 2.0 - 40.0,
                 content_y + 15.0,
                 FONT_SMALL_SIZE,
@@ -154,7 +152,7 @@ pub fn draw_tech_tree_modal(
         }
         if state.scroll_offset < total_height - content_h {
             draw_ui_text(
-                "v Scroll down v",
+                "v deeper archive v",
                 modal_x + modal_w / 2.0 - 45.0,
                 modal_y + modal_h - 15.0,
                 FONT_SMALL_SIZE,
@@ -181,6 +179,61 @@ pub fn draw_tech_tree_modal(
     }
 
     result_action
+}
+
+fn draw_doctrine_header(
+    rect: Rect,
+    data: &GameData,
+    unlocked_techs: &[String],
+    spirit_stones: u32,
+) {
+    draw_rectangle(
+        rect.x,
+        rect.y,
+        rect.w,
+        rect.h,
+        Color::new(0.035, 0.026, 0.018, 0.46),
+    );
+    draw_rectangle_lines(
+        rect.x,
+        rect.y,
+        rect.w,
+        rect.h,
+        1.0,
+        Color::new(PRIMARY.r, PRIMARY.g, PRIMARY.b, 0.34),
+    );
+
+    draw_ui_text(
+        "Recover lost doctrine to rebuild halls and open safer paths for disciples.",
+        rect.x + 14.0,
+        rect.y + 28.0,
+        FONT_BODY_SIZE,
+        TEXT_PRIMARY,
+    );
+    draw_ui_text(
+        "The patriarch spends spirit stones here as ink, incense, and bribes for surviving fragments.",
+        rect.x + 14.0,
+        rect.y + 52.0,
+        FONT_SMALL_SIZE,
+        TEXT_SECONDARY,
+    );
+
+    let mut seal_x = rect.x + rect.w - 286.0;
+    seal_x += draw_resource_seal(seal_x, rect.y + 52.0, "Stones", spirit_stones, PRIMARY) + 8.0;
+    seal_x += draw_resource_seal(
+        seal_x,
+        rect.y + 52.0,
+        "Recovered",
+        unlocked_techs.len() as u32,
+        SUCCESS,
+    ) + 8.0;
+    draw_resource_seal(
+        seal_x,
+        rect.y + 52.0,
+        "Sealed",
+        data.techs.len().saturating_sub(unlocked_techs.len()) as u32,
+        FAILURE,
+    );
 }
 
 /// Sort technologies by dependency order (prerequisites first)
@@ -239,43 +292,54 @@ fn draw_tech_entry(
     let can_afford = spirit_stones >= tech.cost_spirit_stones;
     let can_research = !is_unlocked && prereqs_met && can_afford;
 
-    // Entry background
-    let bg_color = if is_unlocked {
-        Color::new(0.1, 0.2, 0.1, 0.6) // Green tint for unlocked
-    } else if prereqs_met {
-        Color::new(0.15, 0.15, 0.1, 0.6) // Yellow tint for available
-    } else {
-        Color::new(0.1, 0.1, 0.1, 0.4) // Gray for locked
-    };
-
     let entry_height = calc_tech_entry_height(tech);
     let entry_rect = Rect::new(x, y, width, entry_height - 5.0);
+    let accent = doctrine_color(tech);
+    let bg_alpha = if is_unlocked {
+        0.62
+    } else if prereqs_met {
+        0.48
+    } else {
+        0.30
+    };
 
     draw_rectangle(
         entry_rect.x,
         entry_rect.y,
         entry_rect.w,
         entry_rect.h,
-        bg_color,
+        Color::new(0.035, 0.026, 0.018, bg_alpha),
     );
-
-    // Border color based on status
-    let border_color = if is_unlocked {
-        SUCCESS
-    } else if can_research {
-        PRIMARY
-    } else if prereqs_met {
-        Color::new(0.6, 0.6, 0.2, 1.0) // Can't afford
-    } else {
-        PANEL_BORDER
-    };
+    draw_rectangle(
+        entry_rect.x,
+        entry_rect.y,
+        5.0,
+        entry_rect.h,
+        Color::new(
+            accent.r,
+            accent.g,
+            accent.b,
+            if prereqs_met { 0.74 } else { 0.28 },
+        ),
+    );
     draw_rectangle_lines(
         entry_rect.x,
         entry_rect.y,
         entry_rect.w,
         entry_rect.h,
-        2.0,
-        border_color,
+        if can_research { 2.0 } else { 1.0 },
+        Color::new(
+            accent.r,
+            accent.g,
+            accent.b,
+            if is_unlocked {
+                0.78
+            } else if prereqs_met {
+                0.54
+            } else {
+                0.28
+            },
+        ),
     );
 
     // Check hover for tooltip
@@ -286,14 +350,8 @@ fn draw_tech_entry(
 
     let mut text_y = y + 22.0;
 
-    // Tech name with status indicator
-    let status_icon = if is_unlocked {
-        "[OK]"
-    } else if prereqs_met {
-        "[?]"
-    } else {
-        "[X]"
-    };
+    // Doctrine title and recovery state
+    let status_label = doctrine_status_label(is_unlocked, prereqs_met, can_afford);
     let name_color = if is_unlocked {
         SUCCESS
     } else if prereqs_met {
@@ -302,8 +360,8 @@ fn draw_tech_entry(
         TEXT_SECONDARY
     };
 
-    draw_ui_text(status_icon, x + 10.0, text_y, FONT_BODY_SIZE, name_color);
-    draw_ui_text(&tech.name, x + 50.0, text_y, FONT_HEADER_SIZE, name_color);
+    draw_ui_text(status_label, x + 16.0, text_y, FONT_SMALL_SIZE, accent);
+    draw_ui_text(&tech.name, x + 116.0, text_y, FONT_HEADER_SIZE, name_color);
 
     // Cost (right-aligned)
     if !is_unlocked {
@@ -326,7 +384,7 @@ fn draw_tech_entry(
     } else {
         tech.description.clone()
     };
-    draw_ui_text(&desc, x + 15.0, text_y, FONT_SMALL_SIZE, TEXT_SECONDARY);
+    draw_ui_text(&desc, x + 16.0, text_y, FONT_SMALL_SIZE, TEXT_SECONDARY);
 
     text_y += 20.0;
 
@@ -349,11 +407,11 @@ fn draw_tech_entry(
                 .iter()
                 .map(|m| format!("{:?}", m))
                 .collect();
-            unlocks_parts.push(format!("Missions: {}", missions.join(", ")));
+            unlocks_parts.push(format!("Dispatches: {}", missions.join(", ")));
         }
 
-        let unlocks_text = format!("Unlocks: {}", unlocks_parts.join(" | "));
-        draw_ui_text(&unlocks_text, x + 15.0, text_y, FONT_SMALL_SIZE, SECONDARY);
+        let unlocks_text = format!("Restores: {}", unlocks_parts.join(" | "));
+        draw_ui_text(&unlocks_text, x + 16.0, text_y, FONT_SMALL_SIZE, SECONDARY);
         text_y += 20.0;
     }
 
@@ -365,7 +423,7 @@ fn draw_tech_entry(
             .filter_map(|id| data.techs.get(id))
             .map(|t| {
                 if unlocked_techs.contains(&t.id) {
-                    format!("{} [OK]", t.name)
+                    format!("{} recovered", t.name)
                 } else {
                     t.name.clone()
                 }
@@ -374,8 +432,8 @@ fn draw_tech_entry(
 
         let prereq_color = if prereqs_met { TEXT_SECONDARY } else { FAILURE };
         draw_ui_text(
-            &format!("Requires: {}", prereq_names.join(", ")),
-            x + 15.0,
+            &format!("Requires doctrine: {}", prereq_names.join(", ")),
+            x + 16.0,
             text_y,
             FONT_SMALL_SIZE,
             prereq_color,
@@ -385,20 +443,54 @@ fn draw_tech_entry(
     // Research button
     if can_research {
         let btn_rect = Rect::new(x + width - 110.0, y + entry_height - 40.0, 100.0, 30.0);
-        if draw_button(btn_rect, "Research", false) {
+        if draw_button(btn_rect, "Recover", false) {
             return Some(Action::ResearchTech(tech.id.clone()));
         }
     } else if is_unlocked {
         draw_ui_text(
-            "Learned",
-            x + width - 80.0,
+            "Recovered",
+            x + width - 92.0,
             y + entry_height - 25.0,
             FONT_SMALL_SIZE,
             SUCCESS,
         );
+    } else if prereqs_met && !can_afford {
+        draw_ui_text(
+            "Treasury too low",
+            x + width - 116.0,
+            y + entry_height - 25.0,
+            FONT_SMALL_SIZE,
+            FAILURE,
+        );
     }
 
     None
+}
+
+fn doctrine_status_label(is_unlocked: bool, prereqs_met: bool, can_afford: bool) -> &'static str {
+    if is_unlocked {
+        "Recovered"
+    } else if prereqs_met && can_afford {
+        "Unsealed"
+    } else if prereqs_met {
+        "Unfunded"
+    } else {
+        "Sealed"
+    }
+}
+
+fn doctrine_color(tech: &Technology) -> Color {
+    if !tech.unlocks_buildings.is_empty() {
+        PRIMARY
+    } else if !tech.unlocks_missions.is_empty() {
+        ACCENT
+    } else if tech.name.to_ascii_lowercase().contains("herb") {
+        SUCCESS
+    } else if tech.name.to_ascii_lowercase().contains("alchemy") {
+        WARNING
+    } else {
+        SECONDARY
+    }
 }
 
 /// Draw detailed tooltip for a tech
@@ -411,15 +503,18 @@ fn draw_tech_tooltip(tech: &Technology, data: &GameData, unlocked_techs: &[Strin
     lines.push(String::new()); // Empty line
     lines.push(tech.description.clone());
     lines.push(String::new());
-    lines.push(format!("Cost: {} Spirit Stones", tech.cost_spirit_stones));
+    lines.push(format!(
+        "Recovery cost: {} Spirit Stones",
+        tech.cost_spirit_stones
+    ));
 
     if !tech.prerequisites.is_empty() {
         lines.push(String::new());
-        lines.push("Prerequisites:".to_string());
+        lines.push("Required doctrines:".to_string());
         for prereq_id in &tech.prerequisites {
             if let Some(prereq) = data.techs.get(prereq_id) {
                 let status = if unlocked_techs.contains(prereq_id) {
-                    " [Learned]"
+                    " [Recovered]"
                 } else {
                     ""
                 };
@@ -430,7 +525,7 @@ fn draw_tech_tooltip(tech: &Technology, data: &GameData, unlocked_techs: &[Strin
 
     if !tech.unlocks_buildings.is_empty() {
         lines.push(String::new());
-        lines.push("Unlocks Buildings:".to_string());
+        lines.push("Restores Halls:".to_string());
         for building in &tech.unlocks_buildings {
             lines.push(format!("  - {}", building));
         }
@@ -438,7 +533,7 @@ fn draw_tech_tooltip(tech: &Technology, data: &GameData, unlocked_techs: &[Strin
 
     if !tech.unlocks_missions.is_empty() {
         lines.push(String::new());
-        lines.push("Unlocks Mission Types:".to_string());
+        lines.push("Opens Dispatch Paths:".to_string());
         for mission in &tech.unlocks_missions {
             lines.push(format!("  - {:?}", mission));
         }

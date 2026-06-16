@@ -19,7 +19,7 @@ impl Game {
         };
 
         self.event_log
-            .push(format!("Mission Started: {}", mission.description));
+            .push(format!("Dispatch issued: {}", mission.description));
         self.ongoing_missions.push(OngoingMission {
             mission: mission.clone(),
             disciple_indices,
@@ -40,7 +40,7 @@ impl Game {
         for (item_id, amount) in &outcome.rewards.items {
             *self.inventory.entry(item_id.clone()).or_insert(0) += amount;
             self.event_log
-                .push(format!("Received {}x Item '{}'", amount, item_id));
+                .push(format!("Sect stores received {}x '{}'", amount, item_id));
         }
 
         for &idx in &outcome.disciple_indices {
@@ -55,7 +55,7 @@ impl Game {
                 if let Some(recipe) = self.data.recipes.iter().find(|r| r.id == *recipe_id) {
                     let recipe_name = recipe.name.clone();
                     self.event_log
-                        .push(format!("Discovered recipe: {}!", recipe_name));
+                        .push(format!("Recovered workshop formula: {}!", recipe_name));
                     self.show_moment(
                         MomentKind::Discovery,
                         "A Forgotten Technique Has Been Found",
@@ -70,7 +70,7 @@ impl Game {
         }
 
         self.event_log.push(format!(
-            "Mission Rewards Claimed: {} SS, {} XP",
+            "Dispatch spoils recorded: {} SS, {} disciple insight",
             outcome.rewards.spirit_stones, outcome.rewards.disciple_exp
         ));
 
@@ -111,7 +111,7 @@ impl Game {
             if mission_matches {
                 let disciple_name = disciple.name.clone();
                 self.event_log.push(format!(
-                    "{} overcame their bottleneck: Complete a {} mission!",
+                    "{} fulfilled a fate trial: complete a {} dispatch!",
                     disciple_name, mt
                 ));
                 disciple.breakthrough_bottleneck = None;

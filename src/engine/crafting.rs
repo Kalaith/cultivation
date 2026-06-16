@@ -52,7 +52,10 @@ pub fn calculate_craft(
             output_quality: ItemQuality::Common,
             output_amount: 0,
             materials_lost_fraction: 0.5,
-            message: format!("Failed to craft {}! Materials partially lost.", recipe.name),
+            message: format!(
+                "Refinement of {} failed. Some offerings were lost to smoke.",
+                recipe.name
+            ),
         };
     }
 
@@ -109,7 +112,7 @@ pub fn calculate_craft(
         output_amount,
         materials_lost_fraction: 0.0,
         message: format!(
-            "Crafted {}x {}{}!{}",
+            "Refined {}x {}{}!{}",
             output_amount, recipe.name, quality_str, crit_str
         ),
     }

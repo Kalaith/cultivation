@@ -36,6 +36,10 @@ pub enum Action {
     },
     // Breakthrough action (player-controlled)
     AttemptBreakthrough(usize), // Disciple Index
+    ResolveTribulation {
+        disciple_idx: usize,
+        survived: bool,
+    },
     // Spirit beast actions
     RecruitSpiritBeast(String),  // Definition ID
     EquipBeastItem(u64, String), // Beast ID, Item ID

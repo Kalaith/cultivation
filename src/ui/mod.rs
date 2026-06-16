@@ -1,5 +1,6 @@
 pub mod components;
 pub mod fonts;
+pub mod herb_widgets;
 pub mod herbs;
 pub mod tech;
 pub mod textures;

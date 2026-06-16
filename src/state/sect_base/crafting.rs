@@ -6,31 +6,44 @@ impl SectBaseState {
         &mut self,
         data: &GameData,
         unlocked_techs: &[String],
+        spirit_stones: u32,
     ) -> Option<UpdateResult> {
         let (screen_w, screen_h) = (screen_width(), screen_height());
-        draw_rectangle(0.0, 0.0, screen_w, screen_h, Color::new(0.0, 0.0, 0.0, 0.8));
+        draw_rectangle(
+            0.0,
+            0.0,
+            screen_w,
+            screen_h,
+            Color::new(0.0, 0.0, 0.0, 0.76),
+        );
 
-        let modal_w = 400.0;
-        let modal_h = 500.0;
+        let modal_w = 620.0_f32.min(screen_w - 60.0);
+        let modal_h = 560.0_f32.min(screen_h - 70.0);
         let modal_x = (screen_w - modal_w) / 2.0;
         let modal_y = (screen_h - modal_h) / 2.0;
 
         draw_panel(
             Rect::new(modal_x, modal_y, modal_w, modal_h),
-            Some("Construction Blueprints"),
+            Some("Hall-Raising Ledger"),
         );
 
         if draw_button(
-            Rect::new(modal_x + modal_w - 60.0, modal_y + 10.0, 50.0, 30.0),
-            "Close",
+            Rect::new(modal_x + modal_w - 76.0, modal_y + 10.0, 64.0, 30.0),
+            "Seal",
             false,
         ) {
             self.crafting_modal_open = false;
         }
 
-        let content_y = modal_y + 50.0;
-        let content_h = modal_h - 70.0;
-        let content_rect = Rect::new(modal_x + 10.0, content_y, modal_w - 20.0, content_h);
+        draw_construction_intro(
+            Rect::new(modal_x + 22.0, modal_y + 54.0, modal_w - 44.0, 86.0),
+            data,
+            spirit_stones,
+        );
+
+        let content_y = modal_y + 152.0;
+        let content_h = modal_h - 180.0;
+        let content_rect = Rect::new(modal_x + 18.0, content_y, modal_w - 36.0, content_h);
 
         let mut build_opts: Vec<_> = data.building_definitions.values().collect();
         build_opts.sort_by_key(|a| a.cost);
@@ -49,12 +62,12 @@ impl SectBaseState {
             })
             .collect();
 
-        let item_height = 70.0;
+        let item_height = 108.0;
         let total_height = available_defs.len() as f32 * item_height;
         if content_rect.contains(mouse_position().into()) {
             let wheel = mouse_wheel().1;
             if total_height > content_h {
-                self.construction_scroll -= wheel * 30.0;
+                self.construction_scroll -= wheel * 42.0;
                 self.construction_scroll = self
                     .construction_scroll
                     .clamp(0.0, (total_height - content_h).max(0.0));
@@ -64,10 +77,11 @@ impl SectBaseState {
         }
 
         if available_defs.is_empty() {
-            draw_ui_text(
-                "No available buildings.",
-                modal_x + 20.0,
-                content_y + 20.0,
+            draw_wrapped_text(
+                "No new hall plans are ready. Recover more doctrine in the archive or research the missing techniques before expanding the mountain.",
+                content_rect.x + 18.0,
+                content_rect.y + 34.0,
+                content_rect.w - 36.0,
                 FONT_BODY_SIZE,
                 TEXT_SECONDARY,
             );
@@ -76,7 +90,7 @@ impl SectBaseState {
 
         let mut b_y = content_y - self.construction_scroll;
         for def in available_defs {
-            if b_y + 40.0 < content_y {
+            if b_y + item_height < content_y {
                 b_y += item_height;
                 continue;
             }
@@ -84,52 +98,37 @@ impl SectBaseState {
                 break;
             }
 
-            if draw_button(
-                Rect::new(modal_x + 20.0, b_y, modal_w - 40.0, 40.0),
-                &format!("{} ({} SS)", def.name, def.cost),
-                false,
-            ) {
+            let card = Rect::new(
+                content_rect.x,
+                b_y,
+                content_rect.w - 10.0,
+                item_height - 12.0,
+            );
+            let affordable = spirit_stones >= def.cost;
+            if draw_building_plan_card(card, def, affordable) && affordable {
                 self.crafting_modal_open = false;
                 self.placement_mode = Some(def.building_type.clone());
-            }
-
-            let desc_y = b_y + 50.0;
-            if desc_y < content_y + content_h {
-                let desc = if def.description.len() > 50 {
-                    format!("{}...", &def.description[..47])
-                } else {
-                    def.description.clone()
-                };
-                draw_ui_text(
-                    &desc,
-                    modal_x + 25.0,
-                    desc_y,
-                    FONT_SMALL_SIZE,
-                    TEXT_SECONDARY,
-                );
             }
 
             b_y += item_height;
         }
 
         if total_height > content_h {
-            let track_x = modal_x + modal_w - 12.0;
+            let track_x = content_rect.x + content_rect.w - 5.0;
             let track_y = content_y;
             let track_h = content_h;
-            draw_rectangle(track_x, track_y, 4.0, track_h, PANEL_BORDER);
+            draw_rectangle(
+                track_x,
+                track_y,
+                3.0,
+                track_h,
+                Color::new(0.0, 0.0, 0.0, 0.32),
+            );
 
             let handle_h = (content_h * content_h / total_height).max(20.0);
             let max_offset = (total_height - content_h).max(1.0);
             let handle_y = track_y + (self.construction_scroll / max_offset) * (track_h - handle_h);
             draw_rectangle(track_x - 1.0, handle_y, 6.0, handle_h, TEXT_HIGHLIGHT);
-
-            draw_ui_text(
-                "Scroll",
-                modal_x + 20.0,
-                modal_y + modal_h - 15.0,
-                FONT_SMALL_SIZE,
-                TEXT_SECONDARY,
-            );
         }
         None
     }
@@ -156,12 +155,12 @@ impl SectBaseState {
 
         draw_panel(
             Rect::new(modal_x, modal_y, modal_w, modal_h),
-            Some("Crafting Menu"),
+            Some("Sect Workshop Ledger"),
         );
 
         if draw_button(
             Rect::new(modal_x + modal_w - 60.0, modal_y + 10.0, 50.0, 30.0),
-            "Close",
+            "Seal",
             false,
         ) {
             self.crafting_modal_open = false;
@@ -181,7 +180,7 @@ impl SectBaseState {
 
         let info_y = modal_y + 45.0;
         draw_ui_text(
-            &format!("Building Lv.{}", building_level),
+            &format!("Hall grade {}", building_level),
             modal_x + 20.0,
             info_y,
             FONT_SMALL_SIZE,
@@ -189,7 +188,7 @@ impl SectBaseState {
         );
         if let Some(d) = assigned_disciple {
             draw_ui_text(
-                &format!("Worker: {} (Mind: {})", d.name, d.attributes.mind),
+                &format!("Attendant: {} (Mind Sea: {})", d.name, d.attributes.mind),
                 modal_x + 150.0,
                 info_y,
                 FONT_SMALL_SIZE,
@@ -197,7 +196,7 @@ impl SectBaseState {
             );
         } else {
             draw_ui_text(
-                "No worker assigned",
+                "No attendant appointed",
                 modal_x + 150.0,
                 info_y,
                 FONT_SMALL_SIZE,
@@ -214,7 +213,7 @@ impl SectBaseState {
 
         if recipes.is_empty() {
             draw_ui_text(
-                "No discovered recipes for this station.",
+                "No recovered formulas for this workshop.",
                 modal_x + 20.0,
                 r_y,
                 FONT_BODY_SIZE,
@@ -316,7 +315,7 @@ impl SectBaseState {
         let status_text = if can_craft {
             ing_text
         } else {
-            format!("MISSING: {}", ing_text)
+            format!("LACKING: {}", ing_text)
         };
         let status_color = if can_craft {
             TEXT_SECONDARY
@@ -334,5 +333,190 @@ impl SectBaseState {
         *r_y += 65.0;
 
         None
+    }
+}
+
+fn draw_construction_intro(rect: Rect, data: &GameData, spirit_stones: u32) {
+    draw_rectangle(
+        rect.x,
+        rect.y,
+        rect.w,
+        rect.h,
+        Color::new(0.035, 0.026, 0.018, 0.46),
+    );
+    draw_rectangle_lines(
+        rect.x,
+        rect.y,
+        rect.w,
+        rect.h,
+        1.0,
+        Color::new(PRIMARY.r, PRIMARY.g, PRIMARY.b, 0.34),
+    );
+
+    let active = data
+        .buildings
+        .iter()
+        .filter(|b| b.status == BuildingStatus::Active)
+        .count() as u32;
+    let ruined = data
+        .buildings
+        .iter()
+        .filter(|b| b.status == BuildingStatus::Ruined)
+        .count() as u32;
+
+    draw_ui_text(
+        "Choose which hall the patriarch raises next.",
+        rect.x + 14.0,
+        rect.y + 28.0,
+        FONT_BODY_SIZE,
+        TEXT_PRIMARY,
+    );
+    draw_ui_text(
+        "Each foundation changes what the fallen sect can survive.",
+        rect.x + 14.0,
+        rect.y + 52.0,
+        FONT_SMALL_SIZE,
+        TEXT_SECONDARY,
+    );
+
+    let mut x = rect.x + rect.w - 270.0;
+    x += draw_resource_seal(x, rect.y + 50.0, "Treasury", spirit_stones, PRIMARY) + 8.0;
+    x += draw_resource_seal(x, rect.y + 50.0, "Active", active, SUCCESS) + 8.0;
+    draw_resource_seal(x, rect.y + 50.0, "Ruined", ruined, FAILURE);
+}
+
+fn draw_building_plan_card(
+    rect: Rect,
+    def: &crate::data::loader::BuildingDefinition,
+    affordable: bool,
+) -> bool {
+    let hovered = rect.contains(mouse_position().into());
+    let accent = building_plan_color(&def.building_type);
+    let alpha = if hovered { 0.54 } else { 0.38 };
+
+    draw_rectangle(
+        rect.x,
+        rect.y,
+        rect.w,
+        rect.h,
+        Color::new(0.035, 0.026, 0.018, alpha),
+    );
+    draw_rectangle_lines(
+        rect.x,
+        rect.y,
+        rect.w,
+        rect.h,
+        if hovered { 2.0 } else { 1.0 },
+        Color::new(
+            accent.r,
+            accent.g,
+            accent.b,
+            if affordable { 0.62 } else { 0.28 },
+        ),
+    );
+    draw_rectangle(
+        rect.x,
+        rect.y,
+        5.0,
+        rect.h,
+        Color::new(
+            accent.r,
+            accent.g,
+            accent.b,
+            if affordable { 0.76 } else { 0.34 },
+        ),
+    );
+
+    draw_ui_text(
+        &def.name,
+        rect.x + 18.0,
+        rect.y + 28.0,
+        FONT_BODY_SIZE,
+        if affordable {
+            TEXT_PRIMARY
+        } else {
+            TEXT_SECONDARY
+        },
+    );
+    draw_ui_text(
+        building_plan_role(&def.building_type),
+        rect.x + 18.0,
+        rect.y + 52.0,
+        FONT_SMALL_SIZE,
+        accent,
+    );
+    draw_wrapped_text(
+        &def.description,
+        rect.x + 18.0,
+        rect.y + 76.0,
+        rect.w - 160.0,
+        FONT_SMALL_SIZE,
+        TEXT_SECONDARY,
+    );
+
+    let cost_text = format!("{} SS", def.cost);
+    draw_ui_text(
+        &cost_text,
+        rect.x + rect.w - 118.0,
+        rect.y + 32.0,
+        FONT_HEADER_SIZE,
+        if affordable { TEXT_HIGHLIGHT } else { FAILURE },
+    );
+    draw_ui_text(
+        if affordable {
+            "Place foundation"
+        } else {
+            "Need more stones"
+        },
+        rect.x + rect.w - 126.0,
+        rect.y + 66.0,
+        FONT_SMALL_SIZE,
+        if affordable { TEXT_SECONDARY } else { FAILURE },
+    );
+    draw_ui_text(
+        &format!("Aspect: {:?}", def.element),
+        rect.x + rect.w - 126.0,
+        rect.y + 88.0,
+        FONT_SMALL_SIZE,
+        TEXT_SECONDARY,
+    );
+
+    hovered && is_mouse_button_pressed(MouseButton::Left)
+}
+
+fn building_plan_role(building_type: &BuildingType) -> &'static str {
+    match building_type {
+        BuildingType::SectHall => "Ancestral command",
+        BuildingType::Dormitory => "Disciple shelter",
+        BuildingType::TrainingYard => "Cultivation ascent",
+        BuildingType::LibraryPavilion => "Memory and scripture",
+        BuildingType::MissionBoard => "Beyond-gate dispatch",
+        BuildingType::SpiritGarden => "Ambient Qi income",
+        BuildingType::Decoration => "Mountain dignity",
+        BuildingType::AlchemyFurnace => "Pill refinement",
+        BuildingType::ArtifactForge => "Artifact forging",
+        BuildingType::Blacksmith => "Weapons and armor",
+        BuildingType::HerbGarden => "Medicine roots",
+        BuildingType::Greenhouse => "Rare herb sanctuary",
+        BuildingType::DryingPavilion => "Herb preservation",
+        BuildingType::HerbStorage => "Winter stores",
+        BuildingType::TalismanScriptorium => "Talismans and seals",
+    }
+}
+
+fn building_plan_color(building_type: &BuildingType) -> Color {
+    match building_type {
+        BuildingType::SectHall | BuildingType::Dormitory | BuildingType::HerbStorage => PRIMARY,
+        BuildingType::TrainingYard | BuildingType::Blacksmith | BuildingType::ArtifactForge => {
+            WARNING
+        }
+        BuildingType::LibraryPavilion | BuildingType::TalismanScriptorium => SECONDARY,
+        BuildingType::MissionBoard => ACCENT,
+        BuildingType::SpiritGarden
+        | BuildingType::HerbGarden
+        | BuildingType::Greenhouse
+        | BuildingType::DryingPavilion => SUCCESS,
+        BuildingType::AlchemyFurnace => ACCENT,
+        BuildingType::Decoration => TEXT_HIGHLIGHT,
     }
 }

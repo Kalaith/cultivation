@@ -160,25 +160,28 @@ impl SectBaseState {
         match step {
             0 => (
                 "Restore the Sect Hall",
-                "Select the ruined Sect Hall and choose Restore (50 SS).",
+                "Select the ruined Sect Hall and choose Restore Hall (50 SS).",
             ),
             1 => (
-                "Unlock the Mission Board",
-                "Open Research / Tech and learn Sect Administration (0 SS).",
+                "Recover the Dispatch Doctrine",
+                "Open Recover Doctrine and learn Sect Administration (0 SS).",
             ),
             2 => (
-                "Build the Mission Board",
-                "Open Construction and place a Mission Board on the map.",
+                "Raise the Gate Dispatch Board",
+                "Open Construction and place the Gate Dispatch Board on the mountain map.",
             ),
             3 => (
-                "Recruit a Disciple",
-                "Select the Sect Hall and press Recruit to bring in help.",
+                "Accept a Disciple",
+                "Select the Sect Hall and press Accept Disciple to bring in help.",
             ),
             4 => (
-                "Send a Mission",
-                "Open the Mission Board, assign a team, and depart on a mission.",
+                "Issue a Dispatch",
+                "Open the Gate Dispatch Board, assign a team, and send them beyond the gate.",
             ),
-            _ => ("Tutorial Complete", "All steps finished."),
+            _ => (
+                "Mandate Established",
+                "The first patriarch decrees are complete.",
+            ),
         }
     }
 }

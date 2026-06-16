@@ -1,4 +1,5 @@
 mod building_details;
+mod building_missions;
 mod crafting;
 mod map_view;
 mod panels;
