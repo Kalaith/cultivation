@@ -9,7 +9,9 @@ use crate::data::spirit_beasts::SpiritBeast;
 use crate::engine::proc_gen::generate_disciple;
 use crate::engine::scheduler::Scheduler;
 use crate::engine::world_sim::WorldSim;
-use crate::state::{main_menu::MainMenuState, GameState};
+use crate::state::{
+    main_menu::MainMenuState, sect_base::SectBaseState, world_map::WorldMapState, GameState,
+};
 use crate::ui::{FontManager, TextureManager};
 
 mod actions;
@@ -156,6 +158,18 @@ impl Game {
             textures,
             fonts,
             active_moment: None,
+        }
+    }
+
+    /// Seed a specific scene for the screenshot harness.
+    pub fn begin_capture_scene(&mut self, scene: &str) {
+        match scene {
+            "sectbase" => self.state = GameState::SectBase(SectBaseState::new()),
+            "worldmap" => self.state = GameState::WorldMap(WorldMapState::new()),
+            _ => {
+                // Default: the boot state, the main menu.
+                self.state = GameState::MainMenu(MainMenuState::new());
+            }
         }
     }
 
