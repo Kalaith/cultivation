@@ -417,6 +417,30 @@ impl SectBaseState {
             };
             self.draw_building_sprite(rect, textures, &building.building_type, world_pos, tint);
 
+            if self.tutorial_step_active.is_some() {
+                let screen_pos = self.world_to_screen(rect, world_pos);
+                if rect.contains(screen_pos.into()) {
+                    let half = 60.0 * self.map_zoom.max(0.5);
+                    let target = Rect::new(
+                        screen_pos.x - half,
+                        screen_pos.y - half * 1.4,
+                        half * 2.0,
+                        half * 2.0,
+                    );
+                    match building.building_type {
+                        BuildingType::SectHall => {
+                            self.register_tutorial_target(0, target);
+                            self.register_tutorial_target(1, target);
+                            self.register_tutorial_target(3, target);
+                        }
+                        BuildingType::MissionBoard => {
+                            self.register_tutorial_target(4, target);
+                        }
+                        _ => {}
+                    }
+                }
+            }
+
             if self.placement_mode.is_none() && rect.contains(mouse.into()) {
                 if self.point_hits_building(textures, building, mouse_world) {
                     hovered_building_id = Some(building.id);
@@ -479,7 +503,7 @@ impl SectBaseState {
     pub(super) fn draw_placement_preview(&mut self, rect: Rect, _map_x: f32, _map_y: f32) {
         if let Some(place_type) = &self.placement_mode {
             draw_ui_text(
-                &format!("Placing: {:?}", place_type),
+                &format!("Placing: {}", place_type),
                 rect.x + 20.0,
                 rect.y + rect.h - 40.0,
                 FONT_HEADER_SIZE,

@@ -112,7 +112,7 @@ impl Game {
             }
             crate::data::items::ItemEffect::ElementalStrike(element, amt) => {
                 logs.push(format!(
-                    "{} released a {:?} strike ({} force) from {}.",
+                    "{} released a {} strike ({} force) from {}.",
                     disciple.name, element, amt, item.name
                 ));
             }

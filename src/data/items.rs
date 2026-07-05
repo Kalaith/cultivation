@@ -83,6 +83,24 @@ pub enum EquipmentSlot {
     Belt,
 }
 
+impl std::fmt::Display for EquipmentSlot {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let name = match self {
+            EquipmentSlot::Weapon => "Weapon",
+            EquipmentSlot::OffHand => "Off-Hand",
+            EquipmentSlot::Chest => "Chest",
+            EquipmentSlot::Legs => "Legs",
+            EquipmentSlot::Arms => "Arms",
+            EquipmentSlot::Head => "Head",
+            EquipmentSlot::Boots => "Boots",
+            EquipmentSlot::Ring => "Ring",
+            EquipmentSlot::Amulet => "Amulet",
+            EquipmentSlot::Belt => "Belt",
+        };
+        write!(f, "{}", name)
+    }
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct StatModifier {
     pub stat: String,

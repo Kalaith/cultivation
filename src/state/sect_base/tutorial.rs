@@ -2,102 +2,77 @@ use super::*;
 use macroquad_toolkit::ui::draw_ui_text;
 
 impl SectBaseState {
+    /// Register a rect to be highlighted while the given tutorial step is active.
+    pub(super) fn register_tutorial_target(&mut self, step: usize, rect: Rect) {
+        if self.tutorial_step_active == Some(step) {
+            self.tutorial_targets.push(rect);
+        }
+    }
+
+    /// Pulsing gold outlines around this frame's registered tutorial targets.
+    pub(super) fn draw_tutorial_highlights(&self) {
+        if self.tutorial_targets.is_empty() {
+            return;
+        }
+        let pulse = 0.5 + 0.5 * ((get_time() as f32) * 3.2).sin();
+        let alpha = 0.45 + 0.45 * pulse;
+        let expand = 3.0 + 3.0 * pulse;
+        for r in &self.tutorial_targets {
+            draw_rectangle_lines(
+                r.x - expand,
+                r.y - expand,
+                r.w + expand * 2.0,
+                r.h + expand * 2.0,
+                3.0,
+                Color::new(TEXT_HIGHLIGHT.r, TEXT_HIGHLIGHT.g, TEXT_HIGHLIGHT.b, alpha),
+            );
+        }
+    }
+
     pub(super) fn draw_tutorial_overlay(
         &self,
         screen_w: f32,
-        screen_h: f32,
+        header_h: f32,
         tutorial: &mut TutorialState,
     ) {
         let total_steps = 5;
         let (title, body) = self.get_tutorial_step_text(tutorial.step);
         let header = format!(
-            "Tutorial {}/{}",
+            "First Decrees {}/{}",
             (tutorial.step + 1).min(total_steps),
             total_steps
         );
 
-        let overlay_w = 700.0;
-        let overlay_h = 220.0;
-        let overlay_x = (screen_w - overlay_w) / 2.0;
-        let overlay_y = screen_h - overlay_h - 10.0;
-        let rect = Rect::new(overlay_x, overlay_y, overlay_w, overlay_h);
+        let card_w = 480.0;
+        let card_h = 128.0;
+        let rect = Rect::new((screen_w - card_w) / 2.0, header_h + 12.0, card_w, card_h);
 
         draw_panel(rect, Some(&header));
 
-        let portrait_w = 110.0;
-        let portrait_h = 140.0;
-        let portrait_y = rect.y + 50.0;
-        let left_portrait = Rect::new(rect.x + 10.0, portrait_y, portrait_w, portrait_h);
-        let right_portrait = Rect::new(
-            rect.x + rect.w - portrait_w - 10.0,
-            portrait_y,
-            portrait_w,
-            portrait_h,
-        );
-        draw_panel(left_portrait, Some("Portrait"));
-        draw_panel(right_portrait, Some("Portrait"));
-
-        let text_x = rect.x + portrait_w + 25.0;
-        let text_w = rect.w - (portrait_w * 2.0) - 50.0;
-
-        draw_ui_text(
-            title,
-            text_x,
-            rect.y + 60.0,
-            FONT_HEADER_SIZE,
-            TEXT_HIGHLIGHT,
-        );
-
-        let mut text_y = rect.y + 85.0;
-        let words: Vec<&str> = body.split_whitespace().collect();
-        let mut current_line = String::new();
-
-        for word in words {
-            let test_line = if current_line.is_empty() {
-                word.to_string()
-            } else {
-                format!("{} {}", current_line, word)
-            };
-
-            if test_line.len() as f32 * 7.0 > text_w {
-                draw_ui_text(
-                    &current_line,
-                    text_x,
-                    text_y,
-                    FONT_SMALL_SIZE,
-                    TEXT_SECONDARY,
-                );
-                text_y += 18.0;
-                current_line = word.to_string();
-            } else {
-                current_line = test_line;
-            }
-        }
-        if !current_line.is_empty() {
-            draw_ui_text(
-                &current_line,
-                text_x,
-                text_y,
-                FONT_SMALL_SIZE,
-                TEXT_SECONDARY,
-            );
-        }
-
-        let btn_y = rect.y + rect.h - 40.0;
         if draw_button(
-            Rect::new(rect.x + rect.w - 190.0, btn_y, 80.0, 30.0),
+            Rect::new(rect.x + rect.w - 148.0, rect.y + 8.0, 64.0, 26.0),
             "Hide",
             false,
         ) {
             tutorial.hidden = true;
         }
         if draw_button(
-            Rect::new(rect.x + rect.w - 100.0, btn_y, 80.0, 30.0),
+            Rect::new(rect.x + rect.w - 76.0, rect.y + 8.0, 64.0, 26.0),
             "Skip",
             false,
         ) {
             tutorial.active = false;
         }
+
+        draw_ui_text(title, rect.x + 16.0, rect.y + 66.0, FONT_BODY_SIZE, TEXT_HIGHLIGHT);
+        draw_wrapped_text(
+            body,
+            rect.x + 16.0,
+            rect.y + 92.0,
+            rect.w - 32.0,
+            FONT_SMALL_SIZE,
+            TEXT_SECONDARY,
+        );
     }
 
     pub(super) fn update_tutorial_progress(
@@ -164,11 +139,11 @@ impl SectBaseState {
             ),
             1 => (
                 "Recover the Dispatch Doctrine",
-                "Open Recover Doctrine and learn Sect Administration (0 SS).",
+                "Open the Sect Hall, press Recover Doctrine, and learn Sect Administration (free).",
             ),
             2 => (
-                "Raise the Gate Dispatch Board",
-                "Open Construction and place the Gate Dispatch Board on the mountain map.",
+                "Raise the Mission Board",
+                "Press Raise Halls and place the Mission Board on the mountain map.",
             ),
             3 => (
                 "Accept a Disciple",
@@ -176,7 +151,7 @@ impl SectBaseState {
             ),
             4 => (
                 "Issue a Dispatch",
-                "Open the Gate Dispatch Board, assign a team, and send them beyond the gate.",
+                "Open the Mission Board, assign a team, and send them beyond the gate.",
             ),
             _ => (
                 "Mandate Established",

@@ -97,6 +97,18 @@ pub enum Talent {
     HeavenSent,
 }
 
+impl std::fmt::Display for Talent {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Talent::Low => write!(f, "Dim Spark"),
+            Talent::Medium => write!(f, "Steady Root"),
+            Talent::High => write!(f, "Bright Root"),
+            Talent::Genius => write!(f, "Genius"),
+            Talent::HeavenSent => write!(f, "Heaven-Sent"),
+        }
+    }
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Attributes {
     pub body: u32,
@@ -271,9 +283,39 @@ pub enum Bottleneck {
 }
 
 impl Bottleneck {
+    /// Whether the sect can divine the exact nature of bottlenecks.
+    /// Requires an active Library Pavilion.
+    pub fn insight_unlocked(data: &GameData) -> bool {
+        use crate::data::buildings::{BuildingStatus, BuildingType};
+        data.buildings.iter().any(|b| {
+            b.building_type == BuildingType::LibraryPavilion && b.status == BuildingStatus::Active
+        })
+    }
+
+    /// Description shown to the player: exact once insight is unlocked,
+    /// otherwise a vague hint pointing at the Library Pavilion.
+    pub fn player_description(&self, data: &GameData) -> String {
+        if Self::insight_unlocked(data) {
+            self.description(data)
+        } else {
+            "An unseen obstruction bars the way. Raise the Library Pavilion to divine its nature."
+                .to_string()
+        }
+    }
+
     pub fn description(&self, data: &GameData) -> String {
         match self {
-            Bottleneck::CompleteMission(mt) => format!("Complete a {} mission", mt),
+            Bottleneck::CompleteMission(mt) => {
+                let mission_name = match mt.as_str() {
+                    "Exploration" => "Exploration",
+                    "ResourceGathering" => "Resource Gathering",
+                    "MonsterSuppression" => "Monster Suppression",
+                    "Diplomacy" => "Diplomacy",
+                    "RuinDelve" => "Ruin Delve",
+                    other => other,
+                };
+                format!("Complete a {} dispatch", mission_name)
+            }
             Bottleneck::CraftItem(recipe_id) => {
                 let name = data
                     .recipes
@@ -292,21 +334,7 @@ impl Bottleneck {
                     .unwrap_or(item_id.as_str());
                 format!("Use {}", name)
             }
-            Bottleneck::EquipSlot(slot) => {
-                let slot_name = match slot {
-                    EquipmentSlot::Weapon => "Weapon",
-                    EquipmentSlot::OffHand => "Off-Hand",
-                    EquipmentSlot::Chest => "Chest",
-                    EquipmentSlot::Legs => "Legs",
-                    EquipmentSlot::Arms => "Arms",
-                    EquipmentSlot::Head => "Head",
-                    EquipmentSlot::Boots => "Boots",
-                    EquipmentSlot::Ring => "Ring",
-                    EquipmentSlot::Amulet => "Amulet",
-                    EquipmentSlot::Belt => "Belt",
-                };
-                format!("Equip a {}", slot_name)
-            }
+            Bottleneck::EquipSlot(slot) => format!("Equip a {}", slot),
         }
     }
 }

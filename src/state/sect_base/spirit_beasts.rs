@@ -145,7 +145,7 @@ impl SectBaseState {
         y += 34.0;
         draw_ui_text(
             &format!(
-                "{} guardian | {:?} tier | {:?} aspect",
+                "{} guardian | {} tier | {} aspect",
                 beast.species, beast.tier, beast.element
             ),
             x,
@@ -239,7 +239,7 @@ impl SectBaseState {
             found_any = true;
             let can_equip = beast.can_equip(item);
             let label = format!(
-                "{} ({:?}) x{}{}",
+                "{} ({}) x{}{}",
                 item.name,
                 item.slot,
                 count,
@@ -323,7 +323,7 @@ fn draw_beast_roster_card(rect: Rect, beast: &SpiritBeast, selected: bool) {
     );
     draw_ui_text(
         &format!(
-            "{} | {:?} | Loyalty {}",
+            "{} | {} | Loyalty {}",
             beast.species, beast.tier, beast.loyalty
         ),
         rect.x + 44.0,

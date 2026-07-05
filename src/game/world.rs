@@ -28,10 +28,15 @@ impl Game {
             }
             WorldSimResult::FactionAction { faction_id, action } => {
                 if let Some(faction) = self.world_sim.get_faction(&faction_id) {
-                    self.event_log.push(format!(
-                        "[Power Tablet] {} moved: {:?}",
-                        faction.name, action
-                    ));
+                    let actor = faction.name.clone();
+                    let deed = action.describe(&|id: &str| {
+                        self.world_sim
+                            .get_faction(id)
+                            .map(|f| f.name.clone())
+                            .unwrap_or_else(|| id.to_string())
+                    });
+                    self.event_log
+                        .push(format!("[Power Tablet] {} {}.", actor, deed));
                 }
             }
             WorldSimResult::WarDeclared {

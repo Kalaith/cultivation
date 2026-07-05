@@ -297,7 +297,7 @@ fn draw_law_card(rect: Rect, law: &CultivationLaw) {
     );
     draw_ui_text(
         &format!(
-            "Element {:?} | Breakthrough {:+.0}%",
+            "Element {} | Breakthrough {:+.0}%",
             law.element,
             law.breakthrough_modifier * 100.0
         ),

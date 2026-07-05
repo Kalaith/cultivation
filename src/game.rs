@@ -164,7 +164,20 @@ impl Game {
     /// Seed a specific scene for the screenshot harness.
     pub fn begin_capture_scene(&mut self, scene: &str) {
         match scene {
-            "sectbase" => self.state = GameState::SectBase(SectBaseState::new()),
+            "intro" => {
+                self.execute_action(crate::engine::actions::Action::StartNewGame(
+                    "Fallen Peak Sect".to_string(),
+                ));
+            }
+            "sectbase" => {
+                // Seed a real fresh campaign so the scene matches actual play
+                // (ruined Sect Hall, tutorial step 0, starting resources).
+                self.execute_action(crate::engine::actions::Action::StartNewGame(
+                    "Fallen Peak Sect".to_string(),
+                ));
+                self.transition(crate::state::StateTransition::ToSectBase);
+                self.active_moment = None;
+            }
             "worldmap" => self.state = GameState::WorldMap(WorldMapState::new()),
             _ => {
                 // Default: the boot state, the main menu.

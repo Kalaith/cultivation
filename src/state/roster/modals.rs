@@ -28,7 +28,7 @@ impl DiscipleRosterState {
         for law in data.laws.values() {
             if draw_button(
                 Rect::new(modal_x + 20.0, m_y, modal_w - 40.0, 36.0),
-                &format!("{} [{:?}]", law.name, law.element),
+                &format!("{} [{}]", law.name, law.element),
                 false,
             ) {
                 self.law_modal_open = false;

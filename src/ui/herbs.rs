@@ -321,7 +321,14 @@ pub fn draw_herb_planting_modal(
             let lines = vec![
                 herb.description.clone(),
                 format!("Growth vigil: {} ticks", herb.grow_time_ticks),
-                format!("Favorable seasons: {:?}", herb.grow_seasons),
+                format!(
+                    "Favorable seasons: {}",
+                    herb.grow_seasons
+                        .iter()
+                        .map(|s| s.to_string())
+                        .collect::<Vec<_>>()
+                        .join(", ")
+                ),
             ];
             draw_tooltip_box(mouse_position().0 + 15.0, mouse_position().1 + 15.0, &lines);
         }

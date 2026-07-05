@@ -105,7 +105,7 @@ impl SectBaseState {
             TEXT_PRIMARY,
         );
         draw_ui_text(
-            &format!("Aspect: {:?}", building.element),
+            &format!("Aspect: {}", building.element),
             rect.x + 20.0,
             d_y + 44.0,
             FONT_BODY_SIZE,
@@ -257,11 +257,11 @@ impl SectBaseState {
         } else {
             format!("Raise Beams ({} SS)", repair_cost)
         };
-        if draw_button(
-            Rect::new(rect.x + 20.0, action_y, 200.0, 40.0),
-            &repair_label,
-            false,
-        ) {
+        let repair_rect = Rect::new(rect.x + 20.0, action_y, 200.0, 40.0);
+        if *b_type == BuildingType::SectHall {
+            self.register_tutorial_target(0, repair_rect);
+        }
+        if draw_button(repair_rect, &repair_label, false) {
             return Some(UpdateResult::new().with_action(Action::RepairBuilding(building.id)));
         }
         None
@@ -282,18 +282,14 @@ impl SectBaseState {
         }
 
         if *b_type == BuildingType::SectHall {
-            if draw_button(
-                Rect::new(rect.x + 180.0, action_y, 150.0, 40.0),
-                "Accept Disciple",
-                false,
-            ) {
+            let accept_rect = Rect::new(rect.x + 180.0, action_y, 150.0, 40.0);
+            self.register_tutorial_target(3, accept_rect);
+            if draw_button(accept_rect, "Accept Disciple", false) {
                 return Some(UpdateResult::new().with_action(Action::RecruitDisciple));
             }
-            if draw_button(
-                Rect::new(rect.x + 340.0, action_y, 150.0, 40.0),
-                "Recover Doctrine",
-                false,
-            ) {
+            let doctrine_rect = Rect::new(rect.x + 340.0, action_y, 150.0, 40.0);
+            self.register_tutorial_target(1, doctrine_rect);
+            if draw_button(doctrine_rect, "Recover Doctrine", false) {
                 self.tech_tree_open = true;
             }
         } else if matches!(

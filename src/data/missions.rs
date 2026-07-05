@@ -11,12 +11,34 @@ pub enum MissionType {
     RuinDelve,
 }
 
+impl std::fmt::Display for MissionType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            MissionType::Exploration => write!(f, "Exploration"),
+            MissionType::ResourceGathering => write!(f, "Resource Gathering"),
+            MissionType::MonsterSuppression => write!(f, "Monster Suppression"),
+            MissionType::Diplomacy => write!(f, "Diplomacy"),
+            MissionType::RuinDelve => write!(f, "Ruin Delve"),
+        }
+    }
+}
+
 /// Which attribute is most relevant for a given mission type.
 #[derive(Clone, Copy, Debug)]
 pub enum RelevantStat {
     Body,
     Mind,
     Spirit,
+}
+
+impl std::fmt::Display for RelevantStat {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            RelevantStat::Body => write!(f, "Body"),
+            RelevantStat::Mind => write!(f, "Mind"),
+            RelevantStat::Spirit => write!(f, "Spirit"),
+        }
+    }
 }
 
 impl MissionType {

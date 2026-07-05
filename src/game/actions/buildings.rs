@@ -31,7 +31,7 @@ impl Game {
         self.spirit_stones -= cost;
         building.level += 1;
         self.event_log.push(format!(
-            "Raised {:?} to hall grade {}.",
+            "Raised {} to hall grade {}.",
             building.building_type, building.level
         ));
     }

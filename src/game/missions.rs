@@ -10,7 +10,7 @@ impl Game {
 
         let relevant_stat = ongoing.mission.mission_type.get_relevant_stat();
         logs.push(format!(
-            "Dispatch path: {:?} (tests {:?})",
+            "Dispatch path: {} (tests {})",
             ongoing.mission.mission_type, relevant_stat
         ));
 

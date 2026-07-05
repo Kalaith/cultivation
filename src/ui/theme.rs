@@ -4,11 +4,11 @@ pub const PRIMARY: Color = Color::new(0.86, 0.68, 0.32, 1.0); // Aged gold
 pub const SECONDARY: Color = Color::new(0.34, 0.72, 0.63, 1.0); // Jade
 pub const ACCENT: Color = Color::new(0.72, 0.18, 0.16, 1.0); // Cinnabar
 
-pub const PANEL_BG: Color = Color::new(0.09, 0.075, 0.055, 0.82); // Ink over parchment
-pub const PANEL_BORDER: Color = Color::new(0.55, 0.43, 0.25, 0.95); // Tarnished trim
+pub const PANEL_BG: Color = Color::new(0.07, 0.06, 0.045, 0.94); // Ink over parchment
+pub const PANEL_BORDER: Color = Color::new(0.62, 0.49, 0.29, 0.95); // Tarnished trim
 
-pub const TEXT_PRIMARY: Color = Color::new(0.94, 0.89, 0.76, 1.0); // Parchment
-pub const TEXT_SECONDARY: Color = Color::new(0.70, 0.66, 0.56, 1.0); // Muted ink
+pub const TEXT_PRIMARY: Color = Color::new(0.97, 0.94, 0.86, 1.0); // Parchment
+pub const TEXT_SECONDARY: Color = Color::new(0.80, 0.76, 0.66, 1.0); // Muted ink
 pub const TEXT_HIGHLIGHT: Color = Color::new(0.97, 0.80, 0.38, 1.0); // Lit gold
 
 pub const SUCCESS: Color = Color::new(0.32, 0.78, 0.46, 1.0);
@@ -29,7 +29,7 @@ pub const FENG_SHUI_EXCELLENT: Color = Color::new(1.0, 0.85, 0.2, 1.0); // Gold
 
 // Panel colors (aliases and variants)
 pub const PANEL: Color = PANEL_BG;
-pub const PANEL_DARK: Color = Color::new(0.055, 0.045, 0.035, 0.86); // Darker ink wash
+pub const PANEL_DARK: Color = Color::new(0.045, 0.038, 0.028, 0.96); // Darker ink wash
 pub const BORDER: Color = PANEL_BORDER;
 
 // Status colors

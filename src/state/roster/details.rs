@@ -151,7 +151,7 @@ impl DiscipleRosterState {
         y += 24.0;
 
         draw_ui_text(
-            &format!("Talent: {:?}", disciple.talent),
+            &format!("Talent: {}", disciple.talent),
             x,
             y,
             FONT_SMALL_SIZE,
@@ -193,7 +193,7 @@ impl DiscipleRosterState {
         }
 
         if let Some(ref bottleneck) = disciple.breakthrough_bottleneck {
-            let desc = bottleneck.description(data);
+            let desc = bottleneck.player_description(data);
             draw_rectangle(
                 x,
                 y - 16.0,
@@ -201,10 +201,11 @@ impl DiscipleRosterState {
                 44.0,
                 Color::new(0.48, 0.34, 0.10, 0.32),
             );
-            draw_ui_text(
+            draw_wrapped_text(
                 &format!("Bottleneck: {}", desc),
                 x + 12.0,
-                y + 7.0,
+                y + 2.0,
+                right_rect.w - 234.0,
                 FONT_SMALL_SIZE,
                 WARNING,
             );
@@ -232,7 +233,7 @@ impl DiscipleRosterState {
                     .breakthrough_bottleneck
                     .as_ref()
                     .unwrap()
-                    .description(data);
+                    .player_description(data);
                 draw_ui_text(
                     &format!("Breakthrough sealed: {}", desc),
                     right_x,

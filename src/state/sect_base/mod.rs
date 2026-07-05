@@ -57,6 +57,8 @@ pub struct SectBaseState {
     pub(super) herb_planting_modal: Option<usize>,
     pub(super) disciple_assignment_modal: bool,
     pub(super) infusion_modal_open: bool,
+    pub(super) tutorial_step_active: Option<usize>,
+    pub(super) tutorial_targets: Vec<Rect>,
 }
 
 impl SectBaseState {
@@ -82,6 +84,8 @@ impl SectBaseState {
             herb_planting_modal: None,
             disciple_assignment_modal: false,
             infusion_modal_open: false,
+            tutorial_step_active: None,
+            tutorial_targets: Vec::new(),
         }
     }
 
@@ -118,6 +122,21 @@ impl SectBaseState {
         let left_panel_w = 230.0;
         let right_panel_w = 280.0;
         let center_w = screen_w - left_panel_w - right_panel_w - 70.0;
+
+        self.update_tutorial_progress(
+            tutorial,
+            data,
+            unlocked_techs,
+            disciples,
+            ongoing_missions,
+            completed_history,
+        );
+        self.tutorial_targets.clear();
+        self.tutorial_step_active = if tutorial.active && !tutorial.hidden {
+            Some(tutorial.step)
+        } else {
+            None
+        };
 
         let center_rect = match self.view {
             SectView::Map => Rect::new(0.0, header_h, screen_w, screen_h - header_h),
@@ -165,14 +184,6 @@ impl SectBaseState {
             return res;
         }
 
-        self.update_tutorial_progress(
-            tutorial,
-            data,
-            unlocked_techs,
-            disciples,
-            ongoing_missions,
-            completed_history,
-        );
         self.draw_right_panel(
             header_h,
             screen_h,
@@ -182,8 +193,9 @@ impl SectBaseState {
             event_log,
         );
 
+        self.draw_tutorial_highlights();
         if tutorial.active && !tutorial.hidden {
-            self.draw_tutorial_overlay(screen_w, screen_h, tutorial);
+            self.draw_tutorial_overlay(screen_w, header_h, tutorial);
         }
 
         if self.settings_open {

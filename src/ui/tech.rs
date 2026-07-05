@@ -405,7 +405,7 @@ fn draw_tech_entry(
             let missions: Vec<String> = tech
                 .unlocks_missions
                 .iter()
-                .map(|m| format!("{:?}", m))
+                .map(|m| m.to_string())
                 .collect();
             unlocks_parts.push(format!("Dispatches: {}", missions.join(", ")));
         }
@@ -535,7 +535,7 @@ fn draw_tech_tooltip(tech: &Technology, data: &GameData, unlocked_techs: &[Strin
         lines.push(String::new());
         lines.push("Opens Dispatch Paths:".to_string());
         for mission in &tech.unlocks_missions {
-            lines.push(format!("  - {:?}", mission));
+            lines.push(format!("  - {}", mission));
         }
     }
 

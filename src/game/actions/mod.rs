@@ -151,15 +151,6 @@ impl Game {
         }
         self.data.buildings.push(sect_hall);
 
-        self.transition(StateTransition::ToSectBase);
-        self.show_moment(
-            MomentKind::Founding,
-            "A Fallen Sect Endures",
-            "The patriarch returns to the mountain",
-            format!(
-                "{} begins again with one ruined hall, a handful of stones, and an immortal ambition.",
-                self.sect_name
-            ),
-        );
+        self.transition(StateTransition::ToIntro);
     }
 }

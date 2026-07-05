@@ -3,7 +3,8 @@ use crate::data::buildings::{BuildingStatus, BuildingType};
 use crate::data::disciples::DiscipleRank;
 use crate::engine::world_sim::WorldSimResult;
 use crate::state::{
-    faction_screen::FactionScreenState, library::LibraryState, main_menu::MainMenuState,
+    faction_screen::FactionScreenState, intro::IntroState, library::LibraryState,
+    main_menu::MainMenuState,
     mission_assignment::MissionAssignmentState, mission_resolution::MissionResolutionState,
     roster::DiscipleRosterState, sect_base::SectBaseState, sect_creation::SectCreationState,
     trade_screen::TradeScreenState, tribulation::TribulationEncounterState,
@@ -87,7 +88,7 @@ impl Game {
                     realm_index,
                 );
                 if let Some(ref bn) = bottleneck {
-                    let desc = bn.description(&self.data);
+                    let desc = bn.player_description(&self.data);
                     self.event_log.push(format!(
                         "{} feels the heavenly gate, but fate demands a trial first: {}",
                         disciple.name, desc
@@ -321,6 +322,7 @@ impl Game {
     fn dispatch_state_update(&mut self) {
         let update_result = match &mut self.state {
             GameState::MainMenu(s) => s.update(),
+            GameState::Intro(s) => s.update(&self.sect_name),
             GameState::SectBase(s) => s.update(
                 &mut self.data,
                 &mut self.grid,
@@ -370,6 +372,7 @@ impl Game {
     fn draw_screen_background(&self) {
         let bg_name = match &self.state {
             GameState::MainMenu(_) => "bg_main_menu",
+            GameState::Intro(_) => "bg_main_menu",
             GameState::SectBase(_) => "bg_sect_base",
             GameState::DiscipleRoster(_) => "bg_roster",
             GameState::WorldMap(_) => "bg_world_map",
@@ -402,6 +405,7 @@ impl Game {
     pub fn draw(&mut self) {
         match &mut self.state {
             GameState::MainMenu(s) => s.draw(&self.data, self.spirit_stones),
+            GameState::Intro(s) => s.draw(),
             GameState::SectBase(s) => s.draw(&self.data, &self.grid, self.spirit_stones),
             GameState::DiscipleRoster(s) => s.draw(&self.data, &self.disciples, self.spirit_stones),
             GameState::WorldMap(s) => s.draw(&self.data, self.spirit_stones),
@@ -534,6 +538,7 @@ impl Game {
     pub(super) fn transition(&mut self, transition: StateTransition) {
         self.state = match transition {
             StateTransition::ToMainMenu => GameState::MainMenu(MainMenuState::new()),
+            StateTransition::ToIntro => GameState::Intro(IntroState::new()),
             StateTransition::ToSectBase => GameState::SectBase(SectBaseState::new()),
             StateTransition::ToDiscipleRoster => {
                 GameState::DiscipleRoster(DiscipleRosterState::new())

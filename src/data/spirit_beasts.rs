@@ -16,12 +16,34 @@ impl Default for BeastTier {
     }
 }
 
+impl std::fmt::Display for BeastTier {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            BeastTier::Mortal => write!(f, "Mortal"),
+            BeastTier::Body => write!(f, "Body Tempering"),
+            BeastTier::Qi => write!(f, "Qi Gathering"),
+            BeastTier::Foundation => write!(f, "Foundation"),
+        }
+    }
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum BeastEquipmentSlot {
     Collar,
     Harness,
     Talisman,
     Relic,
+}
+
+impl std::fmt::Display for BeastEquipmentSlot {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            BeastEquipmentSlot::Collar => write!(f, "Collar"),
+            BeastEquipmentSlot::Harness => write!(f, "Harness"),
+            BeastEquipmentSlot::Talisman => write!(f, "Talisman"),
+            BeastEquipmentSlot::Relic => write!(f, "Relic"),
+        }
+    }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, Default)]

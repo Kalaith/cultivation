@@ -23,7 +23,8 @@ impl SectBaseState {
         };
         draw_screen_title(title, "Mountain command ledger", 20.0, 31.0);
 
-        herbs::draw_season_indicator(275.0, 40.0, current_season, season_ticks);
+        let title_w = measure_ui_text(title, None, FONT_TITLE_SIZE as u16, 1.0).width;
+        herbs::draw_season_indicator(20.0 + title_w + 28.0, 40.0, current_season, season_ticks);
 
         let mut res_x = screen_w - 620.0;
         res_x += draw_resource_seal(res_x, 38.0, "Spirit Stones", spirit_stones, PRIMARY) + 8.0;
@@ -61,7 +62,7 @@ impl SectBaseState {
 
         self.draw_mountain_mandate(rect, data);
 
-        let mut btn_y = rect.y + 132.0;
+        let mut btn_y = rect.y + 162.0;
         for building in &data.buildings {
             let status_str = match building.status {
                 BuildingStatus::Active => "",
@@ -70,11 +71,21 @@ impl SectBaseState {
             };
             let label = format!("{}{}", building.building_type, status_str);
 
-            if draw_button_muted(
-                Rect::new(rect.x + 10.0, btn_y, width - 20.0, 35.0),
-                &label,
-                false,
-            ) {
+            let btn_rect = Rect::new(rect.x + 10.0, btn_y, width - 20.0, 35.0);
+            if matches!(self.view, SectView::Map) {
+                match building.building_type {
+                    BuildingType::SectHall => {
+                        self.register_tutorial_target(0, btn_rect);
+                        self.register_tutorial_target(1, btn_rect);
+                        self.register_tutorial_target(3, btn_rect);
+                    }
+                    BuildingType::MissionBoard => {
+                        self.register_tutorial_target(4, btn_rect);
+                    }
+                    _ => {}
+                }
+            }
+            if draw_button_muted(btn_rect, &label, false) {
                 self.view = SectView::BuildingDetails(building.id);
             }
             btn_y += 40.0;
@@ -122,11 +133,11 @@ impl SectBaseState {
         ) {
             return Some(UpdateResult::new().with_transition(StateTransition::ToTradeScreen));
         }
-        if draw_button_muted(
-            Rect::new(rect.x + 10.0, nav_y_start + 200.0, width - 20.0, 40.0),
-            "Raise Halls",
-            false,
-        ) {
+        let raise_rect = Rect::new(rect.x + 10.0, nav_y_start + 200.0, width - 20.0, 40.0);
+        if !self.crafting_modal_open {
+            self.register_tutorial_target(2, raise_rect);
+        }
+        if draw_button_muted(raise_rect, "Raise Halls", false) {
             self.view = SectView::Map;
             self.crafting_modal_open = true;
         }
@@ -173,7 +184,7 @@ impl SectBaseState {
         draw_ui_text(
             "Restore halls before ambition outruns shelter.",
             rect.x + 14.0,
-            y + 62.0,
+            y + 88.0,
             FONT_SMALL_SIZE,
             TEXT_SECONDARY,
         );
@@ -229,7 +240,7 @@ impl SectBaseState {
         }
 
         let mut log_y = rect.y + 96.0;
-        let max_width = rect.w - 20.0;
+        let max_width = rect.w - 36.0;
 
         for (idx, event) in event_log.iter().rev().take(20).enumerate() {
             let event_color = self.event_color(event, idx);
@@ -239,40 +250,14 @@ impl SectBaseState {
                 3.0,
                 Color::new(event_color.r, event_color.g, event_color.b, event_color.a),
             );
-            let words: Vec<&str> = event.split_whitespace().collect();
-            let mut current_line = String::new();
-
-            for word in words {
-                let test_line = if current_line.is_empty() {
-                    word.to_string()
-                } else {
-                    format!("{} {}", current_line, word)
-                };
-
-                if test_line.len() as f32 * 7.0 > max_width {
-                    draw_ui_text(
-                        &current_line,
-                        rect.x + 22.0,
-                        log_y,
-                        FONT_SMALL_SIZE,
-                        event_color,
-                    );
-                    log_y += 20.0;
-                    current_line = word.to_string();
-                } else {
-                    current_line = test_line;
-                }
-            }
-            if !current_line.is_empty() {
-                draw_ui_text(
-                    &current_line,
-                    rect.x + 22.0,
-                    log_y,
-                    FONT_SMALL_SIZE,
-                    event_color,
-                );
-                log_y += 20.0;
-            }
+            log_y = draw_wrapped_text(
+                event,
+                rect.x + 22.0,
+                log_y,
+                max_width,
+                FONT_SMALL_SIZE,
+                event_color,
+            );
             log_y += 6.0;
             if log_y > screen_h - 20.0 {
                 break;
@@ -282,7 +267,7 @@ impl SectBaseState {
 
     fn event_color(&self, event: &str, idx: usize) -> Color {
         let lower = event.to_ascii_lowercase();
-        let base_alpha = (0.78 - idx as f32 * 0.035).clamp(0.35, 0.78);
+        let base_alpha = (0.95 - idx as f32 * 0.02).clamp(0.60, 0.95);
         if lower.contains("breakthrough") || lower.contains("ready") {
             Color::new(WARNING.r, WARNING.g, WARNING.b, base_alpha)
         } else if lower.contains("war") || lower.contains("cannot") || lower.contains("danger") {

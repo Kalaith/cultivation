@@ -105,6 +105,9 @@ impl SectBaseState {
                 item_height - 12.0,
             );
             let affordable = spirit_stones >= def.cost;
+            if def.building_type == BuildingType::MissionBoard {
+                self.register_tutorial_target(2, card);
+            }
             if draw_building_plan_card(card, def, affordable) && affordable {
                 self.crafting_modal_open = false;
                 self.placement_mode = Some(def.building_type.clone());
@@ -474,7 +477,7 @@ fn draw_building_plan_card(
         if affordable { TEXT_SECONDARY } else { FAILURE },
     );
     draw_ui_text(
-        &format!("Aspect: {:?}", def.element),
+        &format!("Aspect: {}", def.element),
         rect.x + rect.w - 126.0,
         rect.y + 88.0,
         FONT_SMALL_SIZE,

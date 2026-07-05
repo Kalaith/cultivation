@@ -110,6 +110,26 @@ pub enum FactionAction {
     GatherResources,
 }
 
+impl FactionAction {
+    /// Player-facing phrase describing the action, e.g. "declares war on Azure Peak".
+    /// `resolve_name` maps a faction id to its display name.
+    pub fn describe(&self, resolve_name: &dyn Fn(&str) -> String) -> String {
+        match self {
+            FactionAction::DeclareWar { target } => {
+                format!("declares war on {}", resolve_name(target))
+            }
+            FactionAction::ProposeAlliance { target } => {
+                format!("proposes an alliance with {}", resolve_name(target))
+            }
+            FactionAction::ExpandTerritory { .. } => "expands its territory".to_string(),
+            FactionAction::RaidTradeRoute { .. } => "raids a trade route".to_string(),
+            FactionAction::HostFestival => "hosts a grand festival".to_string(),
+            FactionAction::TrainForces => "drills its forces".to_string(),
+            FactionAction::GatherResources => "gathers resources".to_string(),
+        }
+    }
+}
+
 /// Faction AI state for autonomous behavior
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct FactionAI {

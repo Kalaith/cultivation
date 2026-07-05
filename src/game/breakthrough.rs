@@ -36,7 +36,7 @@ impl Game {
                 ));
                 disciple.breakthrough_bottleneck = None;
             } else {
-                let desc = bottleneck.description(&self.data);
+                let desc = bottleneck.player_description(&self.data);
                 self.event_log.push(format!(
                     "{} cannot break through yet — bottleneck: {}",
                     disciple.name, desc
