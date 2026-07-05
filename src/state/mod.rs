@@ -15,11 +15,10 @@ pub mod world_map;
 
 use self::{
     faction_screen::FactionScreenState, intro::IntroState, library::LibraryState,
-    main_menu::MainMenuState,
-    mission_assignment::MissionAssignmentState, mission_resolution::MissionResolutionState,
-    roster::DiscipleRosterState, sect_base::SectBaseState, sect_creation::SectCreationState,
-    trade_screen::TradeScreenState, tribulation::TribulationEncounterState,
-    world_map::WorldMapState,
+    main_menu::MainMenuState, mission_assignment::MissionAssignmentState,
+    mission_resolution::MissionResolutionState, roster::DiscipleRosterState,
+    sect_base::SectBaseState, sect_creation::SectCreationState, trade_screen::TradeScreenState,
+    tribulation::TribulationEncounterState, world_map::WorldMapState,
 };
 
 pub enum GameState {

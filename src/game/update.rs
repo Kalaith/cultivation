@@ -4,11 +4,10 @@ use crate::data::disciples::DiscipleRank;
 use crate::engine::world_sim::WorldSimResult;
 use crate::state::{
     faction_screen::FactionScreenState, intro::IntroState, library::LibraryState,
-    main_menu::MainMenuState,
-    mission_assignment::MissionAssignmentState, mission_resolution::MissionResolutionState,
-    roster::DiscipleRosterState, sect_base::SectBaseState, sect_creation::SectCreationState,
-    trade_screen::TradeScreenState, tribulation::TribulationEncounterState,
-    world_map::WorldMapState, GameState, StateTransition,
+    main_menu::MainMenuState, mission_assignment::MissionAssignmentState,
+    mission_resolution::MissionResolutionState, roster::DiscipleRosterState,
+    sect_base::SectBaseState, sect_creation::SectCreationState, trade_screen::TradeScreenState,
+    tribulation::TribulationEncounterState, world_map::WorldMapState, GameState, StateTransition,
 };
 use crate::ui::components::{draw_panel, draw_progress_bar};
 use crate::ui::theme::*;

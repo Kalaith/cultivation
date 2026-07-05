@@ -64,7 +64,13 @@ impl SectBaseState {
             tutorial.active = false;
         }
 
-        draw_ui_text(title, rect.x + 16.0, rect.y + 66.0, FONT_BODY_SIZE, TEXT_HIGHLIGHT);
+        draw_ui_text(
+            title,
+            rect.x + 16.0,
+            rect.y + 66.0,
+            FONT_BODY_SIZE,
+            TEXT_HIGHLIGHT,
+        );
         draw_wrapped_text(
             body,
             rect.x + 16.0,

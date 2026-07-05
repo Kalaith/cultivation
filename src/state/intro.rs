@@ -63,7 +63,13 @@ impl IntroState {
         let screen_h = screen_height();
 
         // Ink-black vignette over whatever background is beneath.
-        draw_rectangle(0.0, 0.0, screen_w, screen_h, Color::new(0.02, 0.02, 0.03, 0.90));
+        draw_rectangle(
+            0.0,
+            0.0,
+            screen_w,
+            screen_h,
+            Color::new(0.02, 0.02, 0.03, 0.90),
+        );
 
         let beat = &BEATS[self.beat.min(BEATS.len() - 1)];
         let fade = (((get_time() - self.beat_started) / 0.6).min(1.0)) as f32;
@@ -114,7 +120,12 @@ impl IntroState {
             rect.x + 120.0,
             rect.y + 46.0,
             FONT_SMALL_SIZE,
-            Color::new(TEXT_SECONDARY.r, TEXT_SECONDARY.g, TEXT_SECONDARY.b, 0.8 * fade),
+            Color::new(
+                TEXT_SECONDARY.r,
+                TEXT_SECONDARY.g,
+                TEXT_SECONDARY.b,
+                0.8 * fade,
+            ),
         );
         draw_ui_text(
             beat.title,
