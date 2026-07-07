@@ -86,8 +86,10 @@ impl SectBaseState {
                 draw_tooltip(
                     mouse,
                     &format!(
-                        "{}\nOmen {} | {} ticks beyond the gate",
-                        mission.description, mission.danger_level, mission.duration
+                        "{}\nOmen {} | {} beyond the gate",
+                        mission.description,
+                        mission.danger_level,
+                        crate::data::time::days_label(mission.duration)
                     ),
                 );
             }
@@ -174,10 +176,10 @@ impl SectBaseState {
         );
         draw_ui_text(
             &format!(
-                "{} order | Omen {} | {} ticks",
+                "{} order | Omen {} | {}",
                 mission_type_label(&mission.mission_type),
                 mission.danger_level,
-                mission.duration
+                crate::data::time::days_label(mission.duration)
             ),
             rect.x + 16.0,
             rect.y + 47.0,

@@ -5,7 +5,7 @@ use crate::state::{StateTransition, UpdateResult};
 use crate::ui::components::*;
 use crate::ui::theme::*;
 use macroquad::prelude::*;
-use macroquad_toolkit::ui::draw_ui_text;
+use macroquad_toolkit::ui::{draw_ui_text, measure_ui_text};
 
 pub struct WorldMapState;
 
@@ -276,13 +276,10 @@ impl WorldMapState {
         };
         draw_location_banner(pos, &node.name, danger_color);
         draw_circle(pos.x, pos.y + 30.0, 7.0, danger_color);
-        draw_ui_text(
-            &format!("Threat {} | Corruption {}", total_danger, node.corruption),
-            pos.x + 26.0,
-            pos.y + 42.0,
-            FONT_SMALL_SIZE,
-            danger_color,
-        );
+        // Threat/corruption sits on the pale map ground, so back it with a dark
+        // ink scrim; colored text alone on beige is nearly unreadable.
+        let stat_line = format!("Threat {} | Corruption {}", total_danger, node.corruption);
+        draw_scrim_label(vec2(pos.x + 26.0, pos.y + 42.0), &stat_line, danger_color);
 
         let hit = Rect::new(pos.x - 24.0, pos.y - 24.0, 48.0, 48.0);
         if hit.contains(mouse_position().into()) {

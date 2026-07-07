@@ -590,3 +590,20 @@ pub fn draw_tooltip_box(x: f32, y: f32, lines: &[String]) {
     };
     macroquad_toolkit::ui::draw_tooltip_styled(&lines.join("\n"), vec2(x, y), &style, None);
 }
+
+/// Draw a short small-font label backed by a dark ink scrim so colored or light
+/// text stays legible over busy or pale backgrounds (e.g. the beige world map).
+/// `baseline` is the text's lower-left origin, matching [`draw_ui_text`].
+pub fn draw_scrim_label(baseline: Vec2, text: &str, color: Color) {
+    let dims = measure_ui_text(text, None, FONT_SMALL_SIZE as u16, 1.0);
+    let pad_x = 6.0;
+    let pad_y = 3.0;
+    draw_rectangle(
+        baseline.x - pad_x,
+        baseline.y - dims.height - pad_y,
+        dims.width + pad_x * 2.0,
+        dims.height + pad_y * 2.0,
+        Color::new(0.10, 0.07, 0.05, 0.84),
+    );
+    draw_ui_text(text, baseline.x, baseline.y, FONT_SMALL_SIZE, color);
+}

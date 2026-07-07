@@ -565,7 +565,11 @@ fn draw_route_row(rect: Rect, world_sim: &WorldSim, route: &TradeRoute) {
         "Sealed"
     };
     draw_ui_text(
-        &format!("{} | {} ticks", status, route.travel_ticks),
+        &format!(
+            "{} | {}",
+            status,
+            crate::data::time::days_label(route.travel_ticks)
+        ),
         rect.x + 12.0,
         rect.y + 48.0,
         FONT_SMALL_SIZE,

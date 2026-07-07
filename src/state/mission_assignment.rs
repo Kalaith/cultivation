@@ -141,7 +141,10 @@ impl MissionAssignmentState {
                 rect.x + 24.0,
                 y,
                 "Journey",
-                &format!("{} ticks beyond the gate", mission.duration),
+                &format!(
+                    "{} beyond the gate",
+                    crate::data::time::days_label(mission.duration)
+                ),
                 TEXT_PRIMARY,
             );
 

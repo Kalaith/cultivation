@@ -320,7 +320,10 @@ pub fn draw_herb_planting_modal(
         if text_rect.contains(mouse_position().into()) {
             let lines = vec![
                 herb.description.clone(),
-                format!("Growth vigil: {} ticks", herb.grow_time_ticks),
+                format!(
+                    "Growth vigil: {}",
+                    crate::data::time::days_label(herb.grow_time_ticks)
+                ),
                 format!(
                     "Favorable seasons: {}",
                     herb.grow_seasons

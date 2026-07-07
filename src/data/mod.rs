@@ -17,4 +17,5 @@ pub mod resources;
 pub mod spirit_beasts;
 pub mod stages;
 pub mod tech;
+pub mod time;
 pub mod world_events;

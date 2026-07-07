@@ -229,8 +229,9 @@ impl Game {
                 duration_ticks,
             } => {
                 self.event_log.push(format!(
-                    "Mountain qi circulation shifted by {}x for {} ticks",
-                    modifier, duration_ticks
+                    "Mountain qi circulation quickens {}x for {}.",
+                    modifier,
+                    crate::data::time::days_label(*duration_ticks)
                 ));
             }
             EventEffect::ChainEvent {

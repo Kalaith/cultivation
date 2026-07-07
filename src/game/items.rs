@@ -28,12 +28,12 @@ impl Game {
                             .map(|i| i.recovery_ticks_remaining)
                             .unwrap_or(0);
                         logs.push(format!(
-                            "{} received {} healing from {}. Recovery omen shortened by {} ticks ({} remaining).",
+                            "{} received {} healing from {}. Recovery shortened by {} ({} still to mend).",
                             disciple.name,
                             effective_amt,
                             item.name,
-                            before_ticks - after_ticks,
-                            after_ticks
+                            crate::data::time::days_label(before_ticks - after_ticks),
+                            crate::data::time::days_label(after_ticks)
                         ));
                     } else {
                         logs.push(format!(
@@ -92,8 +92,11 @@ impl Game {
                     1.0,
                 ));
                 logs.push(format!(
-                    "{} bears a temporary {} blessing (+{} for {} ticks).",
-                    disciple.name, stat, value, duration_ticks
+                    "{} bears a temporary {} blessing (+{} for {}).",
+                    disciple.name,
+                    stat,
+                    value,
+                    crate::data::time::days_label(*duration_ticks)
                 ));
             }
             crate::data::items::ItemEffect::DamageShield(amt) => {
@@ -118,8 +121,10 @@ impl Game {
             }
             crate::data::items::ItemEffect::MissionSpeedBoost(amt) => {
                 logs.push(format!(
-                    "{} carries a swifter dispatch omen ({} ticks) from {}.",
-                    disciple.name, amt, item.name
+                    "{} carries a swifter dispatch omen (-{}) from {}.",
+                    disciple.name,
+                    crate::data::time::days_label(*amt),
+                    item.name
                 ));
             }
         }
