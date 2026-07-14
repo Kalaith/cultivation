@@ -1,5 +1,6 @@
 use crate::ui::theme::*;
 use macroquad::prelude::*;
+use macroquad_toolkit::colors::with_alpha;
 use macroquad_toolkit::ui::{draw_ui_text, draw_ui_text_ex, measure_ui_text};
 
 fn resolved_font(font: Option<&Font>) -> Option<&Font> {
@@ -23,7 +24,7 @@ pub fn draw_panel(rect: Rect, title: Option<&str>) {
         rect.x + rect.w - 10.0,
         rect.y + 8.0,
         1.0,
-        Color::new(PRIMARY.r, PRIMARY.g, PRIMARY.b, 0.28),
+        with_alpha(PRIMARY, 0.28),
     );
 
     if let Some(t) = title {
@@ -40,7 +41,7 @@ pub fn draw_panel(rect: Rect, title: Option<&str>) {
             rect.x + rect.w - 12.0,
             rect.y + 40.0,
             1.0,
-            Color::new(PANEL_BORDER.r, PANEL_BORDER.g, PANEL_BORDER.b, 0.65),
+            with_alpha(PANEL_BORDER, 0.65),
         );
     }
 }
@@ -67,19 +68,8 @@ pub fn draw_mountain_sect_backdrop() {
         );
     }
 
-    draw_circle(
-        sw * 0.72,
-        sh * 0.20,
-        78.0,
-        Color::new(PRIMARY.r, PRIMARY.g, PRIMARY.b, 0.12),
-    );
-    draw_circle_lines(
-        sw * 0.72,
-        sh * 0.20,
-        98.0,
-        2.0,
-        Color::new(PRIMARY.r, PRIMARY.g, PRIMARY.b, 0.10),
-    );
+    draw_circle(sw * 0.72, sh * 0.20, 78.0, with_alpha(PRIMARY, 0.12));
+    draw_circle_lines(sw * 0.72, sh * 0.20, 98.0, 2.0, with_alpha(PRIMARY, 0.10));
 
     draw_backdrop_mountains(
         sh * 0.66,
@@ -146,7 +136,7 @@ fn draw_backdrop_mountains(base_y: f32, ridge: Color, shade: Color, offset: f32)
 fn draw_backdrop_sect(center_x: f32, base_y: f32, scale: f32) {
     let roof = Color::new(0.10, 0.07, 0.05, 0.86);
     let wall = Color::new(0.40, 0.30, 0.20, 0.38);
-    let trim = Color::new(PRIMARY.r, PRIMARY.g, PRIMARY.b, 0.32);
+    let trim = with_alpha(PRIMARY, 0.32);
     let tier_w = scale;
     let tier_h = scale * 0.26;
 
@@ -229,21 +219,14 @@ fn draw_backdrop_clouds(y: f32, alpha: f32) {
 }
 
 pub fn draw_ink_divider(x: f32, y: f32, width: f32) {
-    draw_line(
-        x,
-        y,
-        x + width,
-        y,
-        1.0,
-        Color::new(PRIMARY.r, PRIMARY.g, PRIMARY.b, 0.36),
-    );
+    draw_line(x, y, x + width, y, 1.0, with_alpha(PRIMARY, 0.36));
     draw_line(
         x + width * 0.12,
         y + 3.0,
         x + width * 0.88,
         y + 3.0,
         1.0,
-        Color::new(SECONDARY.r, SECONDARY.g, SECONDARY.b, 0.18),
+        with_alpha(SECONDARY, 0.18),
     );
 }
 
@@ -252,14 +235,7 @@ pub fn draw_resource_seal(x: f32, y: f32, label: &str, value: u32, color: Color)
     let dims = measure_ui_text(&text, None, FONT_SMALL_SIZE as u16, 1.0);
     let width = dims.width + 24.0;
     draw_rectangle(x, y - 20.0, width, 28.0, Color::new(0.05, 0.04, 0.03, 0.48));
-    draw_rectangle_lines(
-        x,
-        y - 20.0,
-        width,
-        28.0,
-        1.0,
-        Color::new(color.r, color.g, color.b, 0.55),
-    );
+    draw_rectangle_lines(x, y - 20.0, width, 28.0, 1.0, with_alpha(color, 0.55));
     draw_circle(x + 9.0, y - 6.0, 3.0, color);
     draw_ui_text(&text, x + 18.0, y, FONT_SMALL_SIZE, TEXT_PRIMARY);
     width
@@ -273,27 +249,15 @@ pub fn draw_wrapped_text(
     font_size: f32,
     color: Color,
 ) -> f32 {
-    let mut line = String::new();
-    let line_height = font_size + 5.0;
-
-    for word in text.split_whitespace() {
-        let candidate = if line.is_empty() {
-            word.to_string()
-        } else {
-            format!("{} {}", line, word)
-        };
-        let dims = measure_ui_text(&candidate, None, font_size as u16, 1.0);
-        if dims.width > max_width && !line.is_empty() {
-            draw_ui_text(&line, x, y, font_size, color);
-            y += line_height;
-            line = word.to_string();
-        } else {
-            line = candidate;
-        }
+    if text.trim().is_empty() {
+        return y;
     }
 
-    if !line.is_empty() {
-        draw_ui_text(&line, x, y, font_size, color);
+    let line_height = font_size + 5.0;
+    for line in macroquad_toolkit::ui::wrap_text(text, max_width, font_size) {
+        if !line.is_empty() {
+            draw_ui_text(&line, x, y, font_size, color);
+        }
         y += line_height;
     }
 
@@ -317,7 +281,7 @@ pub fn draw_cultivation_circle(
         center.y,
         radius,
         2.0,
-        Color::new(ring_color.r, ring_color.g, ring_color.b, 0.35),
+        with_alpha(ring_color, 0.35),
     );
     draw_circle(
         center.x,
@@ -332,7 +296,7 @@ pub fn draw_cultivation_circle(
             center.y,
             radius + 8.0,
             3.0,
-            Color::new(WARNING.r, WARNING.g, WARNING.b, 0.45),
+            with_alpha(WARNING, 0.45),
         );
     }
 
@@ -342,9 +306,9 @@ pub fn draw_cultivation_circle(
         let pos = center + vec2(angle.cos() * radius, angle.sin() * radius);
         let filled = i < active;
         let node_color = if filled {
-            Color::new(ring_color.r, ring_color.g, ring_color.b, 0.92)
+            with_alpha(ring_color, 0.92)
         } else {
-            Color::new(TEXT_SECONDARY.r, TEXT_SECONDARY.g, TEXT_SECONDARY.b, 0.30)
+            with_alpha(TEXT_SECONDARY, 0.30)
         };
         draw_circle(pos.x, pos.y, if filled { 6.0 } else { 4.5 }, node_color);
         draw_circle_lines(
@@ -352,12 +316,7 @@ pub fn draw_cultivation_circle(
             pos.y,
             8.0,
             1.0,
-            Color::new(
-                PRIMARY.r,
-                PRIMARY.g,
-                PRIMARY.b,
-                if filled { 0.40 } else { 0.14 },
-            ),
+            with_alpha(PRIMARY, if filled { 0.40 } else { 0.14 }),
         );
     }
 
@@ -381,14 +340,7 @@ pub fn draw_stat_seal(rect: Rect, label: &str, value: u32, color: Color) {
         rect.h,
         Color::new(0.05, 0.04, 0.03, 0.42),
     );
-    draw_rectangle_lines(
-        rect.x,
-        rect.y,
-        rect.w,
-        rect.h,
-        1.0,
-        Color::new(color.r, color.g, color.b, 0.42),
-    );
+    draw_rectangle_lines(rect.x, rect.y, rect.w, rect.h, 1.0, with_alpha(color, 0.42));
     draw_ui_text(
         label,
         rect.x + 10.0,

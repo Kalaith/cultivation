@@ -1,5 +1,6 @@
 use std::collections::{HashMap, HashSet};
 
+use macroquad_toolkit::timing::Cooldown;
 use serde::{Deserialize, Serialize};
 
 use crate::data::ai::AiSchedulerTuning;
@@ -93,7 +94,7 @@ pub struct Scheduler {
     pub tick: u64,
     assignments: HashMap<u64, ScheduledTask>,
     reservations: HashMap<u64, Reservation>,
-    cooldowns: HashMap<(u64, TaskType), u64>,
+    cooldowns: HashMap<(u64, TaskType), Cooldown>,
     tuning: AiSchedulerTuning,
 }
 
@@ -124,7 +125,13 @@ impl Scheduler {
         let cooldowns = saved
             .cooldowns
             .into_iter()
-            .map(|cooldown| ((cooldown.disciple_id, cooldown.task_type), cooldown.until))
+            .map(|cooldown| {
+                let remaining = cooldown.until.saturating_sub(saved.tick) as f32;
+                (
+                    (cooldown.disciple_id, cooldown.task_type),
+                    Cooldown::new_armed(remaining),
+                )
+            })
             .collect();
 
         Self {
@@ -151,10 +158,10 @@ impl Scheduler {
         let cooldowns = self
             .cooldowns
             .iter()
-            .map(|((disciple_id, task_type), until)| SavedCooldown {
+            .map(|((disciple_id, task_type), cooldown)| SavedCooldown {
                 disciple_id: *disciple_id,
                 task_type: task_type.clone(),
-                until: *until,
+                until: self.tick + cooldown.remaining().round() as u64,
             })
             .collect();
 
@@ -453,20 +460,24 @@ impl Scheduler {
     }
 
     fn set_cooldown(&mut self, disciple_id: u64, task_type: TaskType, duration: u64) {
-        self.cooldowns
-            .insert((disciple_id, task_type), self.tick + duration);
+        self.cooldowns.insert(
+            (disciple_id, task_type),
+            Cooldown::new_armed(duration as f32),
+        );
     }
 
     fn is_on_cooldown(&self, disciple_id: u64, task_type: TaskType) -> bool {
         self.cooldowns
             .get(&(disciple_id, task_type))
-            .map(|until| *until > self.tick)
+            .map(|cooldown| !cooldown.is_ready())
             .unwrap_or(false)
     }
 
     fn clear_expired_cooldowns(&mut self) {
-        let tick = self.tick;
-        self.cooldowns.retain(|_, until| *until > tick);
+        for cooldown in self.cooldowns.values_mut() {
+            cooldown.tick(1.0);
+        }
+        self.cooldowns.retain(|_, cooldown| !cooldown.is_ready());
     }
 }
 
