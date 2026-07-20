@@ -1,118 +1,112 @@
 {
-    "backgrounds": {
-        "bg_main_menu": "assets/generated/backgrounds/bg_main_menu.png",
-        "bg_sect_base": "assets/map_background.png",
-        "bg_roster": "assets/generated/backgrounds/bg_roster.png",
-        "bg_world_map": "assets/generated/backgrounds/bg_world_map.png",
-        "bg_mission_assign": "assets/generated/backgrounds/bg_mission_assign.png",
-        "bg_mission_result": "assets/generated/backgrounds/bg_mission_result.png",
-        "bg_library": "assets/generated/backgrounds/bg_library.png",
-        "bg_factions": "assets/generated/backgrounds/bg_factions.png",
-        "bg_trade": "assets/generated/backgrounds/bg_trade.png",
-        "bg_tribulation": "assets/generated/backgrounds/bg_tribulation.png",
-        "bg_sect_creation": "assets/generated/backgrounds/bg_sect_creation.png"
-    },
-    "maps": {
-        "sect_map_base": "assets/generated/maps/sect_map_base.png"
-    },
-    "buildings": {
-        "bld_sect_hall": "assets/generated/buildings/bld_sect_hall.png",
-        "bld_dormitory": "assets/generated/buildings/bld_dormitory.png",
-        "bld_training_yard": "assets/generated/buildings/bld_training_yard.png",
-        "bld_spirit_garden": "assets/generated/buildings/bld_spirit_garden.png",
-        "bld_mission_board": "assets/generated/buildings/bld_mission_board.png",
-        "bld_library": "assets/generated/buildings/bld_library.png",
-        "bld_alchemy": "assets/generated/buildings/bld_alchemy.png",
-        "bld_forge": "assets/generated/buildings/bld_forge.png",
-        "bld_drying": "assets/generated/buildings/bld_drying.png",
-        "bld_storage": "assets/generated/buildings/bld_storage.png",
-        "bld_herb_garden": "assets/generated/buildings/bld_herb_garden.png",
-        "bld_greenhouse": "assets/generated/buildings/bld_greenhouse.png",
-        "bld_mine": "assets/generated/buildings/bld_mine.png"
-    },
-    "elements": {
-        "elem_metal": "assets/generated/elements/elem_metal.png",
-        "elem_wood": "assets/generated/elements/elem_wood.png",
-        "elem_water": "assets/generated/elements/elem_water.png",
-        "elem_fire": "assets/generated/elements/elem_fire.png",
-        "elem_earth": "assets/generated/elements/elem_earth.png"
-    },
-    "seasons": {
-        "season_spring": "assets/generated/seasons/season_spring.png",
-        "season_summer": "assets/generated/seasons/season_summer.png",
-        "season_autumn": "assets/generated/seasons/season_autumn.png",
-        "season_winter": "assets/generated/seasons/season_winter.png"
-    },
-    "factions": {
-        "faction_azure_cloud": "assets/generated/factions/faction_azure_cloud.png",
-        "faction_golden_merchant": "assets/generated/factions/faction_golden_merchant.png",
-        "faction_crimson_fang": "assets/generated/factions/faction_crimson_fang.png",
-        "faction_shadow_moon": "assets/generated/factions/faction_shadow_moon.png",
-        "faction_imperial": "assets/generated/factions/faction_imperial.png",
-        "faction_player": "assets/generated/factions/faction_player.png"
-    },
-    "realms": {
-        "realm_mortal": "assets/generated/realms/realm_mortal.png",
-        "realm_body": "assets/generated/realms/realm_body.png",
-        "realm_qi": "assets/generated/realms/realm_qi.png",
-        "realm_foundation": "assets/generated/realms/realm_foundation.png",
-        "realm_core": "assets/generated/realms/realm_core.png",
-        "realm_nascent": "assets/generated/realms/realm_nascent.png",
-        "realm_soul": "assets/generated/realms/realm_soul.png",
-        "realm_ascension": "assets/generated/realms/realm_ascension.png",
-        "realm_immortal": "assets/generated/realms/realm_immortal.png"
-    },
-    "events": {
-        "event_breakthrough": "assets/generated/events/event_breakthrough.png",
-        "event_tribulation": "assets/generated/events/event_tribulation.png",
-        "event_death": "assets/generated/events/event_death.png",
-        "event_discovery": "assets/generated/events/event_discovery.png",
-        "event_war": "assets/generated/events/event_war.png",
-        "event_peace": "assets/generated/events/event_peace.png",
-        "event_disaster": "assets/generated/events/event_disaster.png",
-        "event_blessing": "assets/generated/events/event_blessing.png",
-        "event_visitor": "assets/generated/events/event_visitor.png",
-        "event_ascension": "assets/generated/events/event_ascension.png"
-    },
-    "ui_elements": {
-        "ui_panel_bg": "assets/generated/ui/ui_panel_bg.png",
-        "ui_divider": "assets/generated/ui/ui_divider.png"
-    },
-    "items": {
-        "item_spirit_stone": "assets/generated/items/item_spirit_stone.png",
-        "item_spirit_grass": "assets/generated/items/item_spirit_grass.png",
-        "item_ember_root": "assets/generated/items/item_ember_root.png",
-        "item_moonwell_lotus": "assets/generated/items/item_moonwell_lotus.png",
-        "item_iron_fungus": "assets/generated/items/item_iron_fungus.png",
-        "item_ginseng": "assets/generated/items/item_ginseng.png",
-        "item_pill": "assets/generated/items/item_pill.png",
-        "item_sword": "assets/generated/items/item_sword.png",
-        "item_scroll": "assets/generated/items/item_scroll.png",
-        "item_relic": "assets/generated/items/item_relic.png",
-        "item_ore": "assets/generated/items/item_ore.png",
-        "item_dried_herb": "assets/generated/items/item_dried_herb.png"
-    },
-    "regions": {
-        "region_central": "assets/generated/regions/region_central.png",
-        "region_northern": "assets/generated/regions/region_northern.png",
-        "region_southern": "assets/generated/regions/region_southern.png",
-        "region_eastern": "assets/generated/regions/region_eastern.png",
-        "region_western": "assets/generated/regions/region_western.png",
-        "region_spirit_vein": "assets/generated/regions/region_spirit_vein.png",
-        "region_demon_lands": "assets/generated/regions/region_demon_lands.png",
-        "region_celestial": "assets/generated/regions/region_celestial.png"
-    },
-    "missions": {
-        "mission_exploration": "assets/generated/missions/mission_exploration.png",
-        "mission_gathering": "assets/generated/missions/mission_gathering.png",
-        "mission_combat": "assets/generated/missions/mission_combat.png",
-        "mission_diplomacy": "assets/generated/missions/mission_diplomacy.png",
-        "mission_ruins": "assets/generated/missions/mission_ruins.png"
-    },
-    "loading": {
-        "loading_default": "assets/generated/loading/loading_default.png",
-        "loading_combat": "assets/generated/loading/loading_combat.png",
-        "loading_peaceful": "assets/generated/loading/loading_peaceful.png",
-        "loading_ominous": "assets/generated/loading/loading_ominous.png"
-    }
+  "backgrounds": {
+    "bg_main_menu": "assets/generated/backgrounds/bg_main_menu.jpg",
+    "bg_sect_base": "assets/map_background.jpg",
+    "bg_roster": "assets/generated/backgrounds/bg_roster.jpg",
+    "bg_world_map": "assets/generated/backgrounds/bg_world_map.jpg",
+    "bg_mission_assign": "assets/generated/backgrounds/bg_mission_assign.jpg",
+    "bg_mission_result": "assets/generated/backgrounds/bg_mission_result.jpg",
+    "bg_library": "assets/generated/backgrounds/bg_library.jpg",
+    "bg_factions": "assets/generated/backgrounds/bg_factions.jpg",
+    "bg_trade": "assets/generated/backgrounds/bg_trade.jpg",
+    "bg_tribulation": "assets/generated/backgrounds/bg_tribulation.jpg",
+    "bg_sect_creation": "assets/generated/backgrounds/bg_sect_creation.jpg"
+  },
+  "maps": {
+    "sect_map_base": "assets/generated/maps/sect_map_base.jpg"
+  },
+  "buildings": {
+    "bld_sect_hall": "assets/generated/buildings/bld_sect_hall.jpg",
+    "bld_dormitory": "assets/generated/buildings/bld_dormitory.jpg",
+    "bld_training_yard": "assets/generated/buildings/bld_training_yard.jpg",
+    "bld_spirit_garden": "assets/generated/buildings/bld_spirit_garden.jpg",
+    "bld_mission_board": "assets/generated/buildings/bld_mission_board.jpg",
+    "bld_library": "assets/generated/buildings/bld_library.jpg",
+    "bld_alchemy": "assets/generated/buildings/bld_alchemy.jpg",
+    "bld_forge": "assets/generated/buildings/bld_forge.jpg",
+    "bld_drying": "assets/generated/buildings/bld_drying.jpg",
+    "bld_storage": "assets/generated/buildings/bld_storage.jpg",
+    "bld_herb_garden": "assets/generated/buildings/bld_herb_garden.jpg",
+    "bld_greenhouse": "assets/generated/buildings/bld_greenhouse.jpg",
+    "bld_mine": "assets/generated/buildings/bld_mine.jpg"
+  },
+  "elements": {
+    "elem_metal": "assets/generated/elements/elem_metal.jpg",
+    "elem_wood": "assets/generated/elements/elem_wood.jpg",
+    "elem_water": "assets/generated/elements/elem_water.jpg",
+    "elem_fire": "assets/generated/elements/elem_fire.jpg",
+    "elem_earth": "assets/generated/elements/elem_earth.jpg"
+  },
+  "seasons": {
+    "season_spring": "assets/generated/seasons/season_spring.jpg",
+    "season_summer": "assets/generated/seasons/season_summer.jpg",
+    "season_autumn": "assets/generated/seasons/season_autumn.jpg",
+    "season_winter": "assets/generated/seasons/season_winter.jpg"
+  },
+  "factions": {
+    "faction_azure_cloud": "assets/generated/factions/faction_azure_cloud.jpg",
+    "faction_golden_merchant": "assets/generated/factions/faction_golden_merchant.jpg",
+    "faction_crimson_fang": "assets/generated/factions/faction_crimson_fang.jpg",
+    "faction_shadow_moon": "assets/generated/factions/faction_shadow_moon.jpg",
+    "faction_imperial": "assets/generated/factions/faction_imperial.jpg",
+    "faction_player": "assets/generated/factions/faction_player.jpg"
+  },
+  "realms": {
+    "realm_mortal": "assets/generated/realms/realm_mortal.jpg",
+    "realm_body": "assets/generated/realms/realm_body.jpg",
+    "realm_qi": "assets/generated/realms/realm_qi.jpg",
+    "realm_foundation": "assets/generated/realms/realm_foundation.jpg",
+    "realm_core": "assets/generated/realms/realm_core.jpg",
+    "realm_nascent": "assets/generated/realms/realm_nascent.jpg",
+    "realm_soul": "assets/generated/realms/realm_soul.jpg",
+    "realm_ascension": "assets/generated/realms/realm_ascension.jpg",
+    "realm_immortal": "assets/generated/realms/realm_immortal.jpg"
+  },
+  "events": {
+    "event_breakthrough": "assets/generated/events/event_breakthrough.jpg",
+    "event_tribulation": "assets/generated/events/event_tribulation.jpg",
+    "event_death": "assets/generated/events/event_death.jpg",
+    "event_discovery": "assets/generated/events/event_discovery.jpg",
+    "event_war": "assets/generated/events/event_war.jpg",
+    "event_peace": "assets/generated/events/event_peace.jpg",
+    "event_disaster": "assets/generated/events/event_disaster.jpg",
+    "event_blessing": "assets/generated/events/event_blessing.jpg",
+    "event_visitor": "assets/generated/events/event_visitor.jpg",
+    "event_ascension": "assets/generated/events/event_ascension.jpg"
+  },
+  "ui_elements": {
+    "ui_panel_bg": "assets/generated/ui/ui_panel_bg.jpg",
+    "ui_divider": "assets/generated/ui/ui_divider.jpg"
+  },
+  "items": {
+    "item_spirit_stone": "assets/generated/items/item_spirit_stone.jpg",
+    "item_spirit_grass": "assets/generated/items/item_spirit_grass.jpg",
+    "item_ember_root": "assets/generated/items/item_ember_root.jpg",
+    "item_moonwell_lotus": "assets/generated/items/item_moonwell_lotus.jpg",
+    "item_iron_fungus": "assets/generated/items/item_iron_fungus.jpg",
+    "item_ginseng": "assets/generated/items/item_ginseng.jpg",
+    "item_pill": "assets/generated/items/item_pill.jpg",
+    "item_sword": "assets/generated/items/item_sword.jpg",
+    "item_scroll": "assets/generated/items/item_scroll.jpg",
+    "item_relic": "assets/generated/items/item_relic.jpg",
+    "item_ore": "assets/generated/items/item_ore.jpg",
+    "item_dried_herb": "assets/generated/items/item_dried_herb.jpg"
+  },
+  "regions": {
+    "region_central": "assets/generated/regions/region_central.jpg",
+    "region_northern": "assets/generated/regions/region_northern.jpg",
+    "region_southern": "assets/generated/regions/region_southern.jpg",
+    "region_eastern": "assets/generated/regions/region_eastern.jpg",
+    "region_western": "assets/generated/regions/region_western.jpg",
+    "region_spirit_vein": "assets/generated/regions/region_spirit_vein.jpg",
+    "region_demon_lands": "assets/generated/regions/region_demon_lands.jpg",
+    "region_celestial": "assets/generated/regions/region_celestial.jpg"
+  },
+  "missions": {
+    "mission_exploration": "assets/generated/missions/mission_exploration.jpg",
+    "mission_gathering": "assets/generated/missions/mission_gathering.jpg",
+    "mission_combat": "assets/generated/missions/mission_combat.jpg",
+    "mission_diplomacy": "assets/generated/missions/mission_diplomacy.jpg",
+    "mission_ruins": "assets/generated/missions/mission_ruins.jpg"
+  }
 }
