@@ -1,0 +1,23 @@
+{
+  "title": "Heavenly Mandate",
+  "status": { "text": "Playable", "class": "playable" },
+  "canvas_rendering": "pixelated",
+  "about": [
+    "Manage a cultivation sect, train disciples, and guide them on dangerous missions in this systems-driven strategy RPG."
+  ],
+  "controls": [
+    { "key": "Mouse", "desc": "Interact" },
+    { "key": "WASD", "desc": "Pan Camera" },
+    { "key": "Space", "desc": "Pause" }
+  ],
+  "details": [
+    { "label": "Genre", "value": "Cultivation Strategy" },
+    { "label": "Engine", "value": "Macroquad" },
+    { "label": "Platform", "value": "Browser, Windows" }
+  ],
+  "download": {
+    "href": "cultivation_windows.zip",
+    "label": "Windows Build"
+  },
+  "repository": "https://github.com/Kalaith/cultivation"
+}
