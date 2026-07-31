@@ -25,10 +25,10 @@ Restore the sect's strength while keeping disciples alive, useful, and advancing
 ## Current Scope
 
 Playable sect-management foundation with base building, disciple growth, world missions, events, and faction simulation systems.
-# Practical Future Improvements
 
-- Add integration tests for roster details, roster modals, faction milestones, mission assignment, and mission resolution.
-- Validate world-map commands for scouting, travel, trade, tribulation, and site actions before mutating campaign state.
-- Centralize cultivation, crafting, herb, beast, and sect-building tuning into data fixtures with boundary tests.
-- Split sect-base map rendering from simulation updates so building details, crafting, and panels can share derived state safely.
+## Documentation
+
+- `gdd.md` — the game design document.
+- `TODO.md` — open work.
+- `wuxia-buildings.md` — the building-type reference `generate_prompts.py` reads to build art prompts.
 
