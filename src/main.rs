@@ -22,14 +22,16 @@ async fn main() {
 
     // Screenshot harness: when CULTIVATION_CAPTURE_PATH is set, seed a scene,
     // simulate deterministic frames, write a PNG, and exit.
-    if let Some(config) = capture::CaptureConfig::from_env("CULTIVATION") {
-        game.begin_capture_scene(&config.scene);
-        capture::run_capture(&config, |_dt| {
-            clear_background(Color::from_rgba(10, 10, 10, 255));
-            game.update();
-            game.draw();
-        })
-        .await;
+    if let Some(configs) = capture::CaptureConfig::all_from_env("CULTIVATION") {
+        for config in configs {
+            game.begin_capture_scene(&config.scene);
+            capture::run_capture_once(&config, |_dt| {
+                clear_background(Color::from_rgba(10, 10, 10, 255));
+                game.update();
+                game.draw();
+            })
+            .await;
+        }
         return;
     }
 
