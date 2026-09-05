@@ -12,8 +12,11 @@ use crate::data::{
     world_events::WorldEvent,
 };
 use crate::engine::world_sim::WorldSimBalance;
+use macroquad_toolkit::data_loader::JsonFallbackPolicy;
 #[cfg(target_arch = "wasm32")]
-use serde::de::DeserializeOwned;
+use macroquad_toolkit::data_loader::{load_json_file, load_json_file_with_fallback};
+#[cfg(not(target_arch = "wasm32"))]
+use macroquad_toolkit::data_loader::{load_json_file_sync, load_json_file_with_fallback_sync};
 
 #[derive(Clone)]
 pub struct GameData {
@@ -78,99 +81,128 @@ fn default_repair_cost() -> u32 {
     50
 }
 
+#[cfg(test)]
+mod tests;
+
 impl GameData {
+    #[cfg(not(target_arch = "wasm32"))]
     pub fn load() -> Result<Self, Box<dyn std::error::Error>> {
         // Buildings list starts empty - populated at runtime when player constructs
         let buildings: Vec<Building> = Vec::new();
 
         // Load building definitions (templates for what can be built)
-        let defs_json = std::fs::read_to_string("assets/data/buildings.json")?;
-        let defs_list: Vec<BuildingDefinition> = serde_json::from_str(&defs_json)?;
+        let defs_list: Vec<BuildingDefinition> = load_json_file_sync("assets/data/buildings.json")?;
         let building_definitions = defs_list
             .into_iter()
             .map(|d| (d.building_type.clone(), d))
             .collect();
 
-        let traits_json = std::fs::read_to_string("assets/data/fatetraits.json")?;
-        let fate_traits: Vec<FateTrait> = serde_json::from_str(&traits_json)?;
+        let fate_traits: Vec<FateTrait> = load_json_file_sync("assets/data/fatetraits.json")?;
 
-        let map_nodes_json = std::fs::read_to_string("assets/data/map_nodes.json")?;
-        let map_nodes: Vec<MapNode> = serde_json::from_str(&map_nodes_json)?;
+        let map_nodes: Vec<MapNode> = load_json_file_sync("assets/data/map_nodes.json")?;
 
-        let missions_json = std::fs::read_to_string("assets/data/missions.json")?;
-        let missions: Vec<Mission> = serde_json::from_str(&missions_json)?;
+        let missions: Vec<Mission> = load_json_file_sync("assets/data/missions.json")?;
 
-        let laws_json =
-            std::fs::read_to_string("assets/data/laws.json").unwrap_or_else(|_| "[]".to_string());
-        let laws_list: Vec<crate::data::laws::CultivationLaw> = serde_json::from_str(&laws_json)?;
+        let laws_list: Vec<crate::data::laws::CultivationLaw> = load_json_file_with_fallback_sync(
+            "assets/data/laws.json",
+            "[]",
+            JsonFallbackPolicy::ReadError,
+        )?;
         let laws = laws_list.into_iter().map(|l| (l.id.clone(), l)).collect();
 
-        let items_json =
-            std::fs::read_to_string("assets/data/items.json").unwrap_or_else(|_| "[]".to_string());
-        let items_list: Vec<crate::data::items::Item> = serde_json::from_str(&items_json)?;
+        let items_list: Vec<crate::data::items::Item> = load_json_file_with_fallback_sync(
+            "assets/data/items.json",
+            "[]",
+            JsonFallbackPolicy::ReadError,
+        )?;
         let items = items_list.into_iter().map(|i| (i.id.clone(), i)).collect();
 
-        let recipes_json = std::fs::read_to_string("assets/data/recipes.json")
-            .unwrap_or_else(|_| "[]".to_string());
-        let recipes: Vec<crate::data::items::Recipe> = serde_json::from_str(&recipes_json)?;
+        let recipes: Vec<crate::data::items::Recipe> = load_json_file_with_fallback_sync(
+            "assets/data/recipes.json",
+            "[]",
+            JsonFallbackPolicy::ReadError,
+        )?;
 
-        let techs_json =
-            std::fs::read_to_string("assets/data/tech.json").unwrap_or_else(|_| "[]".to_string());
-        let techs_list: Vec<crate::data::tech::Technology> = serde_json::from_str(&techs_json)?;
+        let techs_list: Vec<crate::data::tech::Technology> = load_json_file_with_fallback_sync(
+            "assets/data/tech.json",
+            "[]",
+            JsonFallbackPolicy::ReadError,
+        )?;
         let techs = techs_list.into_iter().map(|t| (t.id.clone(), t)).collect();
 
-        let stages_json =
-            std::fs::read_to_string("assets/data/stages.json").unwrap_or_else(|_| "[]".to_string());
-        let stages_list: Vec<StageDefinition> = serde_json::from_str(&stages_json)?;
+        let stages_list: Vec<StageDefinition> = load_json_file_with_fallback_sync(
+            "assets/data/stages.json",
+            "[]",
+            JsonFallbackPolicy::ReadError,
+        )?;
         let stages_order: Vec<String> = stages_list.iter().map(|s| s.id.clone()).collect();
         let stages = stages_list.into_iter().map(|s| (s.id.clone(), s)).collect();
 
-        let bloodlines_json = std::fs::read_to_string("assets/data/bloodlines.json")
-            .unwrap_or_else(|_| "[]".to_string());
-        let bloodlines_list: Vec<Bloodline> = serde_json::from_str(&bloodlines_json)?;
+        let bloodlines_list: Vec<Bloodline> = load_json_file_with_fallback_sync(
+            "assets/data/bloodlines.json",
+            "[]",
+            JsonFallbackPolicy::ReadError,
+        )?;
         let bloodlines = bloodlines_list
             .into_iter()
             .map(|b| (b.id.clone(), b))
             .collect();
 
-        let herbs_json =
-            std::fs::read_to_string("assets/data/herbs.json").unwrap_or_else(|_| "[]".to_string());
-        let herbs_list: Vec<Herb> = serde_json::from_str(&herbs_json)?;
+        let herbs_list: Vec<Herb> = load_json_file_with_fallback_sync(
+            "assets/data/herbs.json",
+            "[]",
+            JsonFallbackPolicy::ReadError,
+        )?;
         let herbs = herbs_list.into_iter().map(|h| (h.id.clone(), h)).collect();
 
         // Load faction data
-        let factions_json = std::fs::read_to_string("assets/data/factions.json")
-            .unwrap_or_else(|_| "[]".to_string());
-        let factions: Vec<Faction> = serde_json::from_str(&factions_json)?;
+        let factions: Vec<Faction> = load_json_file_with_fallback_sync(
+            "assets/data/factions.json",
+            "[]",
+            JsonFallbackPolicy::ReadError,
+        )?;
 
         // Load economy data
-        let economy_json = std::fs::read_to_string("assets/data/economy.json")
-            .unwrap_or_else(|_| r#"{"nodes":[],"routes":[]}"#.to_string());
-        let economy_data: EconomyData = serde_json::from_str(&economy_json)?;
+        let economy_data: EconomyData = load_json_file_with_fallback_sync(
+            "assets/data/economy.json",
+            r#"{"nodes":[],"routes":[]}"#,
+            JsonFallbackPolicy::ReadError,
+        )?;
 
         // Load world events
-        let events_json = std::fs::read_to_string("assets/data/world_events.json")
-            .unwrap_or_else(|_| "[]".to_string());
-        let world_events: Vec<WorldEvent> = serde_json::from_str(&events_json)?;
+        let world_events: Vec<WorldEvent> = load_json_file_with_fallback_sync(
+            "assets/data/world_events.json",
+            "[]",
+            JsonFallbackPolicy::ReadError,
+        )?;
 
         // Load balance configuration
-        let balance_json = std::fs::read_to_string("assets/data/balance.json")
-            .unwrap_or_else(|_| "{}".to_string());
-        let balance: WorldSimBalance = serde_json::from_str(&balance_json).unwrap_or_default();
+        let balance: WorldSimBalance = load_json_file_with_fallback_sync(
+            "assets/data/balance.json",
+            "{}",
+            JsonFallbackPolicy::ReadError,
+        )
+        .unwrap_or_default();
 
-        let ai_json = std::fs::read_to_string("assets/data/ai_scheduler.json")
-            .unwrap_or_else(|_| "{}".to_string());
-        let ai_scheduler: AiSchedulerTuning = serde_json::from_str(&ai_json).unwrap_or_default();
+        let ai_scheduler: AiSchedulerTuning = load_json_file_with_fallback_sync(
+            "assets/data/ai_scheduler.json",
+            "{}",
+            JsonFallbackPolicy::ReadError,
+        )
+        .unwrap_or_default();
 
-        let beasts_json = std::fs::read_to_string("assets/data/spirit_beasts.json")
-            .unwrap_or_else(|_| "[]".to_string());
-        let beasts_list: Vec<SpiritBeastDefinition> = serde_json::from_str(&beasts_json)?;
+        let beasts_list: Vec<SpiritBeastDefinition> = load_json_file_with_fallback_sync(
+            "assets/data/spirit_beasts.json",
+            "[]",
+            JsonFallbackPolicy::ReadError,
+        )?;
         let spirit_beast_definitions = beasts_list.into_iter().map(|b| (b.id.clone(), b)).collect();
 
-        let beast_equipment_json = std::fs::read_to_string("assets/data/beast_equipment.json")
-            .unwrap_or_else(|_| "[]".to_string());
-        let beast_equipment_list: Vec<BeastEquipmentItem> =
-            serde_json::from_str(&beast_equipment_json)?;
+        let beast_equipment_list: Vec<BeastEquipmentItem> = load_json_file_with_fallback_sync(
+            "assets/data/beast_equipment.json",
+            "[]",
+            JsonFallbackPolicy::ReadError,
+        )?;
         let beast_equipment_definitions = beast_equipment_list
             .into_iter()
             .map(|b| (b.id.clone(), b))
@@ -213,72 +245,126 @@ impl GameData {
             let buildings: Vec<Building> = Vec::new();
 
             let defs_list: Vec<BuildingDefinition> =
-                load_required_json("assets/data/buildings.json").await?;
+                load_json_file("assets/data/buildings.json").await?;
             let building_definitions = defs_list
                 .into_iter()
                 .map(|d| (d.building_type.clone(), d))
                 .collect();
 
-            let fate_traits: Vec<FateTrait> =
-                load_required_json("assets/data/fatetraits.json").await?;
-            let map_nodes: Vec<MapNode> = load_required_json("assets/data/map_nodes.json").await?;
-            let missions: Vec<Mission> = load_required_json("assets/data/missions.json").await?;
+            let fate_traits: Vec<FateTrait> = load_json_file("assets/data/fatetraits.json").await?;
+            let map_nodes: Vec<MapNode> = load_json_file("assets/data/map_nodes.json").await?;
+            let missions: Vec<Mission> = load_json_file("assets/data/missions.json").await?;
 
-            let laws_list: Vec<crate::data::laws::CultivationLaw> =
-                load_optional_json("assets/data/laws.json", "[]").await?;
+            let laws_list: Vec<crate::data::laws::CultivationLaw> = load_json_file_with_fallback(
+                "assets/data/laws.json",
+                "[]",
+                JsonFallbackPolicy::ReadOrParseError,
+            )
+            .await?;
             let laws = laws_list.into_iter().map(|l| (l.id.clone(), l)).collect();
 
-            let items_list: Vec<crate::data::items::Item> =
-                load_optional_json("assets/data/items.json", "[]").await?;
+            let items_list: Vec<crate::data::items::Item> = load_json_file_with_fallback(
+                "assets/data/items.json",
+                "[]",
+                JsonFallbackPolicy::ReadOrParseError,
+            )
+            .await?;
             let items = items_list.into_iter().map(|i| (i.id.clone(), i)).collect();
 
-            let recipes: Vec<crate::data::items::Recipe> =
-                load_optional_json("assets/data/recipes.json", "[]").await?;
+            let recipes: Vec<crate::data::items::Recipe> = load_json_file_with_fallback(
+                "assets/data/recipes.json",
+                "[]",
+                JsonFallbackPolicy::ReadOrParseError,
+            )
+            .await?;
 
-            let techs_list: Vec<crate::data::tech::Technology> =
-                load_optional_json("assets/data/tech.json", "[]").await?;
+            let techs_list: Vec<crate::data::tech::Technology> = load_json_file_with_fallback(
+                "assets/data/tech.json",
+                "[]",
+                JsonFallbackPolicy::ReadOrParseError,
+            )
+            .await?;
             let techs = techs_list.into_iter().map(|t| (t.id.clone(), t)).collect();
 
-            let stages_list: Vec<StageDefinition> =
-                load_optional_json("assets/data/stages.json", "[]").await?;
+            let stages_list: Vec<StageDefinition> = load_json_file_with_fallback(
+                "assets/data/stages.json",
+                "[]",
+                JsonFallbackPolicy::ReadOrParseError,
+            )
+            .await?;
             let stages_order: Vec<String> = stages_list.iter().map(|s| s.id.clone()).collect();
             let stages = stages_list.into_iter().map(|s| (s.id.clone(), s)).collect();
 
-            let bloodlines_list: Vec<Bloodline> =
-                load_optional_json("assets/data/bloodlines.json", "[]").await?;
+            let bloodlines_list: Vec<Bloodline> = load_json_file_with_fallback(
+                "assets/data/bloodlines.json",
+                "[]",
+                JsonFallbackPolicy::ReadOrParseError,
+            )
+            .await?;
             let bloodlines = bloodlines_list
                 .into_iter()
                 .map(|b| (b.id.clone(), b))
                 .collect();
 
-            let herbs_list: Vec<Herb> = load_optional_json("assets/data/herbs.json", "[]").await?;
+            let herbs_list: Vec<Herb> = load_json_file_with_fallback(
+                "assets/data/herbs.json",
+                "[]",
+                JsonFallbackPolicy::ReadOrParseError,
+            )
+            .await?;
             let herbs = herbs_list.into_iter().map(|h| (h.id.clone(), h)).collect();
 
-            let factions: Vec<Faction> =
-                load_optional_json("assets/data/factions.json", "[]").await?;
+            let factions: Vec<Faction> = load_json_file_with_fallback(
+                "assets/data/factions.json",
+                "[]",
+                JsonFallbackPolicy::ReadOrParseError,
+            )
+            .await?;
 
-            let economy_data: EconomyData =
-                load_optional_json("assets/data/economy.json", r#"{"nodes":[],"routes":[]}"#)
-                    .await?;
+            let economy_data: EconomyData = load_json_file_with_fallback(
+                "assets/data/economy.json",
+                r#"{"nodes":[],"routes":[]}"#,
+                JsonFallbackPolicy::ReadOrParseError,
+            )
+            .await?;
 
-            let world_events: Vec<WorldEvent> =
-                load_optional_json("assets/data/world_events.json", "[]").await?;
+            let world_events: Vec<WorldEvent> = load_json_file_with_fallback(
+                "assets/data/world_events.json",
+                "[]",
+                JsonFallbackPolicy::ReadOrParseError,
+            )
+            .await?;
 
-            let balance: WorldSimBalance = load_optional_json("assets/data/balance.json", "{}")
-                .await
-                .unwrap_or_default();
-            let ai_scheduler: AiSchedulerTuning =
-                load_optional_json("assets/data/ai_scheduler.json", "{}")
-                    .await
-                    .unwrap_or_default();
+            let balance: WorldSimBalance = load_json_file_with_fallback(
+                "assets/data/balance.json",
+                "{}",
+                JsonFallbackPolicy::ReadOrParseError,
+            )
+            .await
+            .unwrap_or_default();
+            let ai_scheduler: AiSchedulerTuning = load_json_file_with_fallback(
+                "assets/data/ai_scheduler.json",
+                "{}",
+                JsonFallbackPolicy::ReadOrParseError,
+            )
+            .await
+            .unwrap_or_default();
 
-            let beasts_list: Vec<SpiritBeastDefinition> =
-                load_optional_json("assets/data/spirit_beasts.json", "[]").await?;
+            let beasts_list: Vec<SpiritBeastDefinition> = load_json_file_with_fallback(
+                "assets/data/spirit_beasts.json",
+                "[]",
+                JsonFallbackPolicy::ReadOrParseError,
+            )
+            .await?;
             let spirit_beast_definitions =
                 beasts_list.into_iter().map(|b| (b.id.clone(), b)).collect();
 
-            let beast_equipment_list: Vec<BeastEquipmentItem> =
-                load_optional_json("assets/data/beast_equipment.json", "[]").await?;
+            let beast_equipment_list: Vec<BeastEquipmentItem> = load_json_file_with_fallback(
+                "assets/data/beast_equipment.json",
+                "[]",
+                JsonFallbackPolicy::ReadOrParseError,
+            )
+            .await?;
             let beast_equipment_definitions = beast_equipment_list
                 .into_iter()
                 .map(|b| (b.id.clone(), b))
@@ -308,29 +394,5 @@ impl GameData {
                 beast_equipment_definitions,
             })
         }
-    }
-}
-
-#[cfg(target_arch = "wasm32")]
-async fn load_required_json<T>(path: &str) -> Result<T, Box<dyn std::error::Error>>
-where
-    T: DeserializeOwned,
-{
-    macroquad_toolkit::data_loader::load_json_file(path)
-        .await
-        .map_err(|error| std::io::Error::new(std::io::ErrorKind::Other, error).into())
-}
-
-#[cfg(target_arch = "wasm32")]
-async fn load_optional_json<T>(
-    path: &str,
-    fallback_json: &str,
-) -> Result<T, Box<dyn std::error::Error>>
-where
-    T: DeserializeOwned,
-{
-    match macroquad_toolkit::data_loader::load_json_file(path).await {
-        Ok(value) => Ok(value),
-        Err(_) => serde_json::from_str(fallback_json).map_err(Into::into),
     }
 }
